@@ -27,7 +27,7 @@ function App() {
           <Route path="/transparency" element={<Transparency />} />
           <Route path="/track-impact" element={<TrackMyImpact />} />
           <Route path="/login" element={<UserAuth />} />
-          <Route path="/uhf-admin" element={<AdminLogin />} />
+          <Route path="/uhf-admin" element={<UserAuth />} />
           <Route 
             path="/uhf-admin/dashboard" 
             element={

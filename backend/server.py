@@ -481,6 +481,28 @@ async def user_register(user: UserRegister):
 
 @api_router.post("/auth/login")
 async def user_login(login: UserLogin):
+    # Check if this is an admin login
+    if login.email == ADMIN_EMAIL:
+        admin = await db.admin_users.find_one({"email": ADMIN_EMAIL}, {"_id": 0})
+        if not admin:
+            # First admin login - create admin record
+            hashed = bcrypt.hashpw(login.password.encode('utf-8'), bcrypt.gensalt())
+            admin_doc = {
+                "email": ADMIN_EMAIL,
+                "password": hashed.decode('utf-8'),
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            await db.admin_users.insert_one(admin_doc)
+            access_token = create_access_token(data={"sub": ADMIN_EMAIL, "role": "admin", "name": ADMIN_NAME})
+            return {"access_token": access_token, "token_type": "bearer", "user": {"name": ADMIN_NAME, "email": ADMIN_EMAIL, "role": "admin"}}
+        
+        if not bcrypt.checkpw(login.password.encode('utf-8'), admin.get('password', '').encode('utf-8')):
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+        access_token = create_access_token(data={"sub": ADMIN_EMAIL, "role": "admin", "name": ADMIN_NAME})
+        return {"access_token": access_token, "token_type": "bearer", "user": {"name": ADMIN_NAME, "email": ADMIN_EMAIL, "role": "admin"}}
+    
+    # Regular user login
     user = await db.users.find_one({"email": login.email}, {"_id": 0})
     if not user:
         raise HTTPException(status_code=401, detail="Invalid email or password")

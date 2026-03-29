@@ -32,11 +32,22 @@ const UserAuth = () => {
           email: form.email,
           password: form.password
         });
-        localStorage.setItem('uhf_user_token', response.data.access_token);
-        localStorage.setItem('uhf_user_data', JSON.stringify(response.data.user));
-        toast.success(`Welcome back, ${response.data.user.name}!`);
-        navigate('/');
-        window.location.reload();
+        const { access_token, user: userData } = response.data;
+        
+        if (userData.role === 'admin') {
+          localStorage.setItem('uhf_admin_token', access_token);
+          localStorage.setItem('uhf_user_token', access_token);
+          localStorage.setItem('uhf_user_data', JSON.stringify(userData));
+          toast.success(`Welcome back, ${userData.name}!`);
+          navigate('/uhf-admin/dashboard');
+          window.location.reload();
+        } else {
+          localStorage.setItem('uhf_user_token', access_token);
+          localStorage.setItem('uhf_user_data', JSON.stringify(userData));
+          toast.success(`Welcome back, ${userData.name}!`);
+          navigate('/');
+          window.location.reload();
+        }
       } else {
         if (!form.name || !form.email || !form.password) {
           toast.error('Please fill all required fields');

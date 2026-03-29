@@ -22,6 +22,8 @@ const Home = () => {
   });
   const [successStories, setSuccessStories] = useState([]);
   const [galleryImages, setGalleryImages] = useState([]);
+  const [siteAssets, setSiteAssets] = useState({});
+  const [pillars, setPillars] = useState([]);
 
   const statsRef = useRef(null);
   const heroRef = useRef(null);
@@ -54,9 +56,31 @@ const Home = () => {
       }
     };
 
+    const fetchSiteAssets = async () => {
+      try {
+        const response = await axios.get(`${API}/site-assets`);
+        const assetsMap = {};
+        (response.data.assets || []).forEach(a => { assetsMap[a.asset_key] = a.asset_url; });
+        setSiteAssets(assetsMap);
+      } catch (error) {
+        console.error('Failed to fetch site assets:', error);
+      }
+    };
+
+    const fetchPillars = async () => {
+      try {
+        const response = await axios.get(`${API}/pillars`);
+        setPillars(response.data);
+      } catch (error) {
+        console.error('Failed to fetch pillars:', error);
+      }
+    };
+
     fetchStats();
     fetchStories();
     fetchGallery();
+    fetchSiteAssets();
+    fetchPillars();
   }, []);
 
   useEffect(() => {
@@ -321,32 +345,57 @@ const Home = () => {
           <p className="text-center text-lg mb-16" style={{color: 'var(--text-muted)'}}>Ex-Government of India doctors dedicated to community service</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
-            <div className="text-center" data-testid="founder-rahul">
-              <div className="mb-6 overflow-hidden rounded">
-                <img 
-                  src="https://images.unsplash.com/photo-1698465281093-9f09159733b9?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MjJ8MHwxfHNlYXJjaHwyfHxpbmRpYW4lMjBkb2N0b3IlMjBwb3J0cmFpdHxlbnwwfHx8fDE3NzQ3NzkwNDN8MA&ixlib=rb-4.1.0&q=85"
-                  alt="Dr. Rahul Sarwade"
-                  className="w-full h-96 object-cover identity-lock"
-                />
+            {siteAssets.founder_1 && (
+              <div className="text-center" data-testid="founder-rahul">
+                <div className="mb-6 overflow-hidden rounded">
+                  <img 
+                    src={siteAssets.founder_1}
+                    alt="Dr. Rahul Sarwade"
+                    className="w-full h-96 object-cover identity-lock"
+                  />
+                </div>
+                <h3 className="text-2xl font-medium mb-2" style={{fontFamily: 'Cormorant Garamond, serif'}}>Dr. Rahul Sarwade</h3>
+                <p className="text-xs tracking-[0.2em] uppercase font-bold mb-3" style={{color: 'var(--accent-warm)'}}>Co-Founder</p>
+                <p className="text-sm leading-relaxed" style={{color: 'var(--text-muted)'}}>Former Government of India medical officer bringing decades of healthcare expertise to community service.</p>
               </div>
-              <h3 className="text-2xl font-medium mb-2" style={{fontFamily: 'Cormorant Garamond, serif'}}>Dr. Rahul Sarwade</h3>
-              <p className="text-xs tracking-[0.2em] uppercase font-bold mb-3" style={{color: 'var(--accent-warm)'}}>Co-Founder</p>
-              <p className="text-sm leading-relaxed" style={{color: 'var(--text-muted)'}}>Former Government of India medical officer bringing decades of healthcare expertise to community service.</p>
-            </div>
+            )}
 
-            <div className="text-center" data-testid="founder-jagruti">
-              <div className="mb-6 overflow-hidden rounded">
-                <img 
-                  src="https://images.pexels.com/photos/5738735/pexels-photo-5738735.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
-                  alt="Dr. Jagruti Hankare"
-                  className="w-full h-96 object-cover identity-lock"
-                />
+            {siteAssets.founder_2 && (
+              <div className="text-center" data-testid="founder-jagruti">
+                <div className="mb-6 overflow-hidden rounded">
+                  <img 
+                    src={siteAssets.founder_2}
+                    alt="Dr. Jagruti Hankare"
+                    className="w-full h-96 object-cover identity-lock"
+                  />
+                </div>
+                <h3 className="text-2xl font-medium mb-2" style={{fontFamily: 'Cormorant Garamond, serif'}}>Dr. Jagruti Hankare</h3>
+                <p className="text-xs tracking-[0.2em] uppercase font-bold mb-3" style={{color: 'var(--accent-warm)'}}>Co-Founder</p>
+                <p className="text-sm leading-relaxed" style={{color: 'var(--text-muted)'}}>Dedicated healthcare professional committed to improving quality of life for underserved communities.</p>
               </div>
-              <h3 className="text-2xl font-medium mb-2" style={{fontFamily: 'Cormorant Garamond, serif'}}>Dr. Jagruti Hankare</h3>
-              <p className="text-xs tracking-[0.2em] uppercase font-bold mb-3" style={{color: 'var(--accent-warm)'}}>Co-Founder</p>
-              <p className="text-sm leading-relaxed" style={{color: 'var(--text-muted)'}}>Dedicated healthcare professional committed to improving quality of life for underserved communities.</p>
-            </div>
+            )}
           </div>
+
+          {/* Team Pillars */}
+          {pillars.length > 0 && (
+            <div className="mt-16">
+              <h3 className="text-2xl font-medium text-center mb-10" style={{fontFamily: 'Cormorant Garamond, serif'}}>
+                Our <span className="text-gradient-orange">Pillars</span>
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                {pillars.map(pillar => (
+                  <div key={pillar.id} className="glass-morph p-6 rounded hover-lift text-center" data-testid={`pillar-${pillar.id}`}>
+                    {pillar.image_url && (
+                      <img src={pillar.image_url} alt={pillar.name} className="w-24 h-24 rounded-full mx-auto mb-4 object-cover identity-lock" />
+                    )}
+                    <h4 className="text-lg font-medium mb-1" style={{fontFamily: 'Cormorant Garamond, serif'}}>{pillar.name}</h4>
+                    <p className="text-xs tracking-[0.15em] uppercase font-bold mb-2" style={{color: 'var(--accent-teal)'}}>{pillar.role}</p>
+                    {pillar.specialty && <p className="text-xs" style={{color: 'var(--text-muted)'}}>{pillar.specialty}</p>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 

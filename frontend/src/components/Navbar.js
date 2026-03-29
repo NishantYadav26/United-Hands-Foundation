@@ -24,6 +24,7 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem('uhf_user_token');
     localStorage.removeItem('uhf_user_data');
+    localStorage.removeItem('uhf_admin_token');
     setUser(null);
     navigate('/');
   };

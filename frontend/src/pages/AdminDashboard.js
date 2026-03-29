@@ -28,8 +28,10 @@ const AdminDashboard = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('uhf_admin_token');
+    localStorage.removeItem('uhf_user_token');
+    localStorage.removeItem('uhf_user_data');
     toast.success('Logged out successfully');
-    navigate('/uhf-admin');
+    navigate('/login');
   };
 
   const fetchDonations = async () => {
