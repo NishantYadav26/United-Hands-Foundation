@@ -34,7 +34,8 @@ ALGORITHM = 'HS256'
 ACCESS_TOKEN_EXPIRE_MINUTES = 480  # 8 hours
 
 # Admin email (only this email can access admin)
-ADMIN_EMAIL = 'unitedhandsfoundation4@gmail.com'
+ADMIN_EMAIL = 'avdhut456@gmail.com'
+ADMIN_NAME = 'Omkar'
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
@@ -243,6 +244,30 @@ class SiteAssetUpdate(BaseModel):
     asset_url: str
     asset_name: str
     description: Optional[str] = None
+
+class Pillar(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    role: str
+    bio_brief: str
+    bio_detailed: str
+    specialty: str
+    image_url: str
+    category: str  # President, Founder, Team
+    display_priority: int = 0
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class PillarCreate(BaseModel):
+    name: str
+    role: str
+    bio_brief: str
+    bio_detailed: str
+    specialty: str
+    image_url: str
+    category: str
+    display_priority: int = 0
 
 # ===== HELPER FUNCTIONS =====
 
@@ -794,6 +819,91 @@ async def seed_site_assets():
         )
     
     return {"status": "success", "message": f"Seeded {len(default_assets)} default assets"}
+
+# Team Pillars Management
+@api_router.get("/pillars", response_model=List[Pillar])
+async def get_pillars():
+    """Get all team pillars"""
+    pillars = await db.pillars.find({}, {"_id": 0}).sort("display_priority", 1).to_list(1000)
+    
+    for pillar in pillars:
+        if isinstance(pillar.get('created_at'), str):
+            pillar['created_at'] = datetime.fromisoformat(pillar['created_at'])
+    
+    return pillars
+
+@api_router.post("/pillars", response_model=Pillar)
+async def create_pillar(pillar: PillarCreate, admin_email: str = Depends(verify_token)):
+    """Create a new pillar"""
+    pillar_obj = Pillar(**pillar.model_dump())
+    doc = pillar_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    
+    await db.pillars.insert_one(doc)
+    return pillar_obj
+
+@api_router.put("/pillars/{pillar_id}")
+async def update_pillar(pillar_id: str, pillar: PillarCreate, admin_email: str = Depends(verify_token)):
+    """Update a pillar"""
+    await db.pillars.update_one(
+        {"id": pillar_id},
+        {"$set": pillar.model_dump()}
+    )
+    return {"status": "success", "message": "Pillar updated"}
+
+@api_router.delete("/pillars/{pillar_id}")
+async def delete_pillar(pillar_id: str, admin_email: str = Depends(verify_token)):
+    """Delete a pillar"""
+    result = await db.pillars.delete_one({"id": pillar_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Pillar not found")
+    return {"status": "success", "message": "Pillar deleted"}
+
+@api_router.post("/seed/pillars")
+async def seed_pillars():
+    """Seed default team pillars"""
+    default_pillars = [
+        {
+            "name": "Dr. Rahul Sarwade",
+            "role": "President",
+            "bio_brief": "Former Government of India medical officer leading strategic vision",
+            "bio_detailed": "As the President of UHF, Dr. Rahul Sarwade provides the strategic vision that transforms clinical medicine into a community movement. He specializes in building institutional partnerships that ensure long-term sustainability for our 5 Pillars of Impact.",
+            "specialty": "Humanitarian Vision & Strategic Governance",
+            "image_url": "",
+            "category": "President",
+            "display_priority": 1
+        },
+        {
+            "name": "Dr. Jagruti Hankare",
+            "role": "Co-Founder & Chief Medical Officer",
+            "bio_brief": "Dedicated healthcare professional leading Vayorang elderly care",
+            "bio_detailed": "A dedicated medical practitioner leading our Vayorang elderly care initiative. Dr. Jagruti ensures that every medical camp is executed with clinical precision and deep empathy for the marginalized.",
+            "specialty": "Geriatric Care & Rural Health Outreach",
+            "image_url": "",
+            "category": "Founder",
+            "display_priority": 2
+        },
+        {
+            "name": "Field Operations Team",
+            "role": "Our Ground Force",
+            "bio_brief": "Community support and distribution across Maharashtra",
+            "bio_detailed": "The heartbeat of UHF. Our team members manage the day-to-day operations in the field—from Latur to Solapur—ensuring relief reaches the last person in line.",
+            "specialty": "Community Support & Distribution",
+            "image_url": "https://customer-assets.emergentagent.com/job_hands-omni-platform/artifacts/p87903ja_WhatsApp%20Image%202026-03-29%20at%2014.49.29.jpeg",
+            "category": "Team",
+            "display_priority": 3
+        }
+    ]
+    
+    await db.pillars.delete_many({})
+    
+    for pillar_data in default_pillars:
+        pillar_obj = Pillar(**pillar_data)
+        doc = pillar_obj.model_dump()
+        doc['created_at'] = doc['created_at'].isoformat()
+        await db.pillars.insert_one(doc)
+    
+    return {"status": "success", "message": f"Seeded {len(default_pillars)} default pillars"}
 
 @api_router.get("/stats")
 async def get_stats():
