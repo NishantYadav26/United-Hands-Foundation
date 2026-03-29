@@ -1,27 +1,53 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Upload, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { useSearchParams } from 'react-router-dom';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 const Donate = () => {
+  const [searchParams] = useSearchParams();
+  const preSelectedProjectId = searchParams.get('project');
+  
+  const [projects, setProjects] = useState([]);
   const [formData, setFormData] = useState({
     donor_name: '',
     donor_email: '',
     donor_phone: '',
     donor_pan: '',
     amount: '',
-    utr_number: ''
+    utr_number: '',
+    project_id: preSelectedProjectId || ''
   });
   const [screenshot, setScreenshot] = useState(null);
   const [screenshotPreview, setScreenshotPreview] = useState('');
-  const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      const response = await axios.get(`${API}/projects?active_only=true`);
+      setProjects(response.data);
+    } catch (error) {
+      console.error('Failed to fetch projects:', error);
+    }
+  };
+
+  const generateUPIIntent = () => {
+    const upiId = 'unitedhands@upi';
+    const name = 'United Hands Foundation';
+    const amount = formData.amount || '500';
+    
+    return `upi://pay?pa=${upiId}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR`;
+  };
 
   const handleInputChange = (e) => {
     setFormData({
@@ -34,33 +60,8 @@ const Donate = () => {
     const file = e.target.files[0];
     if (file) {
       setScreenshot(file);
+      // Create local preview without Cloudinary
       setScreenshotPreview(URL.createObjectURL(file));
-    }
-  };
-
-  const uploadToCloudinary = async (file) => {
-    try {
-      // Get signature from backend
-      const sigResponse = await axios.get(`${API}/cloudinary/signature?resource_type=image&folder=donations`);
-      const { signature, timestamp, cloud_name, api_key, folder } = sigResponse.data;
-
-      // Upload to Cloudinary
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('api_key', api_key);
-      formData.append('timestamp', timestamp);
-      formData.append('signature', signature);
-      formData.append('folder', folder);
-
-      const uploadResponse = await axios.post(
-        `https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,
-        formData
-      );
-
-      return uploadResponse.data.secure_url;
-    } catch (error) {
-      console.error('Cloudinary upload failed:', error);
-      throw error;
     }
   };
 
@@ -75,41 +76,44 @@ const Donate = () => {
     setSubmitting(true);
 
     try {
-      // Upload screenshot
-      setUploading(true);
-      const screenshotUrl = await uploadToCloudinary(screenshot);
-      setUploading(false);
-
-      // Submit donation
-      await axios.post(`${API}/donations`, {
-        ...formData,
-        amount: parseInt(formData.amount),
-        screenshot_url: screenshotUrl
-      });
-
-      setSubmitted(true);
-      toast.success('Donation submitted successfully! We will review and send your 80G receipt.');
-      
-      // Reset form
-      setTimeout(() => {
-        setFormData({
-          donor_name: '',
-          donor_email: '',
-          donor_phone: '',
-          donor_pan: '',
-          amount: '',
-          utr_number: ''
+      // MOCK: Convert file to base64 for storage
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64Screenshot = reader.result;
+        
+        // Submit donation with base64 screenshot (MOCK)
+        await axios.post(`${API}/donations`, {
+          ...formData,
+          amount: parseInt(formData.amount),
+          screenshot_url: base64Screenshot // In production, this would be Cloudinary URL
         });
-        setScreenshot(null);
-        setScreenshotPreview('');
-        setSubmitted(false);
-      }, 3000);
+
+        setSubmitted(true);
+        toast.success('Donation submitted successfully! We will review and send your 80G receipt.');
+        
+        // Reset form
+        setTimeout(() => {
+          setFormData({
+            donor_name: '',
+            donor_email: '',
+            donor_phone: '',
+            donor_pan: '',
+            amount: '',
+            utr_number: '',
+            project_id: preSelectedProjectId || ''
+          });
+          setScreenshot(null);
+          setScreenshotPreview('');
+          setSubmitted(false);
+        }, 3000);
+      };
+      
+      reader.readAsDataURL(screenshot);
     } catch (error) {
       console.error('Donation submission failed:', error);
       toast.error('Failed to submit donation. Please try again.');
     } finally {
       setSubmitting(false);
-      setUploading(false);
     }
   };
 
@@ -148,7 +152,18 @@ const Donate = () => {
                     {/* Placeholder QR Code */}
                     <span className="text-gray-400 text-sm">UPI QR Code</span>
                   </div>
-                  <p className="text-gray-600 text-sm font-mono">UPI: unitedhands@upi</p>
+                  <p className="text-gray-600 text-sm font-mono mb-4">UPI: unitedhands@upi</p>
+                  
+                  {/* UPI Intent Button */}
+                  {formData.amount && (
+                    <a
+                      href={generateUPIIntent()}
+                      className="inline-block bg-[#D4AF37] hover:bg-[#E5C047] text-[#1A1A1A] px-6 py-3 rounded font-semibold text-sm transition-colors"
+                      data-testid="upi-intent-btn"
+                    >
+                      Pay ₹{formData.amount} via UPI
+                    </a>
+                  )}
                 </div>
               </div>
 
@@ -189,6 +204,27 @@ const Donate = () => {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  <div>
+                    <label className="block text-[#D4AF37] text-xs tracking-[0.2em] uppercase font-bold mb-3">
+                      Select Cause *
+                    </label>
+                    <select
+                      name="project_id"
+                      value={formData.project_id}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full bg-[#27272A] border border-[#D4AF37]/20 rounded px-4 py-3 text-[#F5F5F7] focus:outline-none focus:border-[#D4AF37]"
+                      data-testid="select-project"
+                    >
+                      <option value="">General Fund</option>
+                      {projects.map((project) => (
+                        <option key={project.id} value={project.id}>
+                          {project.title} ({project.category})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
                   <div>
                     <label className="block text-[#D4AF37] text-xs tracking-[0.2em] uppercase font-bold mb-3">
                       Full Name *
@@ -319,14 +355,14 @@ const Donate = () => {
 
                   <button
                     type="submit"
-                    disabled={submitting || uploading}
+                    disabled={submitting}
                     className="btn-gold w-full flex items-center justify-center gap-3"
                     data-testid="submit-donation-btn"
                   >
-                    {(submitting || uploading) ? (
+                    {submitting ? (
                       <>
                         <Loader2 className="animate-spin" size={20} />
-                        {uploading ? 'Uploading...' : 'Submitting...'}
+                        Submitting...
                       </>
                     ) : (
                       'Submit Donation'

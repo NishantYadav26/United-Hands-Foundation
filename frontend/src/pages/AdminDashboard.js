@@ -11,6 +11,7 @@ const API = `${BACKEND_URL}/api`;
 
 const AdminDashboard = () => {
   const [donations, setDonations] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [settings, setSettings] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('donations');
@@ -18,6 +19,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     fetchDonations();
     fetchSettings();
+    fetchProjects();
   }, []);
 
   const fetchDonations = async () => {
@@ -32,12 +34,32 @@ const AdminDashboard = () => {
     }
   };
 
+  const fetchProjects = async () => {
+    try {
+      const response = await axios.get(`${API}/projects`);
+      setProjects(response.data);
+    } catch (error) {
+      console.error('Failed to fetch projects:', error);
+    }
+  };
+
   const fetchSettings = async () => {
     try {
       const response = await axios.get(`${API}/admin/settings`);
       setSettings(response.data);
     } catch (error) {
       console.error('Failed to fetch settings:', error);
+    }
+  };
+
+  const handleSeedProjects = async () => {
+    try {
+      await axios.post(`${API}/seed/projects`);
+      toast.success('Default projects created successfully!');
+      fetchProjects();
+    } catch (error) {
+      console.error('Failed to seed projects:', error);
+      toast.error('Failed to create projects');
     }
   };
 
@@ -140,6 +162,15 @@ const AdminDashboard = () => {
               Donations
             </button>
             <button
+              onClick={() => setActiveTab('projects')}
+              className={`pb-4 px-6 text-sm font-semibold tracking-[0.1em] uppercase transition-colors ${
+                activeTab === 'projects' ? 'text-[#D4AF37] border-b-2 border-[#D4AF37]' : 'text-[#A1A1AA]'
+              }`}
+              data-testid="tab-projects"
+            >
+              Projects
+            </button>
+            <button
               onClick={() => setActiveTab('settings')}
               className={`pb-4 px-6 text-sm font-semibold tracking-[0.1em] uppercase transition-colors ${
                 activeTab === 'settings' ? 'text-[#D4AF37] border-b-2 border-[#D4AF37]' : 'text-[#A1A1AA]'
@@ -219,6 +250,86 @@ const AdminDashboard = () => {
                       ))}
                     </tbody>
                   </table>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'projects' && (
+            <div className="glass-morph p-8 rounded" data-testid="projects-panel">
+              <div className="flex justify-between items-center mb-8">
+                <h2 
+                  className="text-3xl font-medium"
+                  style={{fontFamily: 'Cormorant Garamond, serif'}}
+                >
+                  Projects Management
+                </h2>
+                <button
+                  onClick={handleSeedProjects}
+                  className="btn-gold"
+                  data-testid="seed-projects-btn"
+                >
+                  Seed Default Projects
+                </button>
+              </div>
+
+              {projects.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-[#A1A1AA] mb-4">No projects yet</p>
+                  <button onClick={handleSeedProjects} className="btn-gold">
+                    Create Default Projects
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {projects.map((project) => {
+                    const progress = Math.min((project.raised_amount / project.target_amount) * 100, 100);
+                    
+                    return (
+                      <div 
+                        key={project.id}
+                        className="bg-[#27272A] border border-[#D4AF37]/20 p-6 rounded"
+                        data-testid={`project-card-${project.id}`}
+                      >
+                        <div className="flex items-start justify-between mb-4">
+                          <div>
+                            <h3 className="text-xl font-medium text-[#F5F5F7] mb-1" style={{fontFamily: 'Cormorant Garamond, serif'}}>
+                              {project.title}
+                            </h3>
+                            <span className="text-[#D4AF37] text-xs tracking-[0.2em] uppercase font-bold">
+                              {project.category}
+                            </span>
+                          </div>
+                          <span className={`px-3 py-1 rounded text-xs font-semibold ${
+                            project.is_active ? 'bg-green-900/20 text-green-400' : 'bg-gray-900/20 text-gray-400'
+                          }`}>
+                            {project.is_active ? 'Active' : 'Inactive'}
+                          </span>
+                        </div>
+
+                        <p className="text-[#A1A1AA] text-sm mb-4 line-clamp-2">
+                          {project.description}
+                        </p>
+
+                        <div className="mb-4">
+                          <div className="flex justify-between text-sm mb-2">
+                            <span className="text-[#A1A1AA]">
+                              ₹{project.raised_amount.toLocaleString()} / ₹{project.target_amount.toLocaleString()}
+                            </span>
+                            <span className="text-[#D4AF37] font-semibold">
+                              {progress.toFixed(0)}%
+                            </span>
+                          </div>
+                          <div className="w-full bg-[#1A1A1A] rounded-full h-2 overflow-hidden">
+                            <div 
+                              className="bg-gradient-to-r from-[#D4AF37] to-[#E5C047] h-full"
+                              style={{width: `${progress}%`}}
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>

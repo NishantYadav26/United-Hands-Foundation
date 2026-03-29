@@ -70,6 +70,7 @@ class DonationCreate(BaseModel):
     utr_number: str
     screenshot_url: str
     payment_mode: str = "manual_qr"
+    project_id: Optional[str] = None  # For multi-cause donations
 
 class Donation(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -83,6 +84,8 @@ class Donation(BaseModel):
     utr_number: str
     screenshot_url: str
     payment_mode: str = "manual_qr"
+    project_id: Optional[str] = None
+    project_title: Optional[str] = None
     status: str = "pending"  # pending, approved, rejected
     receipt_number: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -135,6 +138,27 @@ class PressMediaCreate(BaseModel):
     year: str
     image_url: str
 
+class Project(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    category: str  # Elderly, Education, Health, Disaster Relief
+    description: str
+    hero_image: str
+    target_amount: int
+    raised_amount: int = 0
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ProjectCreate(BaseModel):
+    title: str
+    category: str
+    description: str
+    hero_image: str
+    target_amount: int
+    is_active: bool = True
+
 # ===== HELPER FUNCTIONS =====
 
 async def generate_receipt_number():
@@ -144,7 +168,7 @@ async def generate_receipt_number():
     return f"UHF-80G-{year}-{count + 1:04d}"
 
 def create_80g_receipt_pdf(donation: dict, receipt_number: str) -> BytesIO:
-    """Generate 80G compliant PDF receipt"""
+    """Generate 80G compliant PDF receipt with real legal data"""
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=letter)
     width, height = letter
@@ -153,16 +177,21 @@ def create_80g_receipt_pdf(donation: dict, receipt_number: str) -> BytesIO:
     c.setFont("Helvetica-Bold", 20)
     c.drawString(100, height - 80, "United Hands Foundation")
     c.setFont("Helvetica", 10)
-    c.drawString(100, height - 100, "Est. 2020 | Vayorang Elderly Care Program")
-    c.drawString(100, height - 115, "Registered under Section 80G & 12A")
+    c.drawString(100, height - 100, "TA JI LATUR | Est. 2020 | Vayorang Elderly Care Program")
+    c.drawString(100, height - 115, "New Bhagya Nagar, Ring Road, Latur, Maharashtra - 413512")
+    
+    # Legal Details
+    c.setFont("Helvetica-Bold", 9)
+    c.drawString(100, height - 135, "PAN: AABTU0797K | 12A: AABTU0797KE20231 | 80G: AABTU0797KF20231")
+    c.drawString(100, height - 150, "Societies Reg: Latur/0000171/2020 | Registered: 04/08/2020")
     
     # Receipt Number
     c.setFont("Helvetica-Bold", 12)
-    c.drawString(100, height - 150, f"Receipt No: {receipt_number}")
+    c.drawString(100, height - 180, f"Receipt No: {receipt_number}")
     
     # Donation Details
     c.setFont("Helvetica", 11)
-    y_position = height - 190
+    y_position = height - 220
     c.drawString(100, y_position, f"Donor Name: {donation['donor_name']}")
     y_position -= 20
     c.drawString(100, y_position, f"Email: {donation['donor_email']}")
@@ -175,6 +204,12 @@ def create_80g_receipt_pdf(donation: dict, receipt_number: str) -> BytesIO:
     y_position -= 20
     c.drawString(100, y_position, f"UTR: {donation['utr_number']}")
     y_position -= 20
+    
+    # Add project/cause if present
+    if donation.get('project_title'):
+        c.drawString(100, y_position, f"Donated to: {donation['project_title']}")
+        y_position -= 20
+    
     c.drawString(100, y_position, f"Date: {datetime.now().strftime('%d %B %Y')}")
     
     # 80G Declaration
@@ -185,11 +220,14 @@ def create_80g_receipt_pdf(donation: dict, receipt_number: str) -> BytesIO:
     y_position -= 20
     c.drawString(100, y_position, "This donation is eligible for 50% tax deduction under Section 80G of the Income Tax Act, 1961.")
     y_position -= 15
-    c.drawString(100, y_position, "PAN: XXXXXXXXXXXXXX | Registration No: XXXXXX")
+    c.drawString(100, y_position, "80G Registration: AABTU0797KF20231 (Valid up to AY 2026-27)")
+    y_position -= 15
+    c.drawString(100, y_position, "12A Registration: AABTU0797KE20231 (Provisional)")
     
     # Footer
     c.setFont("Helvetica-Oblique", 8)
     c.drawString(100, 50, "Thank you for your generous contribution to United Hands Foundation.")
+    c.drawString(100, 35, "For queries: contact@unitedhands.org | www.unitedhands.org")
     
     c.save()
     buffer.seek(0)
@@ -272,6 +310,13 @@ async def generate_cloudinary_signature(resource_type: str = "image", folder: st
 async def create_donation(donation: DonationCreate):
     """Create a new donation"""
     donation_obj = Donation(**donation.model_dump())
+    
+    # If project_id provided, fetch project title
+    if donation.project_id:
+        project = await db.projects.find_one({"id": donation.project_id}, {"_id": 0})
+        if project:
+            donation_obj.project_title = project['title']
+    
     doc = donation_obj.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
     
@@ -311,25 +356,26 @@ async def approve_donation(approval: DonationApproval):
             {"$set": {"status": "approved", "receipt_number": receipt_number}}
         )
         
+        # Update project raised amount if applicable
+        if donation.get('project_id'):
+            await db.projects.update_one(
+                {"id": donation['project_id']},
+                {"$inc": {"raised_amount": donation['amount']}}
+            )
+        
         # Generate PDF
         pdf_buffer = create_80g_receipt_pdf(donation, receipt_number)
         
-        # Send email
-        try:
-            await send_receipt_email(
-                donation['donor_email'],
-                donation['donor_name'],
-                receipt_number,
-                pdf_buffer
-            )
-        except Exception as e:
-            logger.error(f"Email sending failed: {str(e)}")
-            # Continue even if email fails
+        # MOCK EMAIL: Log instead of sending
+        logger.info(f"[MOCK EMAIL] 80G Receipt would be sent to: {donation['donor_email']}")
+        logger.info(f"[MOCK EMAIL] Receipt Number: {receipt_number}")
+        logger.info(f"[MOCK EMAIL] Amount: ₹{donation['amount']}")
         
         return {
             "status": "success",
-            "message": "Donation approved and receipt sent",
-            "receipt_number": receipt_number
+            "message": "Donation approved and receipt generated (MOCK: Email sending disabled)",
+            "receipt_number": receipt_number,
+            "mock_email_sent_to": donation['donor_email']
         }
     else:
         await db.donations.update_one(
@@ -337,6 +383,25 @@ async def approve_donation(approval: DonationApproval):
             {"$set": {"status": "rejected"}}
         )
         return {"status": "success", "message": "Donation rejected"}
+
+@api_router.get("/donations/{donation_id}/receipt")
+async def download_receipt(donation_id: str):
+    """Download 80G receipt PDF"""
+    donation = await db.donations.find_one({"id": donation_id}, {"_id": 0})
+    
+    if not donation:
+        raise HTTPException(status_code=404, detail="Donation not found")
+    
+    if donation['status'] != 'approved' or not donation.get('receipt_number'):
+        raise HTTPException(status_code=400, detail="Receipt not available")
+    
+    pdf_buffer = create_80g_receipt_pdf(donation, donation['receipt_number'])
+    
+    return FileResponse(
+        path=pdf_buffer,
+        media_type='application/pdf',
+        filename=f"Receipt_{donation['receipt_number']}.pdf"
+    )
 
 # Admin settings
 @api_router.get("/admin/settings", response_model=AdminSettings)
@@ -463,6 +528,62 @@ async def get_press_media(district: Optional[str] = None, year: Optional[str] = 
     
     return media
 
+# Projects/Causes Management
+@api_router.post("/projects", response_model=Project)
+async def create_project(project: ProjectCreate):
+    """Create a new project/cause"""
+    project_obj = Project(**project.model_dump())
+    doc = project_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    
+    await db.projects.insert_one(doc)
+    return project_obj
+
+@api_router.get("/projects", response_model=List[Project])
+async def get_projects(active_only: bool = False):
+    """Get all projects"""
+    query = {}
+    if active_only:
+        query["is_active"] = True
+    
+    projects = await db.projects.find(query, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    
+    for project in projects:
+        if isinstance(project['created_at'], str):
+            project['created_at'] = datetime.fromisoformat(project['created_at'])
+    
+    return projects
+
+@api_router.get("/projects/{project_id}", response_model=Project)
+async def get_project(project_id: str):
+    """Get single project"""
+    project = await db.projects.find_one({"id": project_id}, {"_id": 0})
+    
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    
+    if isinstance(project['created_at'], str):
+        project['created_at'] = datetime.fromisoformat(project['created_at'])
+    
+    return Project(**project)
+
+@api_router.put("/projects/{project_id}")
+async def update_project(project_id: str, project: ProjectCreate):
+    """Update a project"""
+    await db.projects.update_one(
+        {"id": project_id},
+        {"$set": project.model_dump()}
+    )
+    return {"status": "success", "message": "Project updated"}
+
+@api_router.delete("/projects/{project_id}")
+async def delete_project(project_id: str):
+    """Delete a project"""
+    result = await db.projects.delete_one({"id": project_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Project not found")
+    return {"status": "success", "message": "Project deleted"}
+
 # Stats endpoint
 @api_router.get("/stats")
 async def get_stats():
@@ -480,6 +601,70 @@ async def get_stats():
         "total_donations": total_donations,
         "total_amount": total_amount
     }
+
+# Seed default projects
+@api_router.post("/seed/projects")
+async def seed_projects():
+    """Seed default projects for testing"""
+    default_projects = [
+        {
+            "title": "Vayorang Elderly Care",
+            "category": "Elderly",
+            "description": "Comprehensive geriatric daycare program providing medical care, companionship, and dignity to senior citizens across Maharashtra.",
+            "hero_image": "https://images.unsplash.com/photo-1752084794888-0b27a762b6fd?w=1200&q=85",
+            "target_amount": 500000,
+            "raised_amount": 0,
+            "is_active": True
+        },
+        {
+            "title": "Child Education Support",
+            "category": "Education",
+            "description": "Providing quality education, books, and learning materials to underprivileged children in rural Maharashtra.",
+            "hero_image": "https://images.unsplash.com/photo-1497486751825-1233686d5d80?w=1200&q=85",
+            "target_amount": 300000,
+            "raised_amount": 0,
+            "is_active": True
+        },
+        {
+            "title": "Healthcare for All",
+            "category": "Health",
+            "description": "Mobile medical camps and health checkups for communities with limited access to healthcare facilities.",
+            "hero_image": "https://images.unsplash.com/photo-1584362917165-526a968579e8?w=1200&q=85",
+            "target_amount": 400000,
+            "raised_amount": 0,
+            "is_active": True
+        },
+        {
+            "title": "Disaster Relief Fund",
+            "category": "Disaster Relief",
+            "description": "Emergency response and relief for communities affected by natural disasters across Maharashtra.",
+            "hero_image": "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=1200&q=85",
+            "target_amount": 1000000,
+            "raised_amount": 0,
+            "is_active": True
+        },
+        {
+            "title": "General Fund",
+            "category": "General",
+            "description": "Support our overall mission and operations to continue serving communities across all our programs.",
+            "hero_image": "https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=1200&q=85",
+            "target_amount": 200000,
+            "raised_amount": 0,
+            "is_active": True
+        }
+    ]
+    
+    # Clear existing projects
+    await db.projects.delete_many({})
+    
+    # Insert default projects
+    for proj_data in default_projects:
+        project_obj = Project(**proj_data)
+        doc = project_obj.model_dump()
+        doc['created_at'] = doc['created_at'].isoformat()
+        await db.projects.insert_one(doc)
+    
+    return {"status": "success", "message": f"Seeded {len(default_projects)} default projects"}
 
 # Include router
 app.include_router(api_router)

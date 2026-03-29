@@ -48,9 +48,20 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-[#D4AF37]/20 mt-12 pt-8 text-center">
-          <p className="text-[#A1A1AA] text-sm">
-            © {new Date().getFullYear()} United Hands Foundation. Registered under Section 80G & 12A. All rights reserved.
+        <div className="border-t border-[#D4AF37]/20 mt-12 pt-8\">
+          <div className="text-center mb-4">
+            <p className="text-[#F5F5F7] text-sm font-semibold mb-2">
+              PAN: AABTU0797K | 80G: AABTU0797KF20231 | 12A: AABTU0797KE20231
+            </p>
+            <p className="text-[#A1A1AA] text-xs">
+              Societies Reg: Latur/0000171/2020 | Registered: 04/08/2020
+            </p>
+          </div>
+          <p className="text-[#A1A1AA] text-sm text-center">
+            © {new Date().getFullYear()} United Hands Foundation TA JI LATUR. Registered under Section 80G & 12A. All rights reserved.
+          </p>
+          <p className="text-[#A1A1AA] text-xs text-center mt-2">
+            New Bhagya Nagar, Ring Road, Latur, Maharashtra - 413512
           </p>
         </div>
       </div>

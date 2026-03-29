@@ -5,6 +5,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import PillarsOfImpact from '@/components/PillarsOfImpact';
 import axios from 'axios';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -151,6 +152,28 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* Trust Bar - Districts */}
+      <section className="py-12 bg-[#27272A] border-y border-[#D4AF37]/20" data-testid="trust-bar">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-8">
+            <p className="text-[#D4AF37] text-xs tracking-[0.2em] uppercase font-bold mb-2">
+              Serving Communities Across
+            </p>
+          </div>
+          <div className="flex flex-wrap justify-center items-center gap-12">
+            {['Dharashiv', 'Solapur', 'Latur', 'Palghar', 'Panchgani'].map((district) => (
+              <div key={district} className="text-center">
+                <MapPin className="text-[#D4AF37] mx-auto mb-2" size={24} />
+                <span className="text-[#F5F5F7] font-semibold">{district}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pillars of Impact */}
+      <PillarsOfImpact />
 
       {/* Impact Stats */}
       <section ref={statsRef} id="impact" className="py-24 px-6 reveal-section" data-testid="impact-stats-section">
