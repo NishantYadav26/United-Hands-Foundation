@@ -33,12 +33,12 @@ const Footer = () => {
             <h4 className="text-[#D4AF37] text-xs tracking-[0.2em] uppercase font-bold mb-6">Contact Us</h4>
             <div className="flex flex-col gap-4">
               <div className="flex items-start gap-3">
-                <Mail className="text-[#D4AF37] mt-1" size={16} />
-                <span className="text-[#A1A1AA] text-sm">contact@unitedhands.org</span>
+                <Mail className="text-[#3498DB] mt-1" size={16} />
+                <span className="text-[#A1A1AA] text-sm">Uniteduhf@gmail.com</span>
               </div>
               <div className="flex items-start gap-3">
-                <Phone className="text-[#D4AF37] mt-1" size={16} />
-                <span className="text-[#A1A1AA] text-sm">+91 XXXXX XXXXX</span>
+                <Phone className="text-[#3498DB] mt-1" size={16} />
+                <span className="text-[#A1A1AA] text-sm">+91 9028882496</span>
               </div>
               <div className="flex items-start gap-3">
                 <MapPin className="text-[#D4AF37] mt-1" size={16} />

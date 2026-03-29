@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Users, DollarSign, CheckCircle, XCircle, Settings, Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Users, DollarSign, CheckCircle, XCircle, Settings, Loader2, LogOut, Image, UsersRound } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import MediaLibrary from '@/components/MediaLibrary';
+import TeamPillars from '@/components/TeamPillars';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { Switch } from '@/components/ui/switch';
@@ -10,6 +13,7 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
   const [donations, setDonations] = useState([]);
   const [projects, setProjects] = useState([]);
   const [settings, setSettings] = useState(null);
@@ -21,6 +25,12 @@ const AdminDashboard = () => {
     fetchSettings();
     fetchProjects();
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('uhf_admin_token');
+    toast.success('Logged out successfully');
+    navigate('/uhf-admin');
+  };
 
   const fetchDonations = async () => {
     try {
@@ -110,18 +120,28 @@ const AdminDashboard = () => {
   const approvedDonations = donations.filter(d => d.status === 'approved');
 
   return (
-    <div className="min-h-screen bg-[#1A1A1A]">
+    <div className="min-h-screen" style={{background: '#0A1128'}}>
       <Navbar />
 
-      <div className="pt-32 pb-24 px-6">
+      <div className="pt-32 pb-24 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
-          <h1 
-            className="text-5xl sm:text-6xl font-medium tracking-tight mb-12"
-            style={{fontFamily: 'Cormorant Garamond, serif'}}
-            data-testid="admin-title"
-          >
-            Admin <span className="text-[#D4AF37]">Dashboard</span>
-          </h1>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-12 gap-4">
+            <h1 
+              className="text-4xl sm:text-5xl lg:text-6xl font-medium tracking-tight"
+              style={{fontFamily: 'Cormorant Garamond, serif'}}
+              data-testid="admin-title"
+            >
+              Admin <span className="text-gradient-blue">Dashboard</span>
+            </h1>
+            <button 
+              onClick={handleLogout}
+              className="btn-orange flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-3"
+              data-testid="logout-btn"
+            >
+              <LogOut size={18} />
+              Logout
+            </button>
+          </div>
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
@@ -151,11 +171,11 @@ const AdminDashboard = () => {
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-4 mb-8 border-b border-[#D4AF37]/20">
+          <div className="flex gap-2 sm:gap-4 mb-8 border-b blue-border overflow-x-auto pb-0">
             <button
               onClick={() => setActiveTab('donations')}
-              className={`pb-4 px-6 text-sm font-semibold tracking-[0.1em] uppercase transition-colors ${
-                activeTab === 'donations' ? 'text-[#D4AF37] border-b-2 border-[#D4AF37]' : 'text-[#A1A1AA]'
+              className={`pb-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold tracking-[0.1em] uppercase transition-colors whitespace-nowrap ${
+                activeTab === 'donations' ? 'text-[#3498DB] border-b-2 border-[#3498DB]' : 'text-[#A1A1AA]'
               }`}
               data-testid="tab-donations"
             >
@@ -163,17 +183,37 @@ const AdminDashboard = () => {
             </button>
             <button
               onClick={() => setActiveTab('projects')}
-              className={`pb-4 px-6 text-sm font-semibold tracking-[0.1em] uppercase transition-colors ${
-                activeTab === 'projects' ? 'text-[#D4AF37] border-b-2 border-[#D4AF37]' : 'text-[#A1A1AA]'
+              className={`pb-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold tracking-[0.1em] uppercase transition-colors whitespace-nowrap ${
+                activeTab === 'projects' ? 'text-[#3498DB] border-b-2 border-[#3498DB]' : 'text-[#A1A1AA]'
               }`}
               data-testid="tab-projects"
             >
               Projects
             </button>
             <button
+              onClick={() => setActiveTab('media')}
+              className={`pb-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold tracking-[0.1em] uppercase transition-colors whitespace-nowrap flex items-center gap-2 ${
+                activeTab === 'media' ? 'text-[#3498DB] border-b-2 border-[#3498DB]' : 'text-[#A1A1AA]'
+              }`}
+              data-testid="tab-media"
+            >
+              <Image size={16} />
+              Media Library
+            </button>
+            <button
+              onClick={() => setActiveTab('pillars')}
+              className={`pb-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold tracking-[0.1em] uppercase transition-colors whitespace-nowrap flex items-center gap-2 ${
+                activeTab === 'pillars' ? 'text-[#E67E22] border-b-2 border-[#E67E22]' : 'text-[#A1A1AA]'
+              }`}
+              data-testid="tab-pillars"
+            >
+              <UsersRound size={16} />
+              Team Pillars
+            </button>
+            <button
               onClick={() => setActiveTab('settings')}
-              className={`pb-4 px-6 text-sm font-semibold tracking-[0.1em] uppercase transition-colors ${
-                activeTab === 'settings' ? 'text-[#D4AF37] border-b-2 border-[#D4AF37]' : 'text-[#A1A1AA]'
+              className={`pb-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold tracking-[0.1em] uppercase transition-colors whitespace-nowrap ${
+                activeTab === 'settings' ? 'text-[#3498DB] border-b-2 border-[#3498DB]' : 'text-[#A1A1AA]'
               }`}
               data-testid="tab-settings"
             >
@@ -385,6 +425,12 @@ const AdminDashboard = () => {
               </div>
             </div>
           )}
+
+          {/* Media Library Tab */}
+          {activeTab === 'media' && <MediaLibrary />}
+
+          {/* Team Pillars Tab */}
+          {activeTab === 'pillars' && <TeamPillars />}
         </div>
       </div>
 
