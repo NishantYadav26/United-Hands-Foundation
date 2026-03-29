@@ -58,7 +58,7 @@ const PressMedia = () => {
   }));
 
   return (
-    <div className="min-h-screen bg-[#1A1A1A]">
+    <div className="min-h-screen bg-[var(--bg-deep)]">
       <Navbar />
 
       <div className="pt-32 pb-24 px-6">
@@ -69,23 +69,23 @@ const PressMedia = () => {
               style={{fontFamily: 'Cormorant Garamond, serif'}}
               data-testid="press-page-title"
             >
-              Press & <span className="text-[#D4AF37]">Media</span>
+              Press & <span className="text-[var(--accent-gold)]">Media</span>
             </h1>
-            <p className="text-[#A1A1AA] text-lg max-w-2xl mx-auto">
+            <p className="text-[var(--text-muted)] text-lg max-w-2xl mx-auto">
               Our work in elderly care has been recognized by leading publications
             </p>
           </div>
 
           {/* Filters */}
           <div className="glass-morph p-6 rounded mb-12 flex flex-col md:flex-row gap-4 items-center" data-testid="filters">
-            <Filter className="text-[#D4AF37]" size={24} />
+            <Filter className="text-[var(--accent-gold)]" size={24} />
             
             <div className="flex-1">
-              <label className="text-[#D4AF37] text-xs tracking-[0.2em] uppercase font-bold mb-2 block">District</label>
+              <label className="text-[var(--accent-gold)] text-xs tracking-[0.2em] uppercase font-bold mb-2 block">District</label>
               <select
                 value={selectedDistrict}
                 onChange={(e) => setSelectedDistrict(e.target.value)}
-                className="w-full bg-[#27272A] border border-[#D4AF37]/20 rounded px-4 py-2 text-[#F5F5F7] focus:outline-none focus:border-[#D4AF37]"
+                className="w-full bg-[var(--bg-card)] border border-[var(--accent-gold)]/20 rounded px-4 py-2 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-gold)]"
                 data-testid="filter-district"
               >
                 {districts.map((district) => (
@@ -95,11 +95,11 @@ const PressMedia = () => {
             </div>
 
             <div className="flex-1">
-              <label className="text-[#D4AF37] text-xs tracking-[0.2em] uppercase font-bold mb-2 block">Year</label>
+              <label className="text-[var(--accent-gold)] text-xs tracking-[0.2em] uppercase font-bold mb-2 block">Year</label>
               <select
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(e.target.value)}
-                className="w-full bg-[#27272A] border border-[#D4AF37]/20 rounded px-4 py-2 text-[#F5F5F7] focus:outline-none focus:border-[#D4AF37]"
+                className="w-full bg-[var(--bg-card)] border border-[var(--accent-gold)]/20 rounded px-4 py-2 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-gold)]"
                 data-testid="filter-year"
               >
                 {years.map((year) => (
@@ -112,12 +112,12 @@ const PressMedia = () => {
           {/* Masonry Grid */}
           {loading ? (
             <div className="text-center py-12">
-              <Loader2 className="animate-spin text-[#D4AF37] mx-auto mb-4" size={48} />
-              <p className="text-[#A1A1AA]">Loading press coverage...</p>
+              <Loader2 className="animate-spin text-[var(--accent-gold)] mx-auto mb-4" size={48} />
+              <p className="text-[var(--text-muted)]">Loading press coverage...</p>
             </div>
           ) : pressItems.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-[#A1A1AA]">No press coverage found</p>
+              <p className="text-[var(--text-muted)]">No press coverage found</p>
             </div>
           ) : (
             <Masonry
@@ -139,8 +139,8 @@ const PressMedia = () => {
                     className="w-full h-auto"
                   />
                   <div className="p-6">
-                    <h3 className="text-[#F5F5F7] font-semibold mb-2">{item.title}</h3>
-                    <div className="flex items-center justify-between text-xs text-[#A1A1AA]">
+                    <h3 className="text-[var(--text-primary)] font-semibold mb-2">{item.title}</h3>
+                    <div className="flex items-center justify-between text-xs text-[var(--text-muted)]">
                       <span>{item.publication}</span>
                       <span>{item.year}</span>
                     </div>

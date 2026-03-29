@@ -36,19 +36,19 @@ const AdminLogin = () => {
     <div 
       className="min-h-screen flex items-center justify-center px-6"
       style={{
-        background: 'linear-gradient(135deg, #0A1128 0%, #1C2951 100%)'
+        background: 'linear-gradient(135deg, var(--bg-deep) 0%, var(--bg-surface) 100%)'
       }}
     >
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <Shield className="mx-auto mb-4" size={64} style={{color: '#3498DB'}} />
+          <Shield className="mx-auto mb-4" size={64} style={{color: 'var(--accent-teal)'}} />
           <h1 
             className="text-4xl font-medium mb-2"
             style={{fontFamily: 'Cormorant Garamond, serif'}}
           >
             Admin <span className="text-gradient-blue">Portal</span>
           </h1>
-          <p className="text-[#A1A1AA] text-sm">
+          <p className="text-sm" style={{color: 'var(--text-muted)'}}>
             United Hands Foundation Command Center
           </p>
         </div>
@@ -56,7 +56,7 @@ const AdminLogin = () => {
         <div className="glass-morph p-8 rounded">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-[#3498DB] text-xs tracking-[0.2em] uppercase font-bold mb-3">
+              <label className="block text-xs tracking-[0.2em] uppercase font-bold mb-3" style={{color: 'var(--accent-teal)'}}>
                 Email Address
               </label>
               <input
@@ -64,14 +64,15 @@ const AdminLogin = () => {
                 value={formData.email}
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
                 required
-                placeholder="unitedhandsfoundation4@gmail.com"
-                className="w-full bg-[#1C2951] border blue-border rounded px-4 py-3 text-[#F5F5F7] focus:outline-none focus:border-[#3498DB]"
+                placeholder="admin@unitedhandsfoundation.org"
+                className="w-full rounded px-4 py-3 focus:outline-none"
+                style={{background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', color: 'var(--text-primary)'}}
                 data-testid="admin-email-input"
               />
             </div>
 
             <div>
-              <label className="block text-[#3498DB] text-xs tracking-[0.2em] uppercase font-bold mb-3">
+              <label className="block text-xs tracking-[0.2em] uppercase font-bold mb-3" style={{color: 'var(--accent-teal)'}}>
                 Password
               </label>
               <input
@@ -79,7 +80,8 @@ const AdminLogin = () => {
                 value={formData.password}
                 onChange={(e) => setFormData({...formData, password: e.target.value})}
                 required
-                className="w-full bg-[#1C2951] border blue-border rounded px-4 py-3 text-[#F5F5F7] focus:outline-none focus:border-[#3498DB]"
+                className="w-full rounded px-4 py-3 focus:outline-none"
+                style={{background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', color: 'var(--text-primary)'}}
                 data-testid="admin-password-input"
               />
             </div>
@@ -101,16 +103,16 @@ const AdminLogin = () => {
             </button>
           </form>
 
-          <div className="mt-6 p-4 bg-[#1C2951]/50 border blue-border rounded">
-            <p className="text-[#A1A1AA] text-xs text-center">
-              🔐 Authorized access only. Only registered admin email can access this portal.
+          <div className="mt-6 p-4 rounded" style={{background: 'var(--bg-deep)', border: '1px solid var(--border-subtle)'}}>
+            <p className="text-xs text-center" style={{color: 'var(--text-muted)'}}>
+              Authorized access only. Only registered admin email can access this portal.
             </p>
           </div>
         </div>
 
         <div className="text-center mt-6">
-          <a href="/" className="text-[#3498DB] hover:text-[#5DADE2] text-sm transition-colors">
-            ← Back to Website
+          <a href="/" className="text-sm transition-colors" style={{color: 'var(--accent-teal)'}}>
+            Back to Website
           </a>
         </div>
       </div>

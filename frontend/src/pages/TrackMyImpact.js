@@ -61,13 +61,13 @@ const TrackMyImpact = () => {
   };
 
   return (
-    <div className="min-h-screen" style={{background: '#0A1128'}}>
+    <div className="min-h-screen" style={{background: 'var(--bg-deep)'}}>
       <Navbar />
 
       <div className="pt-32 pb-24 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
-            <Heart className="mx-auto mb-6" size={64} style={{color: '#E67E22'}} />
+            <Heart className="mx-auto mb-6" size={64} style={{color: 'var(--accent-warm)'}} />
             <h1 
               className="text-5xl sm:text-6xl font-medium tracking-tight mb-6"
               style={{fontFamily: 'Cormorant Garamond, serif'}}
@@ -75,7 +75,7 @@ const TrackMyImpact = () => {
             >
               Track My <span className="text-gradient-orange">Impact</span>
             </h1>
-            <p className="text-[#A1A1AA] text-lg max-w-2xl mx-auto">
+            <p className="text-[var(--text-muted)] text-lg max-w-2xl mx-auto">
               View your donation history and download 80G tax receipts. No password required.
             </p>
           </div>
@@ -84,7 +84,7 @@ const TrackMyImpact = () => {
           <div className="glass-morph p-12 rounded mb-12">
             <form onSubmit={handleSearch} className="space-y-6">
               <div>
-                <label className="block text-[#3498DB] text-xs tracking-[0.2em] uppercase font-bold mb-3">
+                <label className="block text-[var(--accent-teal)] text-xs tracking-[0.2em] uppercase font-bold mb-3">
                   Email Address *
                 </label>
                 <input
@@ -93,13 +93,13 @@ const TrackMyImpact = () => {
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
                   required
                   placeholder="donor@example.com"
-                  className="w-full bg-[#1C2951] border blue-border rounded px-4 py-3 text-[#F5F5F7] focus:outline-none focus:border-[#3498DB]"
+                  className="w-full bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)]"
                   data-testid="track-email-input"
                 />
               </div>
 
               <div>
-                <label className="block text-[#3498DB] text-xs tracking-[0.2em] uppercase font-bold mb-3">
+                <label className="block text-[var(--accent-teal)] text-xs tracking-[0.2em] uppercase font-bold mb-3">
                   PAN Number *
                 </label>
                 <input
@@ -109,7 +109,7 @@ const TrackMyImpact = () => {
                   required
                   pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
                   placeholder="ABCDE1234F"
-                  className="w-full bg-[#1C2951] border blue-border rounded px-4 py-3 text-[#F5F5F7] focus:outline-none focus:border-[#3498DB]"
+                  className="w-full bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)]"
                   data-testid="track-pan-input"
                 />
               </div>
@@ -134,8 +134,8 @@ const TrackMyImpact = () => {
               </button>
             </form>
 
-            <div className="mt-6 p-4 bg-[#1C2951]/50 border blue-border rounded">
-              <p className="text-[#A1A1AA] text-sm">
+            <div className="mt-6 p-4 bg-[var(--bg-surface)]/50 border blue-border rounded">
+              <p className="text-[var(--text-muted)] text-sm">
                 🔒 <strong>Privacy First:</strong> We only show donations that match BOTH your email AND PAN number. Your data is secure.
               </p>
             </div>
@@ -153,7 +153,7 @@ const TrackMyImpact = () => {
 
               {donations.length === 0 ? (
                 <div className="text-center py-12">
-                  <p className="text-[#A1A1AA]">
+                  <p className="text-[var(--text-muted)]">
                     No approved donations found. If you recently donated, please wait for admin approval.
                   </p>
                 </div>
@@ -162,13 +162,13 @@ const TrackMyImpact = () => {
                   {donations.map((donation) => (
                     <div 
                       key={donation.id}
-                      className="bg-[#1C2951] border blue-border p-6 rounded hover-lift"
+                      className="bg-[var(--bg-surface)] border blue-border p-6 rounded hover-lift"
                       data-testid={`donation-${donation.id}`}
                     >
                       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
-                            <span className="text-[#E67E22] text-sm font-semibold">
+                            <span className="text-[var(--accent-warm)] text-sm font-semibold">
                               {new Date(donation.created_at).toLocaleDateString('en-IN', {
                                 day: 'numeric',
                                 month: 'long',
@@ -176,17 +176,17 @@ const TrackMyImpact = () => {
                               })}
                             </span>
                             {donation.project_title && (
-                              <span className="text-[#3498DB] text-xs tracking-[0.2em] uppercase font-bold">
+                              <span className="text-[var(--accent-teal)] text-xs tracking-[0.2em] uppercase font-bold">
                                 {donation.project_title}
                               </span>
                             )}
                           </div>
                           <div className="flex items-baseline gap-4">
-                            <span className="text-3xl font-medium text-[#F5F5F7]" style={{fontFamily: 'Cormorant Garamond, serif'}}>
+                            <span className="text-3xl font-medium text-[var(--text-primary)]" style={{fontFamily: 'Cormorant Garamond, serif'}}>
                               ₹{donation.amount.toLocaleString()}
                             </span>
                             {donation.receipt_number && (
-                              <span className="text-[#A1A1AA] text-sm">
+                              <span className="text-[var(--text-muted)] text-sm">
                                 Receipt: {donation.receipt_number}
                               </span>
                             )}
@@ -207,11 +207,11 @@ const TrackMyImpact = () => {
                     </div>
                   ))}
 
-                  <div className="mt-8 p-6 bg-[#1C2951]/50 border blue-border rounded text-center">
-                    <p className="text-[#F5F5F7] font-semibold mb-2">
+                  <div className="mt-8 p-6 bg-[var(--bg-surface)]/50 border blue-border rounded text-center">
+                    <p className="text-[var(--text-primary)] font-semibold mb-2">
                       Thank you for your {donations.length} donation{donations.length > 1 ? 's' : ''}!
                     </p>
-                    <p className="text-[#A1A1AA] text-sm">
+                    <p className="text-[var(--text-muted)] text-sm">
                       Total Impact: ₹{donations.reduce((sum, d) => sum + d.amount, 0).toLocaleString()}
                     </p>
                   </div>

@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, DollarSign, CheckCircle, XCircle, Settings, Loader2, LogOut, Image, UsersRound } from 'lucide-react';
+import { Users, DollarSign, CheckCircle, XCircle, Settings, Loader2, LogOut, Image, UsersRound, FolderKanban, Heart } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import MediaLibrary from '@/components/MediaLibrary';
 import TeamPillars from '@/components/TeamPillars';
+import ProjectsManagement from '@/components/ProjectsManagement';
+import GalleryManagement from '@/components/GalleryManagement';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { Switch } from '@/components/ui/switch';
@@ -15,7 +17,6 @@ const API = `${BACKEND_URL}/api`;
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [donations, setDonations] = useState([]);
-  const [projects, setProjects] = useState([]);
   const [settings, setSettings] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('donations');
@@ -23,7 +24,6 @@ const AdminDashboard = () => {
   useEffect(() => {
     fetchDonations();
     fetchSettings();
-    fetchProjects();
   }, []);
 
   const handleLogout = () => {
@@ -44,32 +44,12 @@ const AdminDashboard = () => {
     }
   };
 
-  const fetchProjects = async () => {
-    try {
-      const response = await axios.get(`${API}/projects`);
-      setProjects(response.data);
-    } catch (error) {
-      console.error('Failed to fetch projects:', error);
-    }
-  };
-
   const fetchSettings = async () => {
     try {
       const response = await axios.get(`${API}/admin/settings`);
       setSettings(response.data);
     } catch (error) {
       console.error('Failed to fetch settings:', error);
-    }
-  };
-
-  const handleSeedProjects = async () => {
-    try {
-      await axios.post(`${API}/seed/projects`);
-      toast.success('Default projects created successfully!');
-      fetchProjects();
-    } catch (error) {
-      console.error('Failed to seed projects:', error);
-      toast.error('Failed to create projects');
     }
   };
 
@@ -120,7 +100,7 @@ const AdminDashboard = () => {
   const approvedDonations = donations.filter(d => d.status === 'approved');
 
   return (
-    <div className="min-h-screen" style={{background: '#0A1128'}}>
+    <div className="min-h-screen" style={{background: 'var(--bg-deep)'}}>
       <Navbar />
 
       <div className="pt-32 pb-24 px-4 sm:px-6">
@@ -146,27 +126,27 @@ const AdminDashboard = () => {
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             <div className="glass-morph p-8 rounded" data-testid="stat-card-pending">
-              <Users className="text-[#D4AF37] mb-4" size={32} />
+              <Users className="mb-4" style={{color: 'var(--accent-warm)'}} size={32} />
               <div className="text-4xl font-medium mb-2" style={{fontFamily: 'Cormorant Garamond, serif'}}>
                 {pendingDonations.length}
               </div>
-              <p className="text-[#A1A1AA] text-sm">Pending Approvals</p>
+              <p className="text-sm" style={{color: 'var(--text-muted)'}}>Pending Approvals</p>
             </div>
 
             <div className="glass-morph p-8 rounded" data-testid="stat-card-approved">
-              <CheckCircle className="text-[#D4AF37] mb-4" size={32} />
+              <CheckCircle className="mb-4" style={{color: 'var(--accent-teal)'}} size={32} />
               <div className="text-4xl font-medium mb-2" style={{fontFamily: 'Cormorant Garamond, serif'}}>
                 {approvedDonations.length}
               </div>
-              <p className="text-[#A1A1AA] text-sm">Approved Donations</p>
+              <p className="text-sm" style={{color: 'var(--text-muted)'}}>Approved Donations</p>
             </div>
 
             <div className="glass-morph p-8 rounded" data-testid="stat-card-total">
-              <DollarSign className="text-[#D4AF37] mb-4" size={32} />
+              <DollarSign className="mb-4" style={{color: 'var(--accent-gold)'}} size={32} />
               <div className="text-4xl font-medium mb-2" style={{fontFamily: 'Cormorant Garamond, serif'}}>
                 ₹{approvedDonations.reduce((sum, d) => sum + d.amount, 0).toLocaleString()}
               </div>
-              <p className="text-[#A1A1AA] text-sm">Total Raised</p>
+              <p className="text-sm" style={{color: 'var(--text-muted)'}}>Total Raised</p>
             </div>
           </div>
 
@@ -175,7 +155,7 @@ const AdminDashboard = () => {
             <button
               onClick={() => setActiveTab('donations')}
               className={`pb-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold tracking-[0.1em] uppercase transition-colors whitespace-nowrap ${
-                activeTab === 'donations' ? 'text-[#3498DB] border-b-2 border-[#3498DB]' : 'text-[#A1A1AA]'
+                activeTab === 'donations' ? 'text-[var(--accent-teal)] border-b-2 border-[var(--accent-teal)]' : 'text-[var(--text-muted)]'
               }`}
               data-testid="tab-donations"
             >
@@ -183,17 +163,28 @@ const AdminDashboard = () => {
             </button>
             <button
               onClick={() => setActiveTab('projects')}
-              className={`pb-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold tracking-[0.1em] uppercase transition-colors whitespace-nowrap ${
-                activeTab === 'projects' ? 'text-[#3498DB] border-b-2 border-[#3498DB]' : 'text-[#A1A1AA]'
+              className={`pb-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold tracking-[0.1em] uppercase transition-colors whitespace-nowrap flex items-center gap-2 ${
+                activeTab === 'projects' ? 'text-[var(--accent-teal)] border-b-2 border-[var(--accent-teal)]' : 'text-[var(--text-muted)]'
               }`}
               data-testid="tab-projects"
             >
+              <FolderKanban size={16} />
               Projects
+            </button>
+            <button
+              onClick={() => setActiveTab('gallery')}
+              className={`pb-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold tracking-[0.1em] uppercase transition-colors whitespace-nowrap flex items-center gap-2 ${
+                activeTab === 'gallery' ? 'text-[var(--accent-warm)] border-b-2 border-[var(--accent-warm)]' : 'text-[var(--text-muted)]'
+              }`}
+              data-testid="tab-gallery"
+            >
+              <Heart size={16} />
+              Gallery
             </button>
             <button
               onClick={() => setActiveTab('media')}
               className={`pb-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold tracking-[0.1em] uppercase transition-colors whitespace-nowrap flex items-center gap-2 ${
-                activeTab === 'media' ? 'text-[#3498DB] border-b-2 border-[#3498DB]' : 'text-[#A1A1AA]'
+                activeTab === 'media' ? 'text-[var(--accent-teal)] border-b-2 border-[var(--accent-teal)]' : 'text-[var(--text-muted)]'
               }`}
               data-testid="tab-media"
             >
@@ -203,7 +194,7 @@ const AdminDashboard = () => {
             <button
               onClick={() => setActiveTab('pillars')}
               className={`pb-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold tracking-[0.1em] uppercase transition-colors whitespace-nowrap flex items-center gap-2 ${
-                activeTab === 'pillars' ? 'text-[#E67E22] border-b-2 border-[#E67E22]' : 'text-[#A1A1AA]'
+                activeTab === 'pillars' ? 'text-[var(--accent-warm)] border-b-2 border-[var(--accent-warm)]' : 'text-[var(--text-muted)]'
               }`}
               data-testid="tab-pillars"
             >
@@ -213,7 +204,7 @@ const AdminDashboard = () => {
             <button
               onClick={() => setActiveTab('settings')}
               className={`pb-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold tracking-[0.1em] uppercase transition-colors whitespace-nowrap ${
-                activeTab === 'settings' ? 'text-[#3498DB] border-b-2 border-[#3498DB]' : 'text-[#A1A1AA]'
+                activeTab === 'settings' ? 'text-[var(--accent-teal)] border-b-2 border-[var(--accent-teal)]' : 'text-[var(--text-muted)]'
               }`}
               data-testid="tab-settings"
             >
@@ -226,34 +217,34 @@ const AdminDashboard = () => {
             <div className="glass-morph p-8 rounded" data-testid="donations-list">
               {loading ? (
                 <div className="text-center py-12">
-                  <Loader2 className="animate-spin text-[#D4AF37] mx-auto mb-4" size={48} />
-                  <p className="text-[#A1A1AA]">Loading donations...</p>
+                  <Loader2 className="animate-spin mx-auto mb-4" style={{color: 'var(--accent-warm)'}} size={48} />
+                  <p style={{color: 'var(--text-muted)'}}>Loading donations...</p>
                 </div>
               ) : donations.length === 0 ? (
                 <div className="text-center py-12">
-                  <p className="text-[#A1A1AA]">No donations yet</p>
+                  <p style={{color: 'var(--text-muted)'}}>No donations yet</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-[#D4AF37]/20">
-                        <th className="text-left py-4 px-4 text-[#D4AF37] text-xs tracking-[0.2em] uppercase font-bold">Donor</th>
-                        <th className="text-left py-4 px-4 text-[#D4AF37] text-xs tracking-[0.2em] uppercase font-bold">Amount</th>
-                        <th className="text-left py-4 px-4 text-[#D4AF37] text-xs tracking-[0.2em] uppercase font-bold">UTR</th>
-                        <th className="text-left py-4 px-4 text-[#D4AF37] text-xs tracking-[0.2em] uppercase font-bold">Status</th>
-                        <th className="text-left py-4 px-4 text-[#D4AF37] text-xs tracking-[0.2em] uppercase font-bold">Actions</th>
+                      <tr className="border-b" style={{borderColor: 'var(--border-warm)'}}>
+                        <th className="text-left py-4 px-4 text-xs tracking-[0.2em] uppercase font-bold" style={{color: 'var(--accent-warm)'}}>Donor</th>
+                        <th className="text-left py-4 px-4 text-xs tracking-[0.2em] uppercase font-bold" style={{color: 'var(--accent-warm)'}}>Amount</th>
+                        <th className="text-left py-4 px-4 text-xs tracking-[0.2em] uppercase font-bold" style={{color: 'var(--accent-warm)'}}>UTR</th>
+                        <th className="text-left py-4 px-4 text-xs tracking-[0.2em] uppercase font-bold" style={{color: 'var(--accent-warm)'}}>Status</th>
+                        <th className="text-left py-4 px-4 text-xs tracking-[0.2em] uppercase font-bold" style={{color: 'var(--accent-warm)'}}>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {donations.map((donation) => (
-                        <tr key={donation.id} className="border-b border-[#D4AF37]/10" data-testid={`donation-${donation.id}`}>
+                        <tr key={donation.id} className="border-b" style={{borderColor: 'var(--border-subtle)'}} data-testid={`donation-${donation.id}`}>
                           <td className="py-4 px-4">
-                            <div className="text-[#F5F5F7] font-medium">{donation.donor_name}</div>
-                            <div className="text-[#A1A1AA] text-sm">{donation.donor_email}</div>
+                            <div className="font-medium" style={{color: 'var(--text-primary)'}}>{donation.donor_name}</div>
+                            <div className="text-sm" style={{color: 'var(--text-muted)'}}>{donation.donor_email}</div>
                           </td>
-                          <td className="py-4 px-4 text-[#F5F5F7] font-semibold">₹{donation.amount.toLocaleString()}</td>
-                          <td className="py-4 px-4 text-[#A1A1AA] text-sm">{donation.utr_number}</td>
+                          <td className="py-4 px-4 font-semibold" style={{color: 'var(--text-primary)'}}>₹{donation.amount.toLocaleString()}</td>
+                          <td className="py-4 px-4 text-sm" style={{color: 'var(--text-muted)'}}>{donation.utr_number}</td>
                           <td className="py-4 px-4">
                             <span className={`inline-block px-3 py-1 rounded text-xs font-semibold ${
                               donation.status === 'pending' ? 'bg-yellow-900/20 text-yellow-400' :
@@ -283,7 +274,7 @@ const AdminDashboard = () => {
                               </div>
                             )}
                             {donation.status === 'approved' && donation.receipt_number && (
-                              <span className="text-[#A1A1AA] text-xs">{donation.receipt_number}</span>
+                              <span className="text-xs" style={{color: 'var(--text-muted)'}}>{donation.receipt_number}</span>
                             )}
                           </td>
                         </tr>
@@ -295,85 +286,9 @@ const AdminDashboard = () => {
             </div>
           )}
 
-          {activeTab === 'projects' && (
-            <div className="glass-morph p-8 rounded" data-testid="projects-panel">
-              <div className="flex justify-between items-center mb-8">
-                <h2 
-                  className="text-3xl font-medium"
-                  style={{fontFamily: 'Cormorant Garamond, serif'}}
-                >
-                  Projects Management
-                </h2>
-                <button
-                  onClick={handleSeedProjects}
-                  className="btn-gold"
-                  data-testid="seed-projects-btn"
-                >
-                  Seed Default Projects
-                </button>
-              </div>
+          {activeTab === 'projects' && <ProjectsManagement />}
 
-              {projects.length === 0 ? (
-                <div className="text-center py-12">
-                  <p className="text-[#A1A1AA] mb-4">No projects yet</p>
-                  <button onClick={handleSeedProjects} className="btn-gold">
-                    Create Default Projects
-                  </button>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {projects.map((project) => {
-                    const progress = Math.min((project.raised_amount / project.target_amount) * 100, 100);
-                    
-                    return (
-                      <div 
-                        key={project.id}
-                        className="bg-[#27272A] border border-[#D4AF37]/20 p-6 rounded"
-                        data-testid={`project-card-${project.id}`}
-                      >
-                        <div className="flex items-start justify-between mb-4">
-                          <div>
-                            <h3 className="text-xl font-medium text-[#F5F5F7] mb-1" style={{fontFamily: 'Cormorant Garamond, serif'}}>
-                              {project.title}
-                            </h3>
-                            <span className="text-[#D4AF37] text-xs tracking-[0.2em] uppercase font-bold">
-                              {project.category}
-                            </span>
-                          </div>
-                          <span className={`px-3 py-1 rounded text-xs font-semibold ${
-                            project.is_active ? 'bg-green-900/20 text-green-400' : 'bg-gray-900/20 text-gray-400'
-                          }`}>
-                            {project.is_active ? 'Active' : 'Inactive'}
-                          </span>
-                        </div>
-
-                        <p className="text-[#A1A1AA] text-sm mb-4 line-clamp-2">
-                          {project.description}
-                        </p>
-
-                        <div className="mb-4">
-                          <div className="flex justify-between text-sm mb-2">
-                            <span className="text-[#A1A1AA]">
-                              ₹{project.raised_amount.toLocaleString()} / ₹{project.target_amount.toLocaleString()}
-                            </span>
-                            <span className="text-[#D4AF37] font-semibold">
-                              {progress.toFixed(0)}%
-                            </span>
-                          </div>
-                          <div className="w-full bg-[#1A1A1A] rounded-full h-2 overflow-hidden">
-                            <div 
-                              className="bg-gradient-to-r from-[#D4AF37] to-[#E5C047] h-full"
-                              style={{width: `${progress}%`}}
-                            ></div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
+          {activeTab === 'gallery' && <GalleryManagement />}
 
           {activeTab === 'settings' && settings && (
             <div className="glass-morph p-8 rounded" data-testid="settings-panel">
@@ -384,12 +299,12 @@ const AdminDashboard = () => {
                 Payment Settings
               </h2>
 
-              <div className="bg-[#27272A] border border-[#D4AF37]/20 p-8 rounded mb-6">
+              <div className="p-8 rounded mb-6" style={{background: 'var(--bg-card)', border: '1px solid var(--border-warm)'}}>
                 <div className="flex items-center justify-between mb-6">
                   <div>
-                    <h3 className="text-[#F5F5F7] font-semibold text-lg mb-2">Global Payment Mode Toggle</h3>
-                    <p className="text-[#A1A1AA] text-sm">
-                      Current Mode: <span className="text-[#D4AF37] font-semibold">{settings.payment_mode === 'manual_qr' ? 'Manual QR' : 'Razorpay'}</span>
+                    <h3 className="font-semibold text-lg mb-2" style={{color: 'var(--text-primary)'}}>Global Payment Mode Toggle</h3>
+                    <p className="text-sm" style={{color: 'var(--text-muted)'}}>
+                      Current Mode: <span className="font-semibold" style={{color: 'var(--accent-warm)'}}>{settings.payment_mode === 'manual_qr' ? 'Manual QR' : 'Razorpay'}</span>
                     </p>
                   </div>
                   <Switch
@@ -399,25 +314,25 @@ const AdminDashboard = () => {
                   />
                 </div>
 
-                <div className="bg-[#1A1A1A] p-6 rounded">
+                <div className="p-6 rounded" style={{background: 'var(--bg-deep)'}}>
                   {settings.payment_mode === 'manual_qr' ? (
                     <div>
-                      <p className="text-[#D4AF37] text-sm font-semibold mb-3">MODE A: Manual QR (Active)</p>
-                      <ul className="text-[#A1A1AA] text-sm space-y-2">
-                        <li>✓ Display UPI QR Code</li>
-                        <li>✓ Donors fill form with UTR & screenshot</li>
-                        <li>✓ Manual approval required</li>
-                        <li>✓ 80G receipt sent after approval</li>
+                      <p className="text-sm font-semibold mb-3" style={{color: 'var(--accent-warm)'}}>MODE A: Manual QR (Active)</p>
+                      <ul className="text-sm space-y-2" style={{color: 'var(--text-muted)'}}>
+                        <li>Display UPI QR Code</li>
+                        <li>Donors fill form with UTR & screenshot</li>
+                        <li>Manual approval required</li>
+                        <li>80G receipt sent after approval</li>
                       </ul>
                     </div>
                   ) : (
                     <div>
-                      <p className="text-[#D4AF37] text-sm font-semibold mb-3">MODE B: Razorpay (Active)</p>
-                      <ul className="text-[#A1A1AA] text-sm space-y-2">
-                        <li>✓ Razorpay Standard Checkout</li>
-                        <li>✓ Automated payment processing</li>
-                        <li>✓ Instant payment confirmation</li>
-                        <li>✓ Auto-generated 80G receipt</li>
+                      <p className="text-sm font-semibold mb-3" style={{color: 'var(--accent-teal)'}}>MODE B: Razorpay (Active)</p>
+                      <ul className="text-sm space-y-2" style={{color: 'var(--text-muted)'}}>
+                        <li>Razorpay Standard Checkout</li>
+                        <li>Automated payment processing</li>
+                        <li>Instant payment confirmation</li>
+                        <li>Auto-generated 80G receipt</li>
                       </ul>
                     </div>
                   )}

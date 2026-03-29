@@ -46,9 +46,9 @@ const PillarsOfImpact = () => {
           className="text-4xl sm:text-5xl font-medium tracking-tight text-center mb-4"
           style={{fontFamily: 'Cormorant Garamond, serif'}}
         >
-          Our Pillars of <span className="text-[#D4AF37]">Impact</span>
+          Our Pillars of <span className="text-[var(--accent-gold)]">Impact</span>
         </h2>
-        <p className="text-center text-[#A1A1AA] mb-16 text-lg">
+        <p className="text-center text-[var(--text-muted)] mb-16 text-lg">
           Choose a cause that resonates with your heart
         </p>
 
@@ -67,10 +67,10 @@ const PillarsOfImpact = () => {
                   className="h-64 bg-cover bg-center relative"
                   style={{backgroundImage: `url('${project.hero_image}')`}}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A1A] to-transparent"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-deep)] to-transparent"></div>
                   <div className="absolute bottom-6 left-6">
-                    <Icon className="text-[#D4AF37] mb-2" size={32} />
-                    <span className="text-[#D4AF37] text-xs tracking-[0.2em] uppercase font-bold">
+                    <Icon className="text-[var(--accent-gold)] mb-2" size={32} />
+                    <span className="text-[var(--accent-gold)] text-xs tracking-[0.2em] uppercase font-bold">
                       {project.category}
                     </span>
                   </div>
@@ -78,32 +78,32 @@ const PillarsOfImpact = () => {
 
                 <div className="p-8">
                   <h3 
-                    className="text-2xl font-medium mb-4 text-[#F5F5F7]"
+                    className="text-2xl font-medium mb-4 text-[var(--text-primary)]"
                     style={{fontFamily: 'Cormorant Garamond, serif'}}
                   >
                     {project.title}
                   </h3>
-                  <p className="text-[#A1A1AA] text-sm leading-relaxed mb-6">
+                  <p className="text-[var(--text-muted)] text-sm leading-relaxed mb-6">
                     {project.description}
                   </p>
 
                   {/* Progress Bar */}
                   <div className="mb-6">
                     <div className="flex justify-between text-sm mb-2">
-                      <span className="text-[#A1A1AA]">
+                      <span className="text-[var(--text-muted)]">
                         ₹{project.raised_amount.toLocaleString()} raised
                       </span>
-                      <span className="text-[#D4AF37] font-semibold">
+                      <span className="text-[var(--accent-gold)] font-semibold">
                         {progress.toFixed(0)}%
                       </span>
                     </div>
-                    <div className="w-full bg-[#27272A] rounded-full h-2 overflow-hidden">
+                    <div className="w-full bg-[var(--bg-card)] rounded-full h-2 overflow-hidden">
                       <div 
-                        className="bg-gradient-to-r from-[#D4AF37] to-[#E5C047] h-full transition-all duration-500"
+                        className="bg-gradient-to-r from-[var(--accent-gold)] to-[var(--accent-warm-light)] h-full transition-all duration-500"
                         style={{width: `${progress}%`}}
                       ></div>
                     </div>
-                    <p className="text-[#A1A1AA] text-xs mt-2">
+                    <p className="text-[var(--text-muted)] text-xs mt-2">
                       Goal: ₹{project.target_amount.toLocaleString()}
                     </p>
                   </div>

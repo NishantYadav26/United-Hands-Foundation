@@ -127,10 +127,10 @@ const GalleryManagement = () => {
       <div className="glass-morph p-6 rounded flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h3 className="text-2xl font-medium mb-2 flex items-center gap-3" style={{fontFamily: 'Cormorant Garamond, serif'}}>
-            <Heart style={{color: '#E67E22'}} size={32} fill="#E67E22" />
+            <Heart style={{color: 'var(--accent-warm)'}} size={32} fill="var(--accent-warm)" />
             <span>Heartiest <span className="text-gradient-orange">Moments</span></span>
           </h3>
-          <p className="text-[#A1A1AA] text-sm">
+          <p className="text-[var(--text-muted)] text-sm">
             Share impactful moments from your field work. These appear on the homepage.
           </p>
         </div>
@@ -155,21 +155,21 @@ const GalleryManagement = () => {
               placeholder="Title/Caption *" 
               value={formData.title} 
               onChange={e => setFormData({...formData, title: e.target.value})} 
-              className="bg-[#1C2951] border blue-border rounded px-4 py-3 text-[#F5F5F7] focus:outline-none focus:border-[#3498DB] md:col-span-2" 
+              className="bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)] md:col-span-2" 
             />
             
             <textarea 
               placeholder="Description" 
               value={formData.description} 
               onChange={e => setFormData({...formData, description: e.target.value})} 
-              className="bg-[#1C2951] border blue-border rounded px-4 py-3 text-[#F5F5F7] focus:outline-none focus:border-[#3498DB] md:col-span-2" 
+              className="bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)] md:col-span-2" 
               rows="2" 
             />
             
             <select 
               value={formData.category} 
               onChange={e => setFormData({...formData, category: e.target.value})} 
-              className="bg-[#1C2951] border blue-border rounded px-4 py-3 text-[#F5F5F7] focus:outline-none focus:border-[#3498DB]"
+              className="bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)]"
             >
               <option value="impact">Impact Stories</option>
               <option value="field_work">Field Work</option>
@@ -181,12 +181,12 @@ const GalleryManagement = () => {
               placeholder="Display Priority" 
               value={formData.display_priority} 
               onChange={e => setFormData({...formData, display_priority: parseInt(e.target.value) || 0})} 
-              className="bg-[#1C2951] border blue-border rounded px-4 py-3 text-[#F5F5F7] focus:outline-none focus:border-[#3498DB]" 
+              className="bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)]" 
             />
           </div>
 
           {/* Photo Upload */}
-          <div className="mt-6 p-6 bg-[#1C2951] border blue-border rounded">
+          <div className="mt-6 p-6 bg-[var(--bg-surface)] border blue-border rounded">
             {formData.image_url ? (
               <div className="flex flex-col sm:flex-row items-center gap-4">
                 <img 
@@ -195,7 +195,7 @@ const GalleryManagement = () => {
                   className="w-32 h-32 object-cover rounded"
                 />
                 <div className="flex-1 text-center sm:text-left">
-                  <p className="text-[#F5F5F7] text-sm mb-2">Photo uploaded ✓</p>
+                  <p className="text-[var(--text-primary)] text-sm mb-2">Photo uploaded ✓</p>
                   <button 
                     onClick={uploadImage} 
                     disabled={uploading}
@@ -207,8 +207,8 @@ const GalleryManagement = () => {
               </div>
             ) : (
               <div className="text-center">
-                <Upload className="mx-auto mb-4" style={{color: '#E67E22'}} size={48} />
-                <p className="text-[#A1A1AA] mb-4">No photo uploaded</p>
+                <Upload className="mx-auto mb-4" style={{color: 'var(--accent-warm)'}} size={48} />
+                <p className="text-[var(--text-muted)] mb-4">No photo uploaded</p>
                 <button 
                   onClick={uploadImage} 
                   disabled={uploading}
@@ -242,14 +242,14 @@ const GalleryManagement = () => {
       {/* Gallery Grid */}
       {images.length === 0 ? (
         <div className="glass-morph p-12 rounded text-center">
-          <Heart className="mx-auto mb-4" style={{color: '#E67E22'}} size={64} />
-          <p className="text-[#A1A1AA] mb-4">No photos yet. Share your first heartiest moment!</p>
+          <Heart className="mx-auto mb-4" style={{color: 'var(--accent-warm)'}} size={64} />
+          <p className="text-[var(--text-muted)] mb-4">No photos yet. Share your first heartiest moment!</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {images.map(image => (
             <div key={image.id} className="glass-morph rounded overflow-hidden hover-lift">
-              <div className="h-64 bg-[#1C2951] overflow-hidden">
+              <div className="h-64 bg-[var(--bg-surface)] overflow-hidden">
                 <img 
                   src={image.image_url} 
                   alt={image.title} 
@@ -258,14 +258,14 @@ const GalleryManagement = () => {
               </div>
               
               <div className="p-6">
-                <h3 className="text-[#F5F5F7] font-semibold mb-2">{image.title}</h3>
-                <p className="text-[#A1A1AA] text-sm mb-3 line-clamp-2">
+                <h3 className="text-[var(--text-primary)] font-semibold mb-2">{image.title}</h3>
+                <p className="text-[var(--text-muted)] text-sm mb-3 line-clamp-2">
                   {image.description}
                 </p>
                 
-                <div className="flex items-center justify-between text-xs text-[#A1A1AA] mb-4">
+                <div className="flex items-center justify-between text-xs text-[var(--text-muted)] mb-4">
                   <span>Priority: {image.display_priority}</span>
-                  <span className="px-2 py-1 bg-[#1C2951] rounded">{image.category}</span>
+                  <span className="px-2 py-1 bg-[var(--bg-surface)] rounded">{image.category}</span>
                 </div>
 
                 <div className="flex gap-2">

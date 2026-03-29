@@ -37,7 +37,7 @@ const AnimatedLogo = ({ size = 'md', onClick }) => {
       <img 
         src={logoUrl}
         alt="United Hands Foundation"
-        className="w-full h-full object-contain logo-pulse"
+        className="w-full h-full object-contain logo-pulse logo-see-through"
       />
       <style jsx>{`
         @keyframes logo-pulse {

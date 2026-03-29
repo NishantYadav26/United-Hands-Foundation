@@ -118,7 +118,7 @@ const Donate = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#1A1A1A]">
+    <div className="min-h-screen bg-[var(--bg-deep)]">
       <Navbar />
 
       <div className="pt-32 pb-24 px-6">
@@ -129,9 +129,9 @@ const Donate = () => {
               style={{fontFamily: 'Cormorant Garamond, serif'}}
               data-testid="donate-page-title"
             >
-              Make a <span className="text-[#D4AF37]">Difference</span>
+              Make a <span className="text-[var(--accent-gold)]">Difference</span>
             </h1>
-            <p className="text-[#A1A1AA] text-lg max-w-2xl mx-auto">
+            <p className="text-[var(--text-muted)] text-lg max-w-2xl mx-auto">
               Every contribution helps us provide dignity and care to elderly individuals across Maharashtra
             </p>
           </div>
@@ -158,7 +158,7 @@ const Donate = () => {
                   {formData.amount && (
                     <a
                       href={generateUPIIntent()}
-                      className="inline-block bg-[#D4AF37] hover:bg-[#E5C047] text-[#1A1A1A] px-6 py-3 rounded font-semibold text-sm transition-colors"
+                      className="inline-block bg-[var(--accent-gold)] hover:bg-[var(--accent-warm-light)] text-[var(--bg-deep)] px-6 py-3 rounded font-semibold text-sm transition-colors"
                       data-testid="upi-intent-btn"
                     >
                       Pay ₹{formData.amount} via UPI
@@ -167,12 +167,12 @@ const Donate = () => {
                 </div>
               </div>
 
-              <div className="bg-[#27272A] border border-[#D4AF37]/20 p-6 rounded">
+              <div className="bg-[var(--bg-card)] border border-[var(--accent-gold)]/20 p-6 rounded">
                 <div className="flex items-start gap-3">
-                  <AlertCircle className="text-[#D4AF37] flex-shrink-0 mt-1" size={20} />
+                  <AlertCircle className="text-[var(--accent-gold)] flex-shrink-0 mt-1" size={20} />
                   <div>
-                    <p className="text-[#F5F5F7] font-semibold mb-2">Important Notes:</p>
-                    <ul className="text-[#A1A1AA] text-sm space-y-2 list-disc list-inside">
+                    <p className="text-[var(--text-primary)] font-semibold mb-2">Important Notes:</p>
+                    <ul className="text-[var(--text-muted)] text-sm space-y-2 list-disc list-inside">
                       <li>🇮🇳 Indian Donors Only (INR)</li>
                       <li>Save transaction screenshot</li>
                       <li>80G receipt sent after verification</li>
@@ -194,18 +194,18 @@ const Donate = () => {
 
               {submitted ? (
                 <div className="text-center py-12" data-testid="success-message">
-                  <CheckCircle2 className="text-[#D4AF37] mx-auto mb-6" size={64} />
+                  <CheckCircle2 className="text-[var(--accent-gold)] mx-auto mb-6" size={64} />
                   <h3 className="text-2xl font-medium mb-4" style={{fontFamily: 'Cormorant Garamond, serif'}}>
                     Thank You!
                   </h3>
-                  <p className="text-[#A1A1AA]">
+                  <p className="text-[var(--text-muted)]">
                     Your donation has been submitted. We'll send your 80G receipt after verification.
                   </p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div>
-                    <label className="block text-[#D4AF37] text-xs tracking-[0.2em] uppercase font-bold mb-3">
+                    <label className="block text-[var(--accent-gold)] text-xs tracking-[0.2em] uppercase font-bold mb-3">
                       Select Cause *
                     </label>
                     <select
@@ -213,7 +213,7 @@ const Donate = () => {
                       value={formData.project_id}
                       onChange={handleInputChange}
                       required
-                      className="w-full bg-[#27272A] border border-[#D4AF37]/20 rounded px-4 py-3 text-[#F5F5F7] focus:outline-none focus:border-[#D4AF37]"
+                      className="w-full bg-[var(--bg-card)] border border-[var(--accent-gold)]/20 rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-gold)]"
                       data-testid="select-project"
                     >
                       <option value="">General Fund</option>
@@ -226,7 +226,7 @@ const Donate = () => {
                   </div>
 
                   <div>
-                    <label className="block text-[#D4AF37] text-xs tracking-[0.2em] uppercase font-bold mb-3">
+                    <label className="block text-[var(--accent-gold)] text-xs tracking-[0.2em] uppercase font-bold mb-3">
                       Full Name *
                     </label>
                     <input
@@ -235,13 +235,13 @@ const Donate = () => {
                       value={formData.donor_name}
                       onChange={handleInputChange}
                       required
-                      className="w-full bg-[#27272A] border border-[#D4AF37]/20 rounded px-4 py-3 text-[#F5F5F7] focus:outline-none focus:border-[#D4AF37]"
+                      className="w-full bg-[var(--bg-card)] border border-[var(--accent-gold)]/20 rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-gold)]"
                       data-testid="input-name"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[#D4AF37] text-xs tracking-[0.2em] uppercase font-bold mb-3">
+                    <label className="block text-[var(--accent-gold)] text-xs tracking-[0.2em] uppercase font-bold mb-3">
                       Email *
                     </label>
                     <input
@@ -250,13 +250,13 @@ const Donate = () => {
                       value={formData.donor_email}
                       onChange={handleInputChange}
                       required
-                      className="w-full bg-[#27272A] border border-[#D4AF37]/20 rounded px-4 py-3 text-[#F5F5F7] focus:outline-none focus:border-[#D4AF37]"
+                      className="w-full bg-[var(--bg-card)] border border-[var(--accent-gold)]/20 rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-gold)]"
                       data-testid="input-email"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[#D4AF37] text-xs tracking-[0.2em] uppercase font-bold mb-3">
+                    <label className="block text-[var(--accent-gold)] text-xs tracking-[0.2em] uppercase font-bold mb-3">
                       Phone Number *
                     </label>
                     <input
@@ -265,13 +265,13 @@ const Donate = () => {
                       value={formData.donor_phone}
                       onChange={handleInputChange}
                       required
-                      className="w-full bg-[#27272A] border border-[#D4AF37]/20 rounded px-4 py-3 text-[#F5F5F7] focus:outline-none focus:border-[#D4AF37]"
+                      className="w-full bg-[var(--bg-card)] border border-[var(--accent-gold)]/20 rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-gold)]"
                       data-testid="input-phone"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[#D4AF37] text-xs tracking-[0.2em] uppercase font-bold mb-3">
+                    <label className="block text-[var(--accent-gold)] text-xs tracking-[0.2em] uppercase font-bold mb-3">
                       PAN Number *
                     </label>
                     <input
@@ -282,13 +282,13 @@ const Donate = () => {
                       required
                       pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
                       placeholder="ABCDE1234F"
-                      className="w-full bg-[#27272A] border border-[#D4AF37]/20 rounded px-4 py-3 text-[#F5F5F7] focus:outline-none focus:border-[#D4AF37]"
+                      className="w-full bg-[var(--bg-card)] border border-[var(--accent-gold)]/20 rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-gold)]"
                       data-testid="input-pan"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[#D4AF37] text-xs tracking-[0.2em] uppercase font-bold mb-3">
+                    <label className="block text-[var(--accent-gold)] text-xs tracking-[0.2em] uppercase font-bold mb-3">
                       Amount (₹) *
                     </label>
                     <input
@@ -298,13 +298,13 @@ const Donate = () => {
                       onChange={handleInputChange}
                       required
                       min="1"
-                      className="w-full bg-[#27272A] border border-[#D4AF37]/20 rounded px-4 py-3 text-[#F5F5F7] focus:outline-none focus:border-[#D4AF37]"
+                      className="w-full bg-[var(--bg-card)] border border-[var(--accent-gold)]/20 rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-gold)]"
                       data-testid="input-amount"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[#D4AF37] text-xs tracking-[0.2em] uppercase font-bold mb-3">
+                    <label className="block text-[var(--accent-gold)] text-xs tracking-[0.2em] uppercase font-bold mb-3">
                       UTR / Transaction ID *
                     </label>
                     <input
@@ -313,16 +313,16 @@ const Donate = () => {
                       value={formData.utr_number}
                       onChange={handleInputChange}
                       required
-                      className="w-full bg-[#27272A] border border-[#D4AF37]/20 rounded px-4 py-3 text-[#F5F5F7] focus:outline-none focus:border-[#D4AF37]"
+                      className="w-full bg-[var(--bg-card)] border border-[var(--accent-gold)]/20 rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-gold)]"
                       data-testid="input-utr"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[#D4AF37] text-xs tracking-[0.2em] uppercase font-bold mb-3">
+                    <label className="block text-[var(--accent-gold)] text-xs tracking-[0.2em] uppercase font-bold mb-3">
                       Payment Screenshot *
                     </label>
-                    <div className="border-2 border-dashed border-[#D4AF37]/20 rounded p-8 text-center">
+                    <div className="border-2 border-dashed border-[var(--accent-gold)]/20 rounded p-8 text-center">
                       {screenshotPreview ? (
                         <div className="relative" data-testid="screenshot-preview">
                           <img src={screenshotPreview} alt="Screenshot" className="max-h-48 mx-auto rounded" />
@@ -332,16 +332,16 @@ const Donate = () => {
                               setScreenshot(null);
                               setScreenshotPreview('');
                             }}
-                            className="mt-4 text-[#D4AF37] text-sm hover:underline"
+                            className="mt-4 text-[var(--accent-gold)] text-sm hover:underline"
                           >
                             Change Screenshot
                           </button>
                         </div>
                       ) : (
                         <label className="cursor-pointer" data-testid="upload-area">
-                          <Upload className="text-[#D4AF37] mx-auto mb-4" size={48} />
-                          <p className="text-[#F5F5F7] mb-2">Click to upload</p>
-                          <p className="text-[#A1A1AA] text-sm">PNG, JPG up to 10MB</p>
+                          <Upload className="text-[var(--accent-gold)] mx-auto mb-4" size={48} />
+                          <p className="text-[var(--text-primary)] mb-2">Click to upload</p>
+                          <p className="text-[var(--text-muted)] text-sm">PNG, JPG up to 10MB</p>
                           <input
                             type="file"
                             accept="image/*"

@@ -135,7 +135,7 @@ const ProjectsManagement = () => {
           <h3 className="text-2xl font-medium mb-2" style={{fontFamily: 'Cormorant Garamond, serif'}}>
             Projects <span className="text-gradient-blue">Management</span>
           </h3>
-          <p className="text-[#A1A1AA] text-sm">
+          <p className="text-[var(--text-muted)] text-sm">
             Manage your 5 Pillars of Impact and donation causes
           </p>
         </div>
@@ -160,21 +160,21 @@ const ProjectsManagement = () => {
               placeholder="Project Title *" 
               value={formData.title} 
               onChange={e => setFormData({...formData, title: e.target.value})} 
-              className="bg-[#1C2951] border blue-border rounded px-4 py-3 text-[#F5F5F7] focus:outline-none focus:border-[#3498DB]" 
+              className="bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)]" 
             />
             
             <input 
               placeholder="Category *" 
               value={formData.category} 
               onChange={e => setFormData({...formData, category: e.target.value})} 
-              className="bg-[#1C2951] border blue-border rounded px-4 py-3 text-[#F5F5F7] focus:outline-none focus:border-[#3498DB]" 
+              className="bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)]" 
             />
             
             <textarea 
               placeholder="Description" 
               value={formData.description} 
               onChange={e => setFormData({...formData, description: e.target.value})} 
-              className="bg-[#1C2951] border blue-border rounded px-4 py-3 text-[#F5F5F7] focus:outline-none focus:border-[#3498DB] md:col-span-2" 
+              className="bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)] md:col-span-2" 
               rows="3" 
             />
             
@@ -183,22 +183,22 @@ const ProjectsManagement = () => {
               placeholder="Target Amount (₹)" 
               value={formData.target_amount} 
               onChange={e => setFormData({...formData, target_amount: parseInt(e.target.value) || 0})} 
-              className="bg-[#1C2951] border blue-border rounded px-4 py-3 text-[#F5F5F7] focus:outline-none focus:border-[#3498DB]" 
+              className="bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)]" 
             />
 
-            <div className="flex items-center gap-3 bg-[#1C2951] border blue-border rounded px-4 py-3">
+            <div className="flex items-center gap-3 bg-[var(--bg-surface)] border blue-border rounded px-4 py-3">
               <input 
                 type="checkbox" 
                 checked={formData.is_active}
                 onChange={e => setFormData({...formData, is_active: e.target.checked})}
                 className="w-4 h-4"
               />
-              <label className="text-[#F5F5F7] text-sm">Active Project</label>
+              <label className="text-sm" style={{color: 'var(--text-primary)'}}>Active Project</label>
             </div>
           </div>
 
           {/* Hero Image Upload */}
-          <div className="mt-6 p-6 bg-[#1C2951] border blue-border rounded">
+          <div className="mt-6 p-6 bg-[var(--bg-surface)] border blue-border rounded">
             {formData.hero_image ? (
               <div className="flex flex-col sm:flex-row items-center gap-4">
                 <img 
@@ -207,7 +207,7 @@ const ProjectsManagement = () => {
                   className="w-32 h-32 object-cover rounded"
                 />
                 <div className="flex-1 text-center sm:text-left">
-                  <p className="text-[#F5F5F7] text-sm mb-2">Hero image uploaded ✓</p>
+                  <p className="text-[var(--text-primary)] text-sm mb-2">Hero image uploaded ✓</p>
                   <button 
                     onClick={uploadImage} 
                     disabled={uploading}
@@ -219,8 +219,8 @@ const ProjectsManagement = () => {
               </div>
             ) : (
               <div className="text-center">
-                <Upload className="mx-auto mb-4" style={{color: '#3498DB'}} size={48} />
-                <p className="text-[#A1A1AA] mb-4">No hero image uploaded</p>
+                <Upload className="mx-auto mb-4" style={{color: 'var(--accent-teal)'}} size={48} />
+                <p className="mb-4" style={{color: 'var(--text-muted)'}}>No hero image uploaded</p>
                 <button 
                   onClick={uploadImage} 
                   disabled={uploading}
@@ -254,7 +254,7 @@ const ProjectsManagement = () => {
       {/* Projects Grid */}
       {projects.length === 0 ? (
         <div className="glass-morph p-12 rounded text-center">
-          <p className="text-[#A1A1AA] mb-4">No projects yet. Add your first project above!</p>
+          <p className="text-[var(--text-muted)] mb-4">No projects yet. Add your first project above!</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -263,7 +263,7 @@ const ProjectsManagement = () => {
 
             return (
               <div key={project.id} className="glass-morph p-6 rounded hover-lift">
-                <div className="h-48 bg-[#1C2951] rounded mb-4 overflow-hidden">
+                <div className="h-48 bg-[var(--bg-surface)] rounded mb-4 overflow-hidden">
                   {project.hero_image ? (
                     <img 
                       src={project.hero_image} 
@@ -272,15 +272,15 @@ const ProjectsManagement = () => {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <Upload style={{color: '#3498DB'}} size={48} />
+                      <Upload style={{color: 'var(--accent-teal)'}} size={48} />
                     </div>
                   )}
                 </div>
                 
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
-                    <h3 className="text-[#F5F5F7] font-semibold text-lg mb-1">{project.title}</h3>
-                    <span className="text-[#3498DB] text-xs tracking-[0.2em] uppercase font-bold">
+                    <h3 className="text-[var(--text-primary)] font-semibold text-lg mb-1">{project.title}</h3>
+                    <span className="text-[var(--accent-teal)] text-xs tracking-[0.2em] uppercase font-bold">
                       {project.category}
                     </span>
                   </div>
@@ -291,27 +291,27 @@ const ProjectsManagement = () => {
                   </span>
                 </div>
 
-                <p className="text-[#A1A1AA] text-sm mb-4 line-clamp-2">
+                <p className="text-[var(--text-muted)] text-sm mb-4 line-clamp-2">
                   {project.description}
                 </p>
 
                 {/* Progress Bar */}
                 <div className="mb-4">
                   <div className="flex justify-between text-sm mb-2">
-                    <span className="text-[#A1A1AA]">
+                    <span className="text-[var(--text-muted)]">
                       ₹{project.raised_amount.toLocaleString()}
                     </span>
-                    <span className="text-[#3498DB] font-semibold">
+                    <span className="text-[var(--accent-teal)] font-semibold">
                       {progress.toFixed(0)}%
                     </span>
                   </div>
-                  <div className="w-full bg-[#0A1128] rounded-full h-2 overflow-hidden">
+                  <div className="w-full bg-[var(--bg-deep)] rounded-full h-2 overflow-hidden">
                     <div 
-                      className="bg-gradient-to-r from-[#3498DB] to-[#5DADE2] h-full"
+                      className="bg-gradient-to-r from-[var(--accent-teal)] to-[var(--accent-teal-light)] h-full"
                       style={{width: `${progress}%`}}
                     ></div>
                   </div>
-                  <p className="text-[#A1A1AA] text-xs mt-1">
+                  <p className="text-[var(--text-muted)] text-xs mt-1">
                     Goal: ₹{project.target_amount.toLocaleString()}
                   </p>
                 </div>

@@ -135,7 +135,7 @@ const TeamPillars = () => {
           <h3 className="text-2xl font-medium mb-2" style={{fontFamily: 'Cormorant Garamond, serif'}}>
             Team <span className="text-gradient-orange">Pillars</span>
           </h3>
-          <p className="text-[#A1A1AA] text-sm">
+          <p className="text-[var(--text-muted)] text-sm">
             Manage your leadership team: President, Founders, and Field Operations
           </p>
         </div>
@@ -160,7 +160,7 @@ const TeamPillars = () => {
               placeholder="Full Name *" 
               value={formData.name} 
               onChange={e => setFormData({...formData, name: e.target.value})} 
-              className="bg-[#1C2951] border blue-border rounded px-4 py-3 text-[#F5F5F7] focus:outline-none focus:border-[#3498DB]" 
+              className="bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)]" 
               data-testid="pillar-name-input"
             />
             
@@ -168,21 +168,21 @@ const TeamPillars = () => {
               placeholder="Role/Title *" 
               value={formData.role} 
               onChange={e => setFormData({...formData, role: e.target.value})} 
-              className="bg-[#1C2951] border blue-border rounded px-4 py-3 text-[#F5F5F7] focus:outline-none focus:border-[#3498DB]" 
+              className="bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)]" 
             />
             
             <input 
               placeholder="Specialty/Focus Area" 
               value={formData.specialty} 
               onChange={e => setFormData({...formData, specialty: e.target.value})} 
-              className="bg-[#1C2951] border blue-border rounded px-4 py-3 text-[#F5F5F7] focus:outline-none focus:border-[#3498DB] md:col-span-2" 
+              className="bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)] md:col-span-2" 
             />
             
             <textarea 
               placeholder="Brief Bio (2-3 lines for card preview)" 
               value={formData.bio_brief} 
               onChange={e => setFormData({...formData, bio_brief: e.target.value})} 
-              className="bg-[#1C2951] border blue-border rounded px-4 py-3 text-[#F5F5F7] focus:outline-none focus:border-[#3498DB] md:col-span-2" 
+              className="bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)] md:col-span-2" 
               rows="2" 
             />
             
@@ -190,14 +190,14 @@ const TeamPillars = () => {
               placeholder="Detailed Bio (shows on hover)" 
               value={formData.bio_detailed} 
               onChange={e => setFormData({...formData, bio_detailed: e.target.value})} 
-              className="bg-[#1C2951] border blue-border rounded px-4 py-3 text-[#F5F5F7] focus:outline-none focus:border-[#3498DB] md:col-span-2" 
+              className="bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)] md:col-span-2" 
               rows="4" 
             />
             
             <select 
               value={formData.category} 
               onChange={e => setFormData({...formData, category: e.target.value})} 
-              className="bg-[#1C2951] border blue-border rounded px-4 py-3 text-[#F5F5F7] focus:outline-none focus:border-[#3498DB]"
+              className="bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)]"
             >
               <option value="President">President</option>
               <option value="Founder">Founder</option>
@@ -209,12 +209,12 @@ const TeamPillars = () => {
               placeholder="Display Priority (1 = first)" 
               value={formData.display_priority} 
               onChange={e => setFormData({...formData, display_priority: parseInt(e.target.value) || 0})} 
-              className="bg-[#1C2951] border blue-border rounded px-4 py-3 text-[#F5F5F7] focus:outline-none focus:border-[#3498DB]" 
+              className="bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)]" 
             />
           </div>
 
           {/* Photo Upload */}
-          <div className="mt-6 p-6 bg-[#1C2951] border blue-border rounded">
+          <div className="mt-6 p-6 bg-[var(--bg-surface)] border blue-border rounded">
             {formData.image_url ? (
               <div className="flex flex-col sm:flex-row items-center gap-4">
                 <img 
@@ -223,7 +223,7 @@ const TeamPillars = () => {
                   className="w-24 h-24 object-cover rounded identity-lock"
                 />
                 <div className="flex-1 text-center sm:text-left">
-                  <p className="text-[#F5F5F7] text-sm mb-2">Photo uploaded ✓</p>
+                  <p className="text-[var(--text-primary)] text-sm mb-2">Photo uploaded ✓</p>
                   <button 
                     onClick={uploadImage} 
                     disabled={uploading}
@@ -235,8 +235,8 @@ const TeamPillars = () => {
               </div>
             ) : (
               <div className="text-center">
-                <Upload className="mx-auto mb-4" style={{color: '#3498DB'}} size={48} />
-                <p className="text-[#A1A1AA] mb-4">No photo uploaded</p>
+                <Upload className="mx-auto mb-4" style={{color: 'var(--accent-teal)'}} size={48} />
+                <p className="text-[var(--text-muted)] mb-4">No photo uploaded</p>
                 <button 
                   onClick={uploadImage} 
                   disabled={uploading}
@@ -271,13 +271,13 @@ const TeamPillars = () => {
       {/* Pillars Grid */}
       {pillars.length === 0 ? (
         <div className="glass-morph p-12 rounded text-center">
-          <p className="text-[#A1A1AA] mb-4">No team pillars yet. Add your first pillar above!</p>
+          <p className="text-[var(--text-muted)] mb-4">No team pillars yet. Add your first pillar above!</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {pillars.map(pillar => (
             <div key={pillar.id} className="glass-morph p-6 rounded hover-lift" data-testid={`pillar-${pillar.id}`}>
-              <div className="aspect-square bg-[#1C2951] rounded mb-4 overflow-hidden">
+              <div className="aspect-square bg-[var(--bg-surface)] rounded mb-4 overflow-hidden">
                 {pillar.image_url ? (
                   <img 
                     src={pillar.image_url} 
@@ -286,18 +286,18 @@ const TeamPillars = () => {
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
-                    <Upload style={{color: '#3498DB'}} size={48} />
+                    <Upload style={{color: 'var(--accent-teal)'}} size={48} />
                   </div>
                 )}
               </div>
               
-              <h3 className="text-[#F5F5F7] font-semibold text-lg mb-1">{pillar.name}</h3>
-              <p className="text-[#3498DB] text-xs tracking-[0.2em] uppercase font-bold mb-2">{pillar.role}</p>
-              <p className="text-[#A1A1AA] text-sm mb-3 line-clamp-2">{pillar.specialty}</p>
+              <h3 className="text-[var(--text-primary)] font-semibold text-lg mb-1">{pillar.name}</h3>
+              <p className="text-[var(--accent-teal)] text-xs tracking-[0.2em] uppercase font-bold mb-2">{pillar.role}</p>
+              <p className="text-[var(--text-muted)] text-sm mb-3 line-clamp-2">{pillar.specialty}</p>
               
-              <div className="flex items-center justify-between text-xs text-[#A1A1AA] mb-4">
+              <div className="flex items-center justify-between text-xs text-[var(--text-muted)] mb-4">
                 <span>Priority: {pillar.display_priority}</span>
-                <span className="px-2 py-1 bg-[#1C2951] rounded">{pillar.category}</span>
+                <span className="px-2 py-1 bg-[var(--bg-surface)] rounded">{pillar.category}</span>
               </div>
               
               <div className="flex gap-2">

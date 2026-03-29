@@ -7,6 +7,7 @@ import PressMedia from "@/pages/PressMedia";
 import Transparency from "@/pages/Transparency";
 import AboutUs from "@/pages/AboutUs";
 import TrackMyImpact from "@/pages/TrackMyImpact";
+import UserAuth from "@/pages/UserAuth";
 import "@/App.css";
 
 const ProtectedRoute = ({ children }) => {
@@ -25,6 +26,7 @@ function App() {
           <Route path="/press" element={<PressMedia />} />
           <Route path="/transparency" element={<Transparency />} />
           <Route path="/track-impact" element={<TrackMyImpact />} />
+          <Route path="/login" element={<UserAuth />} />
           <Route path="/uhf-admin" element={<AdminLogin />} />
           <Route 
             path="/uhf-admin/dashboard" 

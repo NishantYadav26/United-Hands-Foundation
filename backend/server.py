@@ -84,6 +84,17 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
+class UserRegister(BaseModel):
+    name: str
+    email: EmailStr
+    password: str
+    phone: Optional[str] = None
+    pan: Optional[str] = None
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
 class DonorTrackRequest(BaseModel):
     email: EmailStr
     pan: str
@@ -101,6 +112,19 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
         if email != ADMIN_EMAIL:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")
         return email
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expired")
+    except jwt.JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
+def verify_user_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    try:
+        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get("sub")
+        role: str = payload.get("role", "user")
+        if not email:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+        return {"email": email, "role": role}
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expired")
     except jwt.JWTError:
@@ -427,6 +451,64 @@ async def track_donations(request: DonorTrackRequest):
     
     for donation in donations:
         if isinstance(donation['created_at'], str):
+            donation['created_at'] = datetime.fromisoformat(donation['created_at'])
+    
+    return {"donations": donations}
+
+# ===== USER AUTH ROUTES =====
+
+@api_router.post("/auth/register")
+async def user_register(user: UserRegister):
+    existing = await db.users.find_one({"email": user.email}, {"_id": 0})
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    hashed = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt())
+    user_doc = {
+        "id": str(uuid.uuid4()),
+        "name": user.name,
+        "email": user.email,
+        "password": hashed.decode('utf-8'),
+        "phone": user.phone or "",
+        "pan": user.pan or "",
+        "role": "user",
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.users.insert_one(user_doc)
+    
+    access_token = create_access_token(data={"sub": user.email, "role": "user", "name": user.name})
+    return {"access_token": access_token, "token_type": "bearer", "user": {"name": user.name, "email": user.email, "role": "user"}}
+
+@api_router.post("/auth/login")
+async def user_login(login: UserLogin):
+    user = await db.users.find_one({"email": login.email}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    
+    if not bcrypt.checkpw(login.password.encode('utf-8'), user['password'].encode('utf-8')):
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    
+    access_token = create_access_token(data={"sub": user['email'], "role": "user", "name": user['name']})
+    return {"access_token": access_token, "token_type": "bearer", "user": {"name": user['name'], "email": user['email'], "role": "user"}}
+
+@api_router.get("/auth/me")
+async def get_current_user(user_data: dict = Depends(verify_user_token)):
+    user = await db.users.find_one({"email": user_data["email"]}, {"_id": 0, "password": 0})
+    if not user:
+        if user_data["email"] == ADMIN_EMAIL:
+            return {"name": ADMIN_NAME, "email": ADMIN_EMAIL, "role": "admin"}
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"name": user["name"], "email": user["email"], "role": user.get("role", "user")}
+
+@api_router.get("/user/donations")
+async def get_user_donations(user_data: dict = Depends(verify_user_token)):
+    donations = await db.donations.find(
+        {"donor_email": user_data["email"]},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(1000)
+    
+    for donation in donations:
+        if isinstance(donation.get('created_at'), str):
             donation['created_at'] = datetime.fromisoformat(donation['created_at'])
     
     return {"donations": donations}

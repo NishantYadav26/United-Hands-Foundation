@@ -49,7 +49,7 @@ const Transparency = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#1A1A1A]">
+    <div className="min-h-screen bg-[var(--bg-deep)]">
       <Navbar />
 
       <div className="pt-32 pb-24 px-6">
@@ -60,20 +60,20 @@ const Transparency = () => {
               style={{fontFamily: 'Cormorant Garamond, serif'}}
               data-testid="transparency-title"
             >
-              Transparency & <span className="text-[#D4AF37]">Governance</span>
+              Transparency & <span className="text-[var(--accent-gold)]">Governance</span>
             </h1>
-            <p className="text-[#A1A1AA] text-lg max-w-2xl mx-auto">
+            <p className="text-[var(--text-muted)] text-lg max-w-2xl mx-auto">
               We believe in complete transparency. Access all our legal and financial documents.
             </p>
           </div>
 
           {/* Legal Status Banner */}
           <div className="glass-morph p-8 rounded mb-12 text-center" data-testid="legal-status">
-            <Shield className="text-[#D4AF37] mx-auto mb-4" size={48} />
+            <Shield className="text-[var(--accent-gold)] mx-auto mb-4" size={48} />
             <h2 className="text-2xl font-medium mb-4" style={{fontFamily: 'Cormorant Garamond, serif'}}>
               Legally Registered NGO
             </h2>
-            <p className="text-[#A1A1AA] max-w-3xl mx-auto">
+            <p className="text-[var(--text-muted)] max-w-3xl mx-auto">
               United Hands Foundation is registered under Section 12A and 80G of the Income Tax Act, 1961. 
               All donations are eligible for 50% tax deduction.
             </p>
@@ -87,14 +87,14 @@ const Transparency = () => {
                 className="glass-morph p-8 rounded hover-lift"
                 data-testid={`document-${index}`}
               >
-                <doc.icon className="text-[#D4AF37] mb-6" size={40} />
-                <h3 className="text-xl font-medium mb-3 text-[#F5F5F7]" style={{fontFamily: 'Cormorant Garamond, serif'}}>
+                <doc.icon className="text-[var(--accent-gold)] mb-6" size={40} />
+                <h3 className="text-xl font-medium mb-3 text-[var(--text-primary)]" style={{fontFamily: 'Cormorant Garamond, serif'}}>
                   {doc.title}
                 </h3>
-                <p className="text-[#A1A1AA] text-sm mb-6">{doc.description}</p>
+                <p className="text-[var(--text-muted)] text-sm mb-6">{doc.description}</p>
                 <a
                   href={doc.link}
-                  className="inline-flex items-center gap-2 text-[#D4AF37] hover:text-[#E5C047] transition-colors text-sm font-semibold"
+                  className="inline-flex items-center gap-2 text-[var(--accent-gold)] hover:text-[var(--accent-warm-light)] transition-colors text-sm font-semibold"
                 >
                   <Download size={16} />
                   Download PDF
@@ -104,15 +104,15 @@ const Transparency = () => {
           </div>
 
           {/* FCRA Notice */}
-          <div className="mt-16 bg-[#27272A] border border-[#D4AF37]/20 p-8 rounded" data-testid="fcra-notice">
-            <h3 className="text-2xl font-medium mb-4 text-[#D4AF37]" style={{fontFamily: 'Cormorant Garamond, serif'}}>
+          <div className="mt-16 bg-[var(--bg-card)] border border-[var(--accent-gold)]/20 p-8 rounded" data-testid="fcra-notice">
+            <h3 className="text-2xl font-medium mb-4 text-[var(--accent-gold)]" style={{fontFamily: 'Cormorant Garamond, serif'}}>
               FCRA Compliance Notice
             </h3>
-            <p className="text-[#F5F5F7] leading-relaxed mb-4">
+            <p className="text-[var(--text-primary)] leading-relaxed mb-4">
               United Hands Foundation currently accepts donations from Indian citizens only (INR transactions). 
               We are in the process of obtaining FCRA (Foreign Contribution Regulation Act) registration to accept international donations.
             </p>
-            <p className="text-[#A1A1AA] text-sm">
+            <p className="text-[var(--text-muted)] text-sm">
               All non-INR transactions are automatically blocked to ensure full regulatory compliance.
             </p>
           </div>
@@ -122,7 +122,7 @@ const Transparency = () => {
             <h3 className="text-2xl font-medium mb-4" style={{fontFamily: 'Cormorant Garamond, serif'}}>
               Questions or Queries?
             </h3>
-            <p className="text-[#A1A1AA] mb-6">
+            <p className="text-[var(--text-muted)] mb-6">
               For any questions about our governance, finances, or operations, please contact us.
             </p>
             <a

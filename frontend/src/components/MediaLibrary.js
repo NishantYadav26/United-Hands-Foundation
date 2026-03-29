@@ -72,7 +72,7 @@ const MediaLibrary = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="animate-spin" style={{color: '#3498DB'}} size={48} />
+        <Loader2 className="animate-spin" style={{color: 'var(--accent-teal)'}} size={48} />
       </div>
     );
   }
@@ -83,7 +83,7 @@ const MediaLibrary = () => {
         <h3 className="text-2xl font-medium mb-2" style={{fontFamily: 'Cormorant Garamond, serif'}}>
           Media <span className="text-gradient-blue">Library</span>
         </h3>
-        <p className="text-[#A1A1AA] text-sm mb-6">
+        <p className="text-[var(--text-muted)] text-sm mb-6">
           Upload and manage all website images. Changes appear instantly across the entire site.
         </p>
       </div>
@@ -91,7 +91,7 @@ const MediaLibrary = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {assets.map(asset => (
           <div key={asset.asset_key} className="glass-morph p-6 rounded hover-lift" data-testid={`asset-${asset.asset_key}`}>
-            <div className="aspect-square bg-[#1C2951] rounded mb-4 flex items-center justify-center overflow-hidden">
+            <div className="aspect-square bg-[var(--bg-surface)] rounded mb-4 flex items-center justify-center overflow-hidden">
               {asset.asset_url ? (
                 <img 
                   src={asset.asset_url} 
@@ -99,14 +99,14 @@ const MediaLibrary = () => {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <ImageIcon style={{color: '#3498DB'}} size={48} />
+                <ImageIcon style={{color: 'var(--accent-teal)'}} size={48} />
               )}
             </div>
             
-            <h3 className="text-[#F5F5F7] font-semibold mb-1 text-sm sm:text-base">
+            <h3 className="text-[var(--text-primary)] font-semibold mb-1 text-sm sm:text-base">
               {asset.asset_name}
             </h3>
-            <p className="text-[#A1A1AA] text-xs mb-4 line-clamp-2">
+            <p className="text-[var(--text-muted)] text-xs mb-4 line-clamp-2">
               {asset.description || 'No description'}
             </p>
             
@@ -120,7 +120,7 @@ const MediaLibrary = () => {
             </button>
 
             {asset.updated_at && (
-              <p className="text-[#A1A1AA] text-xs mt-2 text-center">
+              <p className="text-[var(--text-muted)] text-xs mt-2 text-center">
                 Updated: {new Date(asset.updated_at).toLocaleDateString()}
               </p>
             )}
