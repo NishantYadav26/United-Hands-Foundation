@@ -1,5 +1,6 @@
-from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, Form, Body
+from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, Form, Body, Depends, status
 from fastapi.responses import FileResponse
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -9,7 +10,7 @@ from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict, EmailStr
 from typing import List, Optional
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import time
 import cloudinary
 import cloudinary.utils
@@ -21,9 +22,19 @@ from reportlab.lib.utils import ImageReader
 from io import BytesIO
 import razorpay
 from emergentintegrations.llm.chat import LlmChat, UserMessage, FileContentWithMimeType
+import jwt
+import bcrypt
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
+
+# JWT Configuration
+SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'uhf-secret-key-2026-change-in-production')
+ALGORITHM = 'HS256'
+ACCESS_TOKEN_EXPIRE_MINUTES = 480  # 8 hours
+
+# Admin email (only this email can access admin)
+ADMIN_EMAIL = 'unitedhandsfoundation4@gmail.com'
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
@@ -48,6 +59,9 @@ razorpay_client = razorpay.Client(auth=(
 resend.api_key = os.getenv("RESEND_API_KEY", "re_placeholder")
 SENDER_EMAIL = os.getenv("SENDER_EMAIL", "onboarding@resend.dev")
 
+# Security
+security = HTTPBearer()
+
 # Create the main app
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
@@ -58,6 +72,38 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+# ===== AUTH MODELS & FUNCTIONS =====
+
+class AdminLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class DonorTrackRequest(BaseModel):
+    email: EmailStr
+    pan: str
+
+def create_access_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    try:
+        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get("sub")
+        if email != ADMIN_EMAIL:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")
+        return email
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expired")
+    except jwt.JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
 # ===== MODELS =====
 
@@ -70,7 +116,7 @@ class DonationCreate(BaseModel):
     utr_number: str
     screenshot_url: str
     payment_mode: str = "manual_qr"
-    project_id: Optional[str] = None  # For multi-cause donations
+    project_id: Optional[str] = None
 
 class Donation(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -86,7 +132,7 @@ class Donation(BaseModel):
     payment_mode: str = "manual_qr"
     project_id: Optional[str] = None
     project_title: Optional[str] = None
-    status: str = "pending"  # pending, approved, rejected
+    status: str = "pending"
     receipt_number: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -94,13 +140,13 @@ class AdminSettings(BaseModel):
     model_config = ConfigDict(extra="ignore")
     
     id: str = "settings"
-    payment_mode: str = "manual_qr"  # manual_qr or razorpay
+    payment_mode: str = "manual_qr"
     qr_code_url: str = ""
-    upi_id: str = ""
+    upi_id: str = "unitedhands@upi"
 
 class DonationApproval(BaseModel):
     donation_id: str
-    status: str  # approved or rejected
+    status: str
 
 class SuccessStory(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -129,6 +175,7 @@ class PressMedia(BaseModel):
     district: str
     year: str
     image_url: str
+    category: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class PressMediaCreate(BaseModel):
@@ -137,13 +184,14 @@ class PressMediaCreate(BaseModel):
     district: str
     year: str
     image_url: str
+    category: Optional[str] = None
 
 class Project(BaseModel):
     model_config = ConfigDict(extra="ignore")
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     title: str
-    category: str  # Elderly, Education, Health, Disaster Relief
+    category: str
     description: str
     hero_image: str
     target_amount: int
@@ -159,37 +207,49 @@ class ProjectCreate(BaseModel):
     target_amount: int
     is_active: bool = True
 
+class VideoContent(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    description: str
+    video_url: str
+    thumbnail_url: str
+    category: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class VideoContentCreate(BaseModel):
+    title: str
+    description: str
+    video_url: str
+    thumbnail_url: str
+    category: str
+
 # ===== HELPER FUNCTIONS =====
 
 async def generate_receipt_number():
-    """Generate serial numbered receipt"""
     count = await db.donations.count_documents({"status": "approved"})
     year = datetime.now().year
     return f"UHF-80G-{year}-{count + 1:04d}"
 
 def create_80g_receipt_pdf(donation: dict, receipt_number: str) -> BytesIO:
-    """Generate 80G compliant PDF receipt with real legal data"""
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=letter)
     width, height = letter
     
-    # Header
     c.setFont("Helvetica-Bold", 20)
     c.drawString(100, height - 80, "United Hands Foundation")
     c.setFont("Helvetica", 10)
     c.drawString(100, height - 100, "TA JI LATUR | Est. 2020 | Vayorang Elderly Care Program")
     c.drawString(100, height - 115, "New Bhagya Nagar, Ring Road, Latur, Maharashtra - 413512")
     
-    # Legal Details
     c.setFont("Helvetica-Bold", 9)
     c.drawString(100, height - 135, "PAN: AABTU0797K | 12A: AABTU0797KE20231 | 80G: AABTU0797KF20231")
     c.drawString(100, height - 150, "Societies Reg: Latur/0000171/2020 | Registered: 04/08/2020")
     
-    # Receipt Number
     c.setFont("Helvetica-Bold", 12)
     c.drawString(100, height - 180, f"Receipt No: {receipt_number}")
     
-    # Donation Details
     c.setFont("Helvetica", 11)
     y_position = height - 220
     c.drawString(100, y_position, f"Donor Name: {donation['donor_name']}")
@@ -205,14 +265,12 @@ def create_80g_receipt_pdf(donation: dict, receipt_number: str) -> BytesIO:
     c.drawString(100, y_position, f"UTR: {donation['utr_number']}")
     y_position -= 20
     
-    # Add project/cause if present
     if donation.get('project_title'):
         c.drawString(100, y_position, f"Donated to: {donation['project_title']}")
         y_position -= 20
     
     c.drawString(100, y_position, f"Date: {datetime.now().strftime('%d %B %Y')}")
     
-    # 80G Declaration
     y_position -= 40
     c.setFont("Helvetica-Bold", 11)
     c.drawString(100, y_position, "80G Tax Exemption Certificate")
@@ -224,17 +282,15 @@ def create_80g_receipt_pdf(donation: dict, receipt_number: str) -> BytesIO:
     y_position -= 15
     c.drawString(100, y_position, "12A Registration: AABTU0797KE20231 (Provisional)")
     
-    # Footer
     c.setFont("Helvetica-Oblique", 8)
     c.drawString(100, 50, "Thank you for your generous contribution to United Hands Foundation.")
-    c.drawString(100, 35, "For queries: contact@unitedhands.org | www.unitedhands.org")
+    c.drawString(100, 35, "For queries: unitedhandsfoundation4@gmail.com")
     
     c.save()
     buffer.seek(0)
     return buffer
 
 async def send_receipt_email(donor_email: str, donor_name: str, receipt_number: str, pdf_buffer: BytesIO):
-    """Send 80G receipt via Resend"""
     try:
         import base64
         pdf_base64 = base64.b64encode(pdf_buffer.read()).decode('utf-8')
@@ -248,10 +304,10 @@ async def send_receipt_email(donor_email: str, donor_name: str, receipt_number: 
                 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
                     <h2 style="color: #D4AF37;">Thank You for Your Donation!</h2>
                     <p>Dear {donor_name},</p>
-                    <p>Thank you for your generous contribution to United Hands Foundation. Your support helps us continue our Vayorang Elderly Care program.</p>
+                    <p>Thank you for your generous contribution to United Hands Foundation. Your support helps us continue our Vayorang Elderly Care program and community service.</p>
                     <p>Please find your 80G tax exemption receipt attached to this email.</p>
                     <p><strong>Receipt Number:</strong> {receipt_number}</p>
-                    <p>With gratitude,<br>United Hands Foundation</p>
+                    <p>With gratitude,<br>United Hands Foundation<br>New Bhagya Nagar, Ring Road, Latur, Maharashtra - 413512</p>
                 </body>
             </html>
             """,
@@ -270,17 +326,58 @@ async def send_receipt_email(donor_email: str, donor_name: str, receipt_number: 
         logger.error(f"Failed to send receipt email: {str(e)}")
         raise
 
+# ===== AUTH ROUTES =====
+
+@api_router.post("/auth/admin-login", response_model=Token)
+async def admin_login(login: AdminLogin):
+    if login.email != ADMIN_EMAIL:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+    
+    admin = await db.admin_users.find_one({"email": ADMIN_EMAIL}, {"_id": 0})
+    
+    if not admin:
+        hashed = bcrypt.hashpw(login.password.encode('utf-8'), bcrypt.gensalt())
+        admin_doc = {
+            "email": ADMIN_EMAIL,
+            "password": hashed.decode('utf-8'),
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.admin_users.insert_one(admin_doc)
+        access_token = create_access_token(data={"sub": ADMIN_EMAIL})
+        return {"access_token": access_token, "token_type": "bearer"}
+    
+    if not bcrypt.checkpw(login.password.encode('utf-8'), admin.get('password', '').encode('utf-8')):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+    
+    access_token = create_access_token(data={"sub": ADMIN_EMAIL})
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@api_router.post("/donor/track")
+async def track_donations(request: DonorTrackRequest):
+    donations = await db.donations.find(
+        {
+            "donor_email": request.email,
+            "donor_pan": request.pan,
+            "status": "approved"
+        },
+        {"_id": 0}
+    ).to_list(1000)
+    
+    for donation in donations:
+        if isinstance(donation['created_at'], str):
+            donation['created_at'] = datetime.fromisoformat(donation['created_at'])
+    
+    return {"donations": donations}
+
 # ===== ROUTES =====
 
 @api_router.get("/")
 async def root():
     return {"message": "United Hands Foundation API"}
 
-# Cloudinary signature endpoint
 @api_router.get("/cloudinary/signature")
 async def generate_cloudinary_signature(resource_type: str = "image", folder: str = "uploads"):
-    """Generate signed upload parameters for Cloudinary"""
-    ALLOWED_FOLDERS = ("donations/", "press/", "uploads/", "success_stories/")
+    ALLOWED_FOLDERS = ("donations/", "press/", "uploads/", "success_stories/", "qr_codes/", "videos/")
     if not folder.startswith(ALLOWED_FOLDERS):
         raise HTTPException(status_code=400, detail="Invalid folder path")
     
@@ -305,13 +402,10 @@ async def generate_cloudinary_signature(resource_type: str = "image", folder: st
         "resource_type": resource_type
     }
 
-# Donation endpoints
 @api_router.post("/donations", response_model=Donation)
 async def create_donation(donation: DonationCreate):
-    """Create a new donation"""
     donation_obj = Donation(**donation.model_dump())
     
-    # If project_id provided, fetch project title
     if donation.project_id:
         project = await db.projects.find_one({"id": donation.project_id}, {"_id": 0})
         if project:
@@ -325,7 +419,6 @@ async def create_donation(donation: DonationCreate):
 
 @api_router.get("/donations", response_model=List[Donation])
 async def get_donations(status: Optional[str] = None):
-    """Get all donations, optionally filtered by status"""
     query = {}
     if status:
         query["status"] = status
@@ -339,44 +432,47 @@ async def get_donations(status: Optional[str] = None):
     return donations
 
 @api_router.post("/donations/approve")
-async def approve_donation(approval: DonationApproval):
-    """Approve or reject a donation and send 80G receipt if approved"""
+async def approve_donation(approval: DonationApproval, admin_email: str = Depends(verify_token)):
     donation = await db.donations.find_one({"id": approval.donation_id}, {"_id": 0})
     
     if not donation:
         raise HTTPException(status_code=404, detail="Donation not found")
     
     if approval.status == "approved":
-        # Generate receipt number
         receipt_number = await generate_receipt_number()
         
-        # Update donation status
         await db.donations.update_one(
             {"id": approval.donation_id},
             {"$set": {"status": "approved", "receipt_number": receipt_number}}
         )
         
-        # Update project raised amount if applicable
         if donation.get('project_id'):
             await db.projects.update_one(
                 {"id": donation['project_id']},
                 {"$inc": {"raised_amount": donation['amount']}}
             )
         
-        # Generate PDF
         pdf_buffer = create_80g_receipt_pdf(donation, receipt_number)
         
-        # MOCK EMAIL: Log instead of sending
-        logger.info(f"[MOCK EMAIL] 80G Receipt would be sent to: {donation['donor_email']}")
-        logger.info(f"[MOCK EMAIL] Receipt Number: {receipt_number}")
-        logger.info(f"[MOCK EMAIL] Amount: ₹{donation['amount']}")
-        
-        return {
-            "status": "success",
-            "message": "Donation approved and receipt generated (MOCK: Email sending disabled)",
-            "receipt_number": receipt_number,
-            "mock_email_sent_to": donation['donor_email']
-        }
+        try:
+            await send_receipt_email(
+                donation['donor_email'],
+                donation['donor_name'],
+                receipt_number,
+                pdf_buffer
+            )
+            return {
+                "status": "success",
+                "message": "Donation approved and receipt sent",
+                "receipt_number": receipt_number
+            }
+        except Exception as e:
+            logger.error(f"Email sending failed: {str(e)}")
+            return {
+                "status": "success",
+                "message": f"Donation approved but email failed: {str(e)}",
+                "receipt_number": receipt_number
+            }
     else:
         await db.donations.update_one(
             {"id": approval.donation_id},
@@ -386,7 +482,6 @@ async def approve_donation(approval: DonationApproval):
 
 @api_router.get("/donations/{donation_id}/receipt")
 async def download_receipt(donation_id: str):
-    """Download 80G receipt PDF"""
     donation = await db.donations.find_one({"id": donation_id}, {"_id": 0})
     
     if not donation:
@@ -397,20 +492,18 @@ async def download_receipt(donation_id: str):
     
     pdf_buffer = create_80g_receipt_pdf(donation, donation['receipt_number'])
     
-    return FileResponse(
-        path=pdf_buffer,
+    from fastapi.responses import StreamingResponse
+    return StreamingResponse(
+        pdf_buffer,
         media_type='application/pdf',
-        filename=f"Receipt_{donation['receipt_number']}.pdf"
+        headers={"Content-Disposition": f"attachment; filename=Receipt_{donation['receipt_number']}.pdf"}
     )
 
-# Admin settings
 @api_router.get("/admin/settings", response_model=AdminSettings)
 async def get_admin_settings():
-    """Get admin settings"""
     settings = await db.admin_settings.find_one({"id": "settings"}, {"_id": 0})
     
     if not settings:
-        # Create default settings
         default_settings = AdminSettings()
         doc = default_settings.model_dump()
         await db.admin_settings.insert_one(doc)
@@ -419,8 +512,7 @@ async def get_admin_settings():
     return AdminSettings(**settings)
 
 @api_router.put("/admin/settings")
-async def update_admin_settings(settings: AdminSettings):
-    """Update admin settings"""
+async def update_admin_settings(settings: AdminSettings, admin_email: str = Depends(verify_token)):
     await db.admin_settings.update_one(
         {"id": "settings"},
         {"$set": settings.model_dump()},
@@ -428,10 +520,8 @@ async def update_admin_settings(settings: AdminSettings):
     )
     return {"status": "success", "message": "Settings updated"}
 
-# Success Stories
 @api_router.post("/success-stories", response_model=SuccessStory)
 async def create_success_story(story: SuccessStoryCreate):
-    """Create a new success story"""
     story_obj = SuccessStory(**story.model_dump())
     doc = story_obj.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
@@ -441,7 +531,6 @@ async def create_success_story(story: SuccessStoryCreate):
 
 @api_router.get("/success-stories", response_model=List[SuccessStory])
 async def get_success_stories(limit: int = 10):
-    """Get success stories"""
     stories = await db.success_stories.find({}, {"_id": 0}).sort("created_at", -1).limit(limit).to_list(limit)
     
     for story in stories:
@@ -451,35 +540,33 @@ async def get_success_stories(limit: int = 10):
     return stories
 
 @api_router.post("/ai/extract-story")
-async def extract_story_from_pdf(file_path: str = Body(..., embed=True)):
-    """Extract success story from PDF using Gemini AI"""
+async def extract_story_from_pdf(file_path: str = Body(..., embed=True), admin_email: str = Depends(verify_token)):
     try:
-        # Initialize Gemini chat
         chat = LlmChat(
             api_key=os.getenv("EMERGENT_LLM_KEY"),
             session_id=str(uuid.uuid4()),
             system_message="You are an AI assistant that extracts information from NGO reports and news clippings."
         ).with_model("gemini", "gemini-2.5-flash")
         
-        # Create file content
         file_content = FileContentWithMimeType(
             file_path=file_path,
             mime_type="application/pdf"
         )
         
-        # Extract information
         user_message = UserMessage(
             text="""Extract the following information from this document:
             1. Location (one of: Dharashiv, Solapur, Latur, Palghar, Panchgani)
             2. Patient Count (number)
             3. Date (in YYYY-MM-DD format)
-            4. Generate a 2-3 sentence success story suitable for a homepage
+            4. Category (one of: Elderly, Education, Health, Disaster Relief, General)
+            5. Generate a 2-3 sentence success story suitable for a homepage
             
             Return ONLY in this JSON format:
             {
                 "location": "city name",
                 "patient_count": number,
                 "date": "YYYY-MM-DD",
+                "category": "category name",
                 "story": "2-3 sentence story"
             }
             """,
@@ -488,7 +575,6 @@ async def extract_story_from_pdf(file_path: str = Body(..., embed=True)):
         
         response = await chat.send_message(user_message)
         
-        # Parse JSON response
         import json
         result = json.loads(response)
         
@@ -500,10 +586,8 @@ async def extract_story_from_pdf(file_path: str = Body(..., embed=True)):
         logger.error(f"AI extraction failed: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-# Press Media
 @api_router.post("/press-media", response_model=PressMedia)
 async def create_press_media(media: PressMediaCreate):
-    """Create press media entry"""
     media_obj = PressMedia(**media.model_dump())
     doc = media_obj.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
@@ -513,7 +597,6 @@ async def create_press_media(media: PressMediaCreate):
 
 @api_router.get("/press-media", response_model=List[PressMedia])
 async def get_press_media(district: Optional[str] = None, year: Optional[str] = None):
-    """Get press media, optionally filtered"""
     query = {}
     if district:
         query["district"] = district
@@ -528,10 +611,8 @@ async def get_press_media(district: Optional[str] = None, year: Optional[str] = 
     
     return media
 
-# Projects/Causes Management
 @api_router.post("/projects", response_model=Project)
 async def create_project(project: ProjectCreate):
-    """Create a new project/cause"""
     project_obj = Project(**project.model_dump())
     doc = project_obj.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
@@ -541,7 +622,6 @@ async def create_project(project: ProjectCreate):
 
 @api_router.get("/projects", response_model=List[Project])
 async def get_projects(active_only: bool = False):
-    """Get all projects"""
     query = {}
     if active_only:
         query["is_active"] = True
@@ -556,7 +636,6 @@ async def get_projects(active_only: bool = False):
 
 @api_router.get("/projects/{project_id}", response_model=Project)
 async def get_project(project_id: str):
-    """Get single project"""
     project = await db.projects.find_one({"id": project_id}, {"_id": 0})
     
     if not project:
@@ -568,8 +647,7 @@ async def get_project(project_id: str):
     return Project(**project)
 
 @api_router.put("/projects/{project_id}")
-async def update_project(project_id: str, project: ProjectCreate):
-    """Update a project"""
+async def update_project(project_id: str, project: ProjectCreate, admin_email: str = Depends(verify_token)):
     await db.projects.update_one(
         {"id": project_id},
         {"$set": project.model_dump()}
@@ -577,17 +655,33 @@ async def update_project(project_id: str, project: ProjectCreate):
     return {"status": "success", "message": "Project updated"}
 
 @api_router.delete("/projects/{project_id}")
-async def delete_project(project_id: str):
-    """Delete a project"""
+async def delete_project(project_id: str, admin_email: str = Depends(verify_token)):
     result = await db.projects.delete_one({"id": project_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Project not found")
     return {"status": "success", "message": "Project deleted"}
 
-# Stats endpoint
+@api_router.post("/videos", response_model=VideoContent)
+async def create_video(video: VideoContentCreate, admin_email: str = Depends(verify_token)):
+    video_obj = VideoContent(**video.model_dump())
+    doc = video_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    
+    await db.videos.insert_one(doc)
+    return video_obj
+
+@api_router.get("/videos", response_model=List[VideoContent])
+async def get_videos():
+    videos = await db.videos.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    
+    for video in videos:
+        if isinstance(video['created_at'], str):
+            video['created_at'] = datetime.fromisoformat(video['created_at'])
+    
+    return videos
+
 @api_router.get("/stats")
 async def get_stats():
-    """Get impact statistics"""
     total_donations = await db.donations.count_documents({"status": "approved"})
     total_amount = 0
     
@@ -596,16 +690,14 @@ async def get_stats():
         total_amount += donation.get('amount', 0)
     
     return {
-        "patients_served": 2000,  # Static for now
+        "patients_served": 2000,
         "districts_covered": 5,
         "total_donations": total_donations,
         "total_amount": total_amount
     }
 
-# Seed default projects
 @api_router.post("/seed/projects")
 async def seed_projects():
-    """Seed default projects for testing"""
     default_projects = [
         {
             "title": "Vayorang Elderly Care",
@@ -654,10 +746,8 @@ async def seed_projects():
         }
     ]
     
-    # Clear existing projects
     await db.projects.delete_many({})
     
-    # Insert default projects
     for proj_data in default_projects:
         project_obj = Project(**proj_data)
         doc = project_obj.model_dump()
@@ -666,7 +756,6 @@ async def seed_projects():
     
     return {"status": "success", "message": f"Seeded {len(default_projects)} default projects"}
 
-# Include router
 app.include_router(api_router)
 
 app.add_middleware(

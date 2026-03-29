@@ -63,6 +63,11 @@ const Footer = () => {
           <p className="text-[#A1A1AA] text-xs text-center mt-2">
             New Bhagya Nagar, Ring Road, Latur, Maharashtra - 413512
           </p>
+          <div className="text-center mt-4">
+            <Link to="/uhf-admin" className="text-[#A1A1AA] hover:text-[#D4AF37] text-xs transition-colors">
+              Admin Login
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

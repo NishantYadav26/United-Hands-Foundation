@@ -20,6 +20,7 @@ const Navbar = () => {
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-8">
             <Link to="/" className="text-[#F5F5F7] hover:text-[#D4AF37] transition-colors" data-testid="nav-home">Home</Link>
+            <Link to="/about" className="text-[#F5F5F7] hover:text-[#D4AF37] transition-colors" data-testid="nav-about">About</Link>
             <Link to="/press" className="text-[#F5F5F7] hover:text-[#D4AF37] transition-colors" data-testid="nav-press">Press</Link>
             <Link to="/transparency" className="text-[#F5F5F7] hover:text-[#D4AF37] transition-colors" data-testid="nav-transparency">Transparency</Link>
             <Link to="/donate" data-testid="nav-donate">
@@ -41,6 +42,7 @@ const Navbar = () => {
         {mobileMenuOpen && (
           <div className="md:hidden mt-6 pb-4 flex flex-col gap-4" data-testid="mobile-menu">
             <Link to="/" className="text-[#F5F5F7] hover:text-[#D4AF37] transition-colors">Home</Link>
+            <Link to="/about" className="text-[#F5F5F7] hover:text-[#D4AF37] transition-colors">About</Link>
             <Link to="/press" className="text-[#F5F5F7] hover:text-[#D4AF37] transition-colors">Press</Link>
             <Link to="/transparency" className="text-[#F5F5F7] hover:text-[#D4AF37] transition-colors">Transparency</Link>
             <Link to="/donate">
