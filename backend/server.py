@@ -269,6 +269,24 @@ class PillarCreate(BaseModel):
     category: str
     display_priority: int = 0
 
+class GalleryImage(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    description: str
+    image_url: str
+    category: str = "impact"  # impact, field_work, events
+    display_priority: int = 0
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class GalleryImageCreate(BaseModel):
+    title: str
+    description: str
+    image_url: str
+    category: str = "impact"
+    display_priority: int = 0
+
 # ===== HELPER FUNCTIONS =====
 
 async def generate_receipt_number():
@@ -904,6 +922,45 @@ async def seed_pillars():
         await db.pillars.insert_one(doc)
     
     return {"status": "success", "message": f"Seeded {len(default_pillars)} default pillars"}
+
+# Gallery Management (Heartiest Moments)
+@api_router.get("/gallery", response_model=List[GalleryImage])
+async def get_gallery_images():
+    """Get all gallery images"""
+    images = await db.gallery.find({}, {"_id": 0}).sort("display_priority", 1).to_list(1000)
+    
+    for image in images:
+        if isinstance(image.get('created_at'), str):
+            image['created_at'] = datetime.fromisoformat(image['created_at'])
+    
+    return images
+
+@api_router.post("/gallery", response_model=GalleryImage)
+async def create_gallery_image(image: GalleryImageCreate, admin_email: str = Depends(verify_token)):
+    """Create a new gallery image"""
+    image_obj = GalleryImage(**image.model_dump())
+    doc = image_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    
+    await db.gallery.insert_one(doc)
+    return image_obj
+
+@api_router.put("/gallery/{image_id}")
+async def update_gallery_image(image_id: str, image: GalleryImageCreate, admin_email: str = Depends(verify_token)):
+    """Update a gallery image"""
+    await db.gallery.update_one(
+        {"id": image_id},
+        {"$set": image.model_dump()}
+    )
+    return {"status": "success", "message": "Gallery image updated"}
+
+@api_router.delete("/gallery/{image_id}")
+async def delete_gallery_image(image_id: str, admin_email: str = Depends(verify_token)):
+    """Delete a gallery image"""
+    result = await db.gallery.delete_one({"id": image_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Gallery image not found")
+    return {"status": "success", "message": "Gallery image deleted"}
 
 @api_router.get("/stats")
 async def get_stats():
