@@ -228,6 +228,22 @@ class VideoContentCreate(BaseModel):
     thumbnail_url: str
     category: str
 
+class SiteAsset(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    asset_key: str  # logo, qr_code, hero_bg, founder_1, founder_2, etc.
+    asset_url: str
+    asset_name: str
+    description: Optional[str] = None
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class SiteAssetUpdate(BaseModel):
+    asset_key: str
+    asset_url: str
+    asset_name: str
+    description: Optional[str] = None
+
 # ===== HELPER FUNCTIONS =====
 
 async def generate_receipt_number():
@@ -682,6 +698,102 @@ async def get_videos():
             video['created_at'] = datetime.fromisoformat(video['created_at'])
     
     return videos
+
+# Site Assets Management (CMS)
+@api_router.get("/site-assets")
+async def get_site_assets():
+    """Get all site assets for CMS"""
+    assets = await db.site_assets.find({}, {"_id": 0}).to_list(1000)
+    
+    for asset in assets:
+        if isinstance(asset.get('updated_at'), str):
+            asset['updated_at'] = datetime.fromisoformat(asset['updated_at'])
+    
+    return {"assets": assets}
+
+@api_router.get("/site-assets/{asset_key}")
+async def get_site_asset(asset_key: str):
+    """Get specific site asset by key"""
+    asset = await db.site_assets.find_one({"asset_key": asset_key}, {"_id": 0})
+    
+    if not asset:
+        return {"asset_key": asset_key, "asset_url": "", "asset_name": "Not Set"}
+    
+    if isinstance(asset.get('updated_at'), str):
+        asset['updated_at'] = datetime.fromisoformat(asset['updated_at'])
+    
+    return asset
+
+@api_router.post("/site-assets", response_model=SiteAsset)
+async def update_site_asset(asset: SiteAssetUpdate, admin_email: str = Depends(verify_token)):
+    """Update or create a site asset"""
+    asset_obj = SiteAsset(**asset.model_dump())
+    doc = asset_obj.model_dump()
+    doc['updated_at'] = doc['updated_at'].isoformat()
+    
+    # Upsert - update if exists, insert if not
+    await db.site_assets.update_one(
+        {"asset_key": asset.asset_key},
+        {"$set": doc},
+        upsert=True
+    )
+    
+    return asset_obj
+
+@api_router.post("/seed/site-assets")
+async def seed_site_assets():
+    """Seed default site assets"""
+    default_assets = [
+        {
+            "asset_key": "logo",
+            "asset_url": "https://customer-assets.emergentagent.com/job_hands-omni-platform/artifacts/p9nc55rj_WhatsApp%20Image%202026-03-29%20at%2017.08.49.jpeg",
+            "asset_name": "UHF Logo",
+            "description": "Official United Hands Foundation logo with laurel wreath"
+        },
+        {
+            "asset_key": "qr_code",
+            "asset_url": "https://customer-assets.emergentagent.com/job_hands-omni-platform/artifacts/g8ji028s_WhatsApp%20Image%202026-03-29%20at%2017.12.39.jpeg",
+            "asset_name": "GPay QR Code",
+            "description": "Google Pay QR code for donations"
+        },
+        {
+            "asset_key": "hero_background",
+            "asset_url": "https://customer-assets.emergentagent.com/job_hands-omni-platform/artifacts/p87903ja_WhatsApp%20Image%202026-03-29%20at%2014.49.29.jpeg",
+            "asset_name": "Hero Background",
+            "description": "Main hero section background"
+        },
+        {
+            "asset_key": "founder_1",
+            "asset_url": "",
+            "asset_name": "Dr. Rahul Sarwade",
+            "description": "Co-Founder photo (upload via admin)"
+        },
+        {
+            "asset_key": "founder_2",
+            "asset_url": "",
+            "asset_name": "Dr. Jagruti Hankare",
+            "description": "Co-Founder photo (upload via admin)"
+        },
+        {
+            "asset_key": "center_photo",
+            "asset_url": "https://customer-assets.emergentagent.com/job_hands-omni-platform/artifacts/p87903ja_WhatsApp%20Image%202026-03-29%20at%2014.49.29.jpeg",
+            "asset_name": "UHF Daycare Center",
+            "description": "Geriatric Daycare Health Center"
+        }
+    ]
+    
+    for asset_data in default_assets:
+        asset_obj = SiteAsset(**asset_data)
+        doc = asset_obj.model_dump()
+        doc['updated_at'] = doc['updated_at'].isoformat()
+        
+        await db.site_assets.update_one(
+            {"asset_key": asset_data["asset_key"]},
+            {"$set": doc},
+            upsert=True
+        )
+    
+    return {"status": "success", "message": f"Seeded {len(default_assets)} default assets"}
 
 @api_router.get("/stats")
 async def get_stats():
