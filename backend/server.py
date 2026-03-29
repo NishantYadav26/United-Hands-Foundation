@@ -143,6 +143,9 @@ class AdminSettings(BaseModel):
     payment_mode: str = "manual_qr"
     qr_code_url: str = ""
     upi_id: str = "unitedhands@upi"
+    facebook_url: str = "https://www.facebook.com/share/g/17PHfXpM2Q/"
+    instagram_url: str = ""
+    youtube_url: str = ""
 
 class DonationApproval(BaseModel):
     donation_id: str
