@@ -1,0 +1,113 @@
+{
+  "theme": "Dark",
+  "archetype": "5 (Jewel & Luxury)",
+  "aesthetic": "90s Retro-Cinematic meets Modern Luxury",
+  "colors": {
+    "background": "#1A1A1A",
+    "primary": "#D4AF37",
+    "text_primary": "#F5F5F7",
+    "text_secondary": "#A1A1AA",
+    "surface": "#27272A",
+    "border": "rgba(212, 175, 55, 0.2)"
+  },
+  "typography": {
+    "headings": "Cormorant Garamond, serif",
+    "body": "Outfit, sans-serif",
+    "scale": {
+      "h1": "text-5xl sm:text-6xl tracking-tight leading-none font-medium",
+      "h2": "text-4xl sm:text-5xl tracking-tight leading-none font-medium",
+      "h3": "text-2xl sm:text-3xl tracking-tight leading-snug",
+      "body": "text-base leading-relaxed tracking-wide",
+      "labels": "text-xs tracking-[0.2em] uppercase font-bold text-[#D4AF37]"
+    }
+  },
+  "spacing_and_layout": {
+    "philosophy": "Generous Spacing Philosophy, 2-3x typical",
+    "containers": "Use p-8 or p-12 inside bordered cards to avoid collision",
+    "grids": "Use Bento Grid for Dashboard, Masonry layout for Press & Media 'Newsroom'"
+  },
+  "surface_strategies": {
+    "navbars_and_donation_cards": "Glassmorphism: High-diffusion backdrop-blur (backdrop-blur-2xl), bg-[#1A1A1A]/60, 1px delicate inner stroke (border-[#D4AF37]/20). MUST maintain text contrast.",
+    "founder_photos": "Identity Lock CSS Filter: `contrast-110 saturate-[0.85] sepia-[0.1]`. NO AI BEAUTIFICATION OR DISTORTION. 100% human authenticity."
+  },
+  "motion_and_interactions": {
+    "scroll_effects": "GSAP ScrollTrigger for 'Impact Stats' count-up and staggered section reveals.",
+    "hover_states": "Interactive elements must shift from a lighter gold hue on hover, subtle lift (-translate-y-1).",
+    "press_media": "Lightbox Zoom for clipping readability. Infinity-scrolling logo strip (Marquee) for Authority Ticker."
+  },
+  "image_urls": [
+    {
+      "category": "hero",
+      "url": "https://static.prod-images.emergentagent.com/jobs/b524878d-50d7-4476-80ac-979da01feb2d/images/58284d2e183b0ebd5ac0387aac625a0bc4f964d8807c8d6c43c8df831f653478.png",
+      "description": "Wide-angle cinematic photograph of an Indian village scene at golden hour, deep charcoal shadows, muted gold sunlight, 90s retro film aesthetic"
+    },
+    {
+      "category": "background",
+      "url": "https://static.prod-images.emergentagent.com/jobs/b524878d-50d7-4476-80ac-979da01feb2d/images/61d464f60c775f62f9d87feca2777d9f1c87d66ddbf3d49bd39777f59c343e78.png",
+      "description": "Abstract dark charcoal background with soft muted gold glowing light leaks, 90s retro cinematic film grain texture"
+    },
+    {
+      "category": "impact_stats",
+      "url": "https://images.unsplash.com/photo-1752084794888-0b27a762b6fd?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzN8MHwxfHNlYXJjaHw0fHxpbmRpYW4lMjBlbGRlcmx5JTIwY2FyZSUyMHNtaWxpbmd8ZW58MHx8fHwxNzc0Nzc5MDQyfDA&ixlib=rb-4.1.0&q=85",
+      "description": "Elderly Indian woman smiling broadly, representing Vayorang Elderly Care"
+    },
+    {
+      "category": "impact_stats",
+      "url": "https://images.unsplash.com/photo-1590905775253-a4f0f3c426ff?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzN8MHwxfHNlYXJjaHwzfHxpbmRpYW4lMjBlbGRlcmx5JTIwY2FyZSUyMHNtaWxpbmd8ZW58MHx8fHwxNzc0Nzc5MDQyfDA&ixlib=rb-4.1.0&q=85",
+      "description": "Elderly Indian woman smiling, representing elderly care impact"
+    },
+    {
+      "category": "founders",
+      "url": "https://images.unsplash.com/photo-1698465281093-9f09159733b9?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MjJ8MHwxfHNlYXJjaHwyfHxpbmRpYW4lMjBkb2N0b3IlMjBwb3J0cmFpdHxlbnwwfHx8fDE3NzQ3NzkwNDN8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Portrait of Dr. Rahul Sarwade"
+    },
+    {
+      "category": "founders",
+      "url": "https://images.pexels.com/photos/5738735/pexels-photo-5738735.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "description": "Portrait of Dr. Jagruti Hankare"
+    },
+    {
+      "category": "press_media",
+      "url": "https://images.unsplash.com/photo-1713948412932-aad419b13f5e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODl8MHwxfHNlYXJjaHwzfHxzYWthbCUyMG5ld3NwYXBlcnxlbnwwfHx8fDE3NzQ3NzkwOTB8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Sakal newspaper press clipping visual"
+    },
+    {
+      "category": "press_media",
+      "url": "https://images.unsplash.com/photo-1716755129702-7a7d7b05f072?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzN8MHwxfHNlYXJjaHwzfHxsb2ttYXQlMjBuZXdzcGFwZXJ8ZW58MHx8fHwxNzc0Nzc5MDkwfDA&ixlib=rb-4.1.0&q=85",
+      "description": "Lokmat newspaper press clipping visual"
+    }
+  ],
+  "technical_requirements": {
+    "frontend": "Next.js 15, Tailwind CSS, Shadcn/UI (heavily customized for modern luxury aesthetic), GSAP",
+    "backend": "Node.js, MongoDB Atlas, Razorpay SDK, Google Gemini 1.5 Flash API, Cloudinary",
+    "testing": "All interactive and key informational elements MUST include `data-testid` attribute (e.g., `data-testid=\"donate-button\"`)",
+    "accessibility": "Minimum 4.5:1 contrast ratio for normal text. Use Text Shadow over images.",
+    "icons": "Use lucide-react or @phosphor-icons/react for modern luxury duotone feel."
+  },
+  "modules": [
+    {
+      "name": "Global Payment Toggle (Admin)",
+      "description": "Toggle between Mode A (Manual QR with form upload) and Mode B (Razorpay Standard Checkout). Ensure 'Indian Donors Only (INR)' disclaimer is visible."
+    },
+    {
+      "name": "AI 'Chief of Staff' (Admin)",
+      "description": "Upload PDF/News -> Gemini OCR extracts Location/Patient Count/Date -> Generates 2-3 sentence 'Success Story'. Saves images to Cloudinary."
+    },
+    {
+      "name": "Press & Media 'Newsroom'",
+      "description": "Masonry Grid with Lightbox Zoom. Infinity-scrolling logo strip for Authority Ticker. Filters: 'District' or 'Year'."
+    },
+    {
+      "name": "Legal & Compliance Vault (Admin) / Transparency Page (Public)",
+      "description": "Secure vault for Society Reg, PAN, 12A/80G, Board Resolution. Public transparency page for Governance documents."
+    }
+  ],
+  "instructions_to_main_agent": [
+    "Strictly adhere to the dark theme, using #1A1A1A, #D4AF37, and #F5F5F7.",
+    "Implement high-diffusion glassmorphism strictly on Navbars and Donation Cards.",
+    "DO NOT alter the facial features or geometry of the founder photos. Use the specified CSS identity lock filter (`contrast-110 saturate-[0.85] sepia-[0.1]`) ONLY.",
+    "Ensure GSAP ScrollTrigger is properly integrated for impact stats.",
+    "For the Press & Media Newsroom, use a masonry layout with a lightbox zoom component for full readability.",
+    "All components MUST have a `data-testid` attribute for automated testing."
+  ]
+}
