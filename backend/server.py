@@ -749,22 +749,28 @@ async def create_razorpay_order(data: dict = Body(...)):
         raise HTTPException(status_code=400, detail="Razorpay not configured")
     
     import razorpay
-    client = razorpay.Client(auth=(settings["razorpay_key_id"], settings["razorpay_key_secret"]))
+    try:
+        client = razorpay.Client(auth=(settings["razorpay_key_id"], settings["razorpay_key_secret"]))
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid Razorpay credentials")
     
     amount_paise = int(data.get("amount", 0)) * 100
     if amount_paise < 100:
         raise HTTPException(status_code=400, detail="Minimum amount is ₹1")
     
-    order = client.order.create({
-        "amount": amount_paise,
-        "currency": "INR",
-        "payment_capture": 1,
-        "notes": {
-            "donor_name": data.get("donor_name", ""),
-            "donor_email": data.get("donor_email", ""),
-            "project_id": data.get("project_id", "")
-        }
-    })
+    try:
+        order = client.order.create({
+            "amount": amount_paise,
+            "currency": "INR",
+            "payment_capture": 1,
+            "notes": {
+                "donor_name": data.get("donor_name", ""),
+                "donor_email": data.get("donor_email", ""),
+                "project_id": data.get("project_id", "")
+            }
+        })
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Razorpay error: {str(e)}")
     
     return {
         "order_id": order["id"],
