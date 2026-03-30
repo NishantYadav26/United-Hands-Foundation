@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Filter, Loader2 } from 'lucide-react';
+import { Filter, Loader2, Video } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import axios from 'axios';
@@ -13,17 +13,20 @@ const API = `${BACKEND_URL}/api`;
 
 const PressMedia = () => {
   const [pressItems, setPressItems] = useState([]);
+  const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedDistrict, setSelectedDistrict] = useState('');
   const [selectedYear, setSelectedYear] = useState('');
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [activeSection, setActiveSection] = useState('press');
 
   const districts = ['All', 'Dharashiv', 'Solapur', 'Latur', 'Palghar', 'Panchgani'];
-  const years = ['All', '2024', '2023', '2022', '2021', '2020'];
+  const years = ['All', '2026', '2025', '2024', '2023', '2022', '2021', '2020'];
 
   useEffect(() => {
     fetchPressMedia();
+    fetchVideos();
   }, [selectedDistrict, selectedYear]);
 
   const fetchPressMedia = async () => {
@@ -31,7 +34,6 @@ const PressMedia = () => {
       const params = {};
       if (selectedDistrict && selectedDistrict !== 'All') params.district = selectedDistrict;
       if (selectedYear && selectedYear !== 'All') params.year = selectedYear;
-
       const response = await axios.get(`${API}/press-media`, { params });
       setPressItems(response.data);
     } catch (error) {
@@ -39,6 +41,20 @@ const PressMedia = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchVideos = async () => {
+    try {
+      const response = await axios.get(`${API}/videos`);
+      setVideos(response.data);
+    } catch (error) {
+      console.error('Failed to fetch videos:', error);
+    }
+  };
+
+  const extractYoutubeId = (url) => {
+    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
+    return match ? match[1] : null;
   };
 
   const openLightbox = (index) => {
@@ -72,10 +88,37 @@ const PressMedia = () => {
               Press & <span className="text-[var(--accent-gold)]">Media</span>
             </h1>
             <p className="text-[var(--text-muted)] text-lg max-w-2xl mx-auto">
-              Our work in elderly care has been recognized by leading publications
+              Our work across healthcare, education, and community service has been recognized by leading publications
             </p>
           </div>
 
+          {/* Section Toggle */}
+          <div className="flex gap-4 mb-8 justify-center">
+            <button
+              onClick={() => setActiveSection('press')}
+              className={`px-6 py-3 text-sm font-semibold tracking-[0.1em] uppercase transition-colors rounded ${
+                activeSection === 'press' ? 'bg-[var(--accent-teal)] text-white' : 'text-[var(--text-muted)]'
+              }`}
+              style={activeSection !== 'press' ? {border: '1px solid var(--border-subtle)'} : {}}
+              data-testid="press-section-btn"
+            >
+              Press Clippings
+            </button>
+            <button
+              onClick={() => setActiveSection('videos')}
+              className={`px-6 py-3 text-sm font-semibold tracking-[0.1em] uppercase transition-colors rounded flex items-center gap-2 ${
+                activeSection === 'videos' ? 'bg-[var(--accent-warm)] text-white' : 'text-[var(--text-muted)]'
+              }`}
+              style={activeSection !== 'videos' ? {border: '1px solid var(--border-subtle)'} : {}}
+              data-testid="videos-section-btn"
+            >
+              <Video size={16} />
+              Video Clips
+            </button>
+          </div>
+
+          {activeSection === 'press' && (
+            <>
           {/* Filters */}
           <div className="glass-morph p-6 rounded mb-12 flex flex-col md:flex-row gap-4 items-center" data-testid="filters">
             <Filter className="text-[var(--accent-gold)]" size={24} />
@@ -158,6 +201,50 @@ const PressMedia = () => {
             index={lightboxIndex}
             plugins={[Zoom]}
           />
+            </>
+          )}
+
+          {/* Video Clips Section */}
+          {activeSection === 'videos' && (
+            <div data-testid="videos-section">
+              {videos.length === 0 ? (
+                <div className="text-center py-16 glass-morph rounded">
+                  <Video className="mx-auto mb-4" style={{color: 'var(--text-muted)'}} size={48} />
+                  <p style={{color: 'var(--text-muted)'}}>No video clips available yet</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {videos.map(video => {
+                    const ytId = extractYoutubeId(video.video_url);
+                    return (
+                      <div key={video.id} className="glass-morph rounded overflow-hidden hover-lift" data-testid={`video-public-${video.id}`}>
+                        {ytId ? (
+                          <div className="aspect-video">
+                            <iframe
+                              src={`https://www.youtube.com/embed/${ytId}`}
+                              title={video.title}
+                              className="w-full h-full"
+                              allowFullScreen
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            />
+                          </div>
+                        ) : (
+                          <div className="aspect-video flex items-center justify-center" style={{background: 'var(--bg-card)'}}>
+                            <Video style={{color: 'var(--text-muted)'}} size={48} />
+                          </div>
+                        )}
+                        <div className="p-5">
+                          <h3 className="font-semibold mb-1" style={{color: 'var(--text-primary)'}}>{video.title}</h3>
+                          {video.description && <p className="text-sm line-clamp-2" style={{color: 'var(--text-muted)'}}>{video.description}</p>}
+                          <span className="inline-block mt-3 text-xs px-2 py-1 rounded" style={{background: 'var(--bg-deep)', color: 'var(--accent-warm)'}}>{video.category}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

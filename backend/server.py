@@ -187,6 +187,9 @@ class AdminSettings(BaseModel):
     payment_mode: str = "manual_qr"
     qr_code_url: str = ""
     upi_id: str = "unitedhands@upi"
+    razorpay_key_id: str = ""
+    razorpay_key_secret: str = ""
+    razorpay_enabled: bool = False
     facebook_url: str = "https://www.facebook.com/share/g/17PHfXpM2Q/"
     instagram_url: str = ""
     youtube_url: str = ""
@@ -345,7 +348,7 @@ def create_80g_receipt_pdf(donation: dict, receipt_number: str) -> BytesIO:
     c.setFont("Helvetica-Bold", 20)
     c.drawString(100, height - 80, "United Hands Foundation")
     c.setFont("Helvetica", 10)
-    c.drawString(100, height - 100, "TA JI LATUR | Est. 2020 | Vayorang Elderly Care Program")
+    c.drawString(100, height - 100, "TA JI LATUR | Est. 2020 | Healthcare, Education & Community Service")
     c.drawString(100, height - 115, "New Bhagya Nagar, Ring Road, Latur, Maharashtra - 413512")
     
     c.setFont("Helvetica-Bold", 9)
@@ -409,7 +412,7 @@ async def send_receipt_email(donor_email: str, donor_name: str, receipt_number: 
                 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
                     <h2 style="color: #D4AF37;">Thank You for Your Donation!</h2>
                     <p>Dear {donor_name},</p>
-                    <p>Thank you for your generous contribution to United Hands Foundation. Your support helps us continue our Vayorang Elderly Care program and community service.</p>
+                    <p>Thank you for your generous contribution to United Hands Foundation. Your support helps us continue our healthcare, education, disaster relief, and community service programs.</p>
                     <p>Please find your 80G tax exemption receipt attached to this email.</p>
                     <p><strong>Receipt Number:</strong> {receipt_number}</p>
                     <p>With gratitude,<br>United Hands Foundation<br>New Bhagya Nagar, Ring Road, Latur, Maharashtra - 413512</p>
@@ -725,33 +728,50 @@ async def get_success_stories(limit: int = 10):
     return stories
 
 @api_router.post("/ai/extract-story")
-async def extract_story_from_pdf(file_path: str = Body(..., embed=True), admin_email: str = Depends(verify_token)):
+async def extract_story_from_pdf(file: UploadFile = File(...), admin_email: str = Depends(verify_token)):
     try:
+        # Save uploaded file temporarily
+        temp_path = f"/tmp/{uuid.uuid4()}_{file.filename}"
+        with open(temp_path, "wb") as f:
+            content = await file.read()
+            f.write(content)
+        
+        # Determine mime type
+        mime = file.content_type or "application/pdf"
+        if file.filename.lower().endswith(('.jpg', '.jpeg')):
+            mime = "image/jpeg"
+        elif file.filename.lower().endswith('.png'):
+            mime = "image/png"
+        elif file.filename.lower().endswith('.pdf'):
+            mime = "application/pdf"
+        
         chat = LlmChat(
             api_key=os.getenv("EMERGENT_LLM_KEY"),
             session_id=str(uuid.uuid4()),
-            system_message="You are an AI assistant that extracts information from NGO reports and news clippings."
+            system_message="You are an AI assistant that extracts information from NGO reports and news clippings. Always respond with valid JSON only."
         ).with_model("gemini", "gemini-2.5-flash")
         
         file_content = FileContentWithMimeType(
-            file_path=file_path,
-            mime_type="application/pdf"
+            file_path=temp_path,
+            mime_type=mime
         )
         
         user_message = UserMessage(
-            text="""Extract the following information from this document:
-            1. Location (one of: Dharashiv, Solapur, Latur, Palghar, Panchgani)
-            2. Patient Count (number)
-            3. Date (in YYYY-MM-DD format)
+            text="""Extract the following information from this document/image:
+            1. Location (one of: Dharashiv, Solapur, Latur, Palghar, Panchgani, Other)
+            2. Patient Count or Beneficiary Count (number, estimate if not explicit)
+            3. Date (in YYYY-MM-DD format, use today if not found)
             4. Category (one of: Elderly, Education, Health, Disaster Relief, General)
-            5. Generate a 2-3 sentence success story suitable for a homepage
+            5. Title (a short descriptive title for this story)
+            6. Generate a 2-3 sentence success story suitable for a homepage
             
-            Return ONLY in this JSON format:
+            Return ONLY valid JSON in this format:
             {
                 "location": "city name",
                 "patient_count": number,
                 "date": "YYYY-MM-DD",
                 "category": "category name",
+                "title": "short title",
                 "story": "2-3 sentence story"
             }
             """,
@@ -760,8 +780,18 @@ async def extract_story_from_pdf(file_path: str = Body(..., embed=True), admin_e
         
         response = await chat.send_message(user_message)
         
+        # Clean up temp file
+        import os as os_mod
+        os_mod.remove(temp_path)
+        
+        # Parse JSON from response (handle markdown code blocks)
+        clean = response.strip()
+        if clean.startswith("```"):
+            clean = clean.split("\n", 1)[1] if "\n" in clean else clean[3:]
+            clean = clean.rsplit("```", 1)[0]
+        
         import json
-        result = json.loads(response)
+        result = json.loads(clean.strip())
         
         return {
             "status": "success",
@@ -870,6 +900,13 @@ async def get_videos():
             video['created_at'] = datetime.fromisoformat(video['created_at'])
     
     return videos
+
+@api_router.delete("/videos/{video_id}")
+async def delete_video(video_id: str, admin_email: str = Depends(verify_token)):
+    result = await db.videos.delete_one({"id": video_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Video not found")
+    return {"status": "success", "message": "Video deleted"}
 
 # Site Assets Management (CMS)
 @api_router.get("/site-assets")

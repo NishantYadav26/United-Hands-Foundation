@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, DollarSign, CheckCircle, XCircle, Settings, Loader2, LogOut, Image, UsersRound, FolderKanban, Heart } from 'lucide-react';
+import { Users, DollarSign, CheckCircle, XCircle, Settings, Loader2, LogOut, Image, UsersRound, FolderKanban, Heart, FileText, Video } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import MediaLibrary from '@/components/MediaLibrary';
 import TeamPillars from '@/components/TeamPillars';
 import ProjectsManagement from '@/components/ProjectsManagement';
 import GalleryManagement from '@/components/GalleryManagement';
+import AIChiefOfStaff from '@/components/AIChiefOfStaff';
+import VideosManagement from '@/components/VideosManagement';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { Switch } from '@/components/ui/switch';
@@ -88,15 +90,28 @@ const AdminDashboard = () => {
   const handleTogglePaymentMode = async () => {
     const newMode = settings.payment_mode === 'manual_qr' ? 'razorpay' : 'manual_qr';
     try {
+      const token = localStorage.getItem('uhf_admin_token');
       await axios.put(`${API}/admin/settings`, {
         ...settings,
         payment_mode: newMode
-      });
+      }, { headers: { Authorization: `Bearer ${token}` } });
       setSettings({ ...settings, payment_mode: newMode });
       toast.success(`Payment mode switched to ${newMode === 'manual_qr' ? 'Manual QR' : 'Razorpay'}`);
     } catch (error) {
       console.error('Failed to update settings:', error);
       toast.error('Failed to update payment mode');
+    }
+  };
+
+  const handleSaveSettings = async () => {
+    try {
+      const token = localStorage.getItem('uhf_admin_token');
+      await axios.put(`${API}/admin/settings`, settings, { 
+        headers: { Authorization: `Bearer ${token}` } 
+      });
+      toast.success('Settings saved successfully!');
+    } catch (error) {
+      toast.error('Failed to save settings');
     }
   };
 
@@ -206,6 +221,26 @@ const AdminDashboard = () => {
               Team Pillars
             </button>
             <button
+              onClick={() => setActiveTab('videos')}
+              className={`pb-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold tracking-[0.1em] uppercase transition-colors whitespace-nowrap flex items-center gap-2 ${
+                activeTab === 'videos' ? 'text-[var(--accent-warm)] border-b-2 border-[var(--accent-warm)]' : 'text-[var(--text-muted)]'
+              }`}
+              data-testid="tab-videos"
+            >
+              <Video size={16} />
+              Videos
+            </button>
+            <button
+              onClick={() => setActiveTab('ai')}
+              className={`pb-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold tracking-[0.1em] uppercase transition-colors whitespace-nowrap flex items-center gap-2 ${
+                activeTab === 'ai' ? 'text-[var(--accent-teal)] border-b-2 border-[var(--accent-teal)]' : 'text-[var(--text-muted)]'
+              }`}
+              data-testid="tab-ai"
+            >
+              <FileText size={16} />
+              AI Staff
+            </button>
+            <button
               onClick={() => setActiveTab('settings')}
               className={`pb-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold tracking-[0.1em] uppercase transition-colors whitespace-nowrap ${
                 activeTab === 'settings' ? 'text-[var(--accent-teal)] border-b-2 border-[var(--accent-teal)]' : 'text-[var(--text-muted)]'
@@ -303,20 +338,30 @@ const AdminDashboard = () => {
                 Payment Settings
               </h2>
 
+              {/* Payment Mode Toggle */}
               <div className="p-8 rounded mb-6" style={{background: 'var(--bg-card)', border: '1px solid var(--border-warm)'}}>
                 <div className="flex items-center justify-between mb-6">
                   <div>
                     <h3 className="font-semibold text-lg mb-2" style={{color: 'var(--text-primary)'}}>Global Payment Mode Toggle</h3>
                     <p className="text-sm" style={{color: 'var(--text-muted)'}}>
-                      Current Mode: <span className="font-semibold" style={{color: 'var(--accent-warm)'}}>{settings.payment_mode === 'manual_qr' ? 'Manual QR' : 'Razorpay'}</span>
+                      Current Mode: <span className="font-semibold" style={{color: 'var(--accent-warm)'}}>
+                        {settings.payment_mode === 'manual_qr' ? 'Manual QR' : 'Razorpay'}
+                      </span>
                     </p>
                   </div>
                   <Switch
                     checked={settings.payment_mode === 'razorpay'}
                     onCheckedChange={handleTogglePaymentMode}
+                    disabled={settings.payment_mode !== 'razorpay' && !settings.razorpay_key_id}
                     data-testid="payment-mode-toggle"
                   />
                 </div>
+
+                {!settings.razorpay_key_id && settings.payment_mode !== 'razorpay' && (
+                  <p className="text-xs mb-4" style={{color: 'var(--accent-warm)'}}>
+                    Add Razorpay credentials below to enable the toggle
+                  </p>
+                )}
 
                 <div className="p-6 rounded" style={{background: 'var(--bg-deep)'}}>
                   {settings.payment_mode === 'manual_qr' ? (
@@ -342,6 +387,57 @@ const AdminDashboard = () => {
                   )}
                 </div>
               </div>
+
+              {/* Razorpay Configuration */}
+              <div className="p-8 rounded mb-6" style={{background: 'var(--bg-card)', border: '1px solid var(--border-subtle)'}}>
+                <h3 className="font-semibold text-lg mb-2" style={{color: 'var(--text-primary)'}}>Razorpay Configuration</h3>
+                <p className="text-sm mb-6" style={{color: 'var(--text-muted)'}}>
+                  Enter your Razorpay API credentials. Once saved, you can toggle to Razorpay payment mode above.
+                </p>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs tracking-[0.15em] uppercase font-bold mb-2" style={{color: 'var(--accent-teal)'}}>
+                      Razorpay Key ID
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="rzp_live_xxxxxxxxxx"
+                      value={settings.razorpay_key_id || ''}
+                      onChange={e => setSettings({...settings, razorpay_key_id: e.target.value})}
+                      className="w-full rounded px-4 py-3 text-sm focus:outline-none"
+                      style={{background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', color: 'var(--text-primary)'}}
+                      data-testid="razorpay-key-input"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs tracking-[0.15em] uppercase font-bold mb-2" style={{color: 'var(--accent-teal)'}}>
+                      Razorpay Key Secret
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="Enter your Razorpay secret"
+                      value={settings.razorpay_key_secret || ''}
+                      onChange={e => setSettings({...settings, razorpay_key_secret: e.target.value})}
+                      className="w-full rounded px-4 py-3 text-sm focus:outline-none"
+                      style={{background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', color: 'var(--text-primary)'}}
+                      data-testid="razorpay-secret-input"
+                    />
+                  </div>
+                  <button
+                    onClick={handleSaveSettings}
+                    className="btn-primary"
+                    data-testid="save-razorpay-btn"
+                  >
+                    Save Razorpay Settings
+                  </button>
+                  {settings.razorpay_key_id && (
+                    <p className="text-xs mt-2" style={{color: 'var(--accent-teal)'}}>
+                      Razorpay credentials saved. You can now toggle to Razorpay mode above.
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
           )}
 
@@ -350,6 +446,12 @@ const AdminDashboard = () => {
 
           {/* Team Pillars Tab */}
           {activeTab === 'pillars' && <TeamPillars />}
+
+          {/* Videos Tab */}
+          {activeTab === 'videos' && <VideosManagement />}
+
+          {/* AI Chief of Staff Tab */}
+          {activeTab === 'ai' && <AIChiefOfStaff />}
         </div>
       </div>
 
