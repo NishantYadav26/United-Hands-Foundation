@@ -48,7 +48,7 @@ const Navbar = () => {
     <nav
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
       style={{
-        background: scrolled ? 'rgba(246,243,237,0.95)' : 'rgba(246,243,237,0.88)',
+        background: scrolled ? 'rgba(236,230,219,0.97)' : 'rgba(236,230,219,0.92)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
         boxShadow: scrolled ? '0 2px 20px rgba(31,41,51,0.08)' : '0 1px 8px rgba(31,41,51,0.04)',
