@@ -817,7 +817,6 @@ async def verify_razorpay_payment(data: dict = Body(...)):
     await db.donations.insert_one(donation_doc)
     
     return {"status": "success", "message": "Payment verified and donation recorded", "donation_id": donation_doc["id"]}
-
 @api_router.post("/ai/extract-story")
 async def extract_story_from_pdf(file: UploadFile = File(...), admin_email: str = Depends(verify_token)):
     try:
@@ -826,71 +825,85 @@ async def extract_story_from_pdf(file: UploadFile = File(...), admin_email: str 
         with open(temp_path, "wb") as f:
             content = await file.read()
             f.write(content)
-        
-        # Determine mime type
+
+        # Detect mime type
         mime = file.content_type or "application/pdf"
-        if file.filename.lower().endswith(('.jpg', '.jpeg')):
+        if file.filename.lower().endswith((".jpg", ".jpeg")):
             mime = "image/jpeg"
-        elif file.filename.lower().endswith('.png'):
+        elif file.filename.lower().endswith(".png"):
             mime = "image/png"
-        elif file.filename.lower().endswith('.pdf'):
+        elif file.filename.lower().endswith(".pdf"):
             mime = "application/pdf"
-        
+
+        # Create AI chat with higher budget
         chat = LlmChat(
             api_key=os.getenv("EMERGENT_LLM_KEY"),
             session_id=str(uuid.uuid4()),
-            system_message="You are an AI assistant that extracts information from NGO reports and news clippings. Always respond with valid JSON only."
-        ).with_model("gemini", "gemini-2.5-flash")
-        
+            system_message="You extract structured NGO report data. Respond ONLY with valid JSON.",
+            max_budget=0.1
+        ).with_model("gemini", "gemini-2.5-flash", max_tokens=250)
+
+        # Attach file
         file_content = FileContentWithMimeType(
             file_path=temp_path,
             mime_type=mime
         )
-        
+
+        # Prompt
+        prompt = """
+Extract the following fields from the report:
+
+Location (Dharashiv, Solapur, Latur, Palghar, Panchgani, Other)
+Patient Count
+Date (YYYY-MM-DD)
+Category (Elderly, Education, Health, Disaster Relief, General)
+Title
+Short success story (2 sentences)
+
+Return JSON ONLY:
+
+{
+ "location": "",
+ "patient_count": 0,
+ "date": "",
+ "category": "",
+ "title": "",
+ "story": ""
+}
+"""
+
         user_message = UserMessage(
-            text="""Extract the following information from this document/image:
-            1. Location (one of: Dharashiv, Solapur, Latur, Palghar, Panchgani, Other)
-            2. Patient Count or Beneficiary Count (number, estimate if not explicit)
-            3. Date (in YYYY-MM-DD format, use today if not found)
-            4. Category (one of: Elderly, Education, Health, Disaster Relief, General)
-            5. Title (a short descriptive title for this story)
-            6. Generate a 2-3 sentence success story suitable for a homepage
-            
-            Return ONLY valid JSON in this format:
-            {
-                "location": "city name",
-                "patient_count": number,
-                "date": "YYYY-MM-DD",
-                "category": "category name",
-                "title": "short title",
-                "story": "2-3 sentence story"
-            }
-            """,
+            text=prompt,
             file_contents=[file_content]
         )
-        
+
         response = await chat.send_message(user_message)
-        
-        # Clean up temp file
-        import os as os_mod
-        os_mod.remove(temp_path)
-        
-        # Parse JSON from response (handle markdown code blocks)
+
+        # Remove temp file
+        try:
+            os.remove(temp_path)
+        except:
+            pass
+
+        # Clean markdown formatting
         clean = response.strip()
-        if clean.startswith("```"):
-            clean = clean.split("\n", 1)[1] if "\n" in clean else clean[3:]
-            clean = clean.rsplit("```", 1)[0]
-        
+
+        if clean.startswith("```json"):
+            clean = clean.replace("```json", "").replace("```", "")
+        elif clean.startswith("```"):
+            clean = clean.replace("```", "")
+
         import json
         result = json.loads(clean.strip())
-        
+
         return {
             "status": "success",
             "data": result
         }
+
     except Exception as e:
         logger.error(f"AI extraction failed: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"AI extraction failed: {str(e)}")
 
 @api_router.post("/press-media", response_model=PressMedia)
 async def create_press_media(media: PressMediaCreate):
