@@ -43,13 +43,17 @@ const MediaLibrary = () => {
       maxFileSize: 10000000
     }, async (error, result) => {
       if (error) {
-        toast.error('Upload failed: ' + error.message);
+        toast.error('Upload failed: ' + (error?.message || JSON.stringify(error)));
         return;
       }
 
       if (result.event === 'success') {
         try {
           const token = localStorage.getItem('uhf_admin_token');
+          if (!token) {
+            toast.error('Session expired. Please login again.');
+            return;
+          }
           await axios.post(`${API}/site-assets`, {
             asset_key: assetKey,
             asset_url: result.info.secure_url,
@@ -63,7 +67,8 @@ const MediaLibrary = () => {
           fetchAssets();
         } catch (err) {
           console.error('Failed to save asset:', err);
-          toast.error('Failed to save image');
+          const msg = err.response?.data?.detail || err.message || 'Unknown error';
+          toast.error(`Failed to save image: ${msg}`);
         }
       }
     });

@@ -58,7 +58,8 @@ const GalleryManagement = () => {
       resetForm();
     } catch (error) {
       console.error('Failed to save image:', error);
-      toast.error('Failed to save image');
+      const msg = error.response?.data?.detail || error.message || 'Unknown error';
+      toast.error(`Failed to save image: ${msg}`);
     }
   };
 
@@ -98,7 +99,7 @@ const GalleryManagement = () => {
       setUploading(false);
       
       if (error) {
-        toast.error('Upload failed: ' + error.message);
+        toast.error('Upload failed: ' + (error?.message || JSON.stringify(error)));
         return;
       }
 

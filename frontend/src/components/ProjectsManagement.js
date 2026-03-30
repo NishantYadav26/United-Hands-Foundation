@@ -59,7 +59,8 @@ const ProjectsManagement = () => {
       resetForm();
     } catch (error) {
       console.error('Failed to save project:', error);
-      toast.error('Failed to save project');
+      const msg = error.response?.data?.detail || error.message || 'Unknown error';
+      toast.error(`Failed to save project: ${msg}`);
     }
   };
 
@@ -99,7 +100,7 @@ const ProjectsManagement = () => {
       setUploading(false);
       
       if (error) {
-        toast.error('Upload failed: ' + error.message);
+        toast.error('Upload failed: ' + (error?.message || JSON.stringify(error)));
         return;
       }
 

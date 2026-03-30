@@ -61,7 +61,8 @@ const TeamPillars = () => {
       resetForm();
     } catch (error) {
       console.error('Failed to save pillar:', error);
-      toast.error('Failed to save pillar');
+      const msg = error.response?.data?.detail || error.message || 'Unknown error';
+      toast.error(`Failed to save pillar: ${msg}`);
     }
   };
 
@@ -101,7 +102,7 @@ const TeamPillars = () => {
       setUploading(false);
       
       if (error) {
-        toast.error('Upload failed: ' + error.message);
+        toast.error('Upload failed: ' + (error?.message || JSON.stringify(error)));
         return;
       }
 
