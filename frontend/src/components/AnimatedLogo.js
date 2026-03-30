@@ -4,7 +4,7 @@ import axios from 'axios';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const AnimatedLogo = ({ size = 'md', onClick }) => {
+const AnimatedLogo = ({ size = 'md' }) => {
   const [logoUrl, setLogoUrl] = useState('');
 
   useEffect(() => {
@@ -20,48 +20,27 @@ const AnimatedLogo = ({ size = 'md', onClick }) => {
   }, []);
 
   const sizeClasses = {
-    sm: 'w-16 h-16',
-    md: 'w-20 h-20',
-    lg: 'w-28 h-28',
-    xl: 'w-36 h-36'
+    sm: 'w-10 h-10',
+    md: 'w-12 h-12',
+    lg: 'w-20 h-20',
+    xl: 'w-28 h-28'
   };
 
   if (!logoUrl) return null;
 
   return (
-    <div 
-      className={`${sizeClasses[size]} logo-container cursor-pointer`}
-      onClick={onClick}
+    <div
+      className={`${sizeClasses[size]} logo-container cursor-pointer transition-all duration-300`}
       data-testid="animated-logo"
     >
-      <img 
+      <img
         src={logoUrl}
         alt="United Hands Foundation"
-        className="w-full h-full object-contain logo-pulse logo-see-through"
+        className="w-full h-full object-contain logo-see-through"
+        style={{ transition: 'transform 0.3s ease' }}
+        onMouseEnter={e => { e.target.style.transform = 'scale(1.08)'; }}
+        onMouseLeave={e => { e.target.style.transform = 'scale(1)'; }}
       />
-      <style jsx>{`
-        @keyframes logo-pulse {
-          0%, 100% {
-            transform: scale(1);
-            filter: drop-shadow(0 0 10px rgba(52, 152, 219, 0.3));
-          }
-          50% {
-            transform: scale(1.05);
-            filter: drop-shadow(0 0 20px rgba(52, 152, 219, 0.6));
-          }
-        }
-
-        .logo-pulse {
-          animation: logo-pulse 3s ease-in-out infinite;
-          transition: transform 0.3s ease;
-        }
-
-        .logo-container:hover .logo-pulse {
-          animation: none;
-          transform: scale(1.1) rotate(5deg);
-          filter: drop-shadow(0 0 25px rgba(230, 126, 34, 0.8));
-        }
-      `}</style>
     </div>
   );
 };

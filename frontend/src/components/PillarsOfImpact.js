@@ -40,15 +40,15 @@ const PillarsOfImpact = () => {
   if (loading || projects.length === 0) return null;
 
   return (
-    <section className="py-24 px-6 reveal-section" data-testid="pillars-section">
+    <section className="py-20 px-6 reveal-section" data-testid="pillars-section">
       <div className="max-w-7xl mx-auto">
-        <h2 
+        <h2
           className="text-4xl sm:text-5xl font-medium tracking-tight text-center mb-4"
-          style={{fontFamily: 'Cormorant Garamond, serif'}}
+          style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}
         >
-          Our Pillars of <span className="text-[var(--accent-gold)]">Impact</span>
+          Our Pillars of <span className="text-gradient-gold">Impact</span>
         </h2>
-        <p className="text-center text-[var(--text-muted)] mb-16 text-lg">
+        <p className="text-center mb-14 text-base" style={{ color: 'var(--text-muted)' }}>
           Choose a cause that resonates with your heart
         </p>
 
@@ -58,61 +58,61 @@ const PillarsOfImpact = () => {
             const progress = getProgress(project.raised_amount, project.target_amount);
 
             return (
-              <div 
+              <div
                 key={project.id}
-                className="glass-morph rounded overflow-hidden hover-lift group"
+                className="card-elevated rounded-lg overflow-hidden hover-lift group"
                 data-testid={`project-${project.id}`}
               >
-                <div 
-                  className="h-64 bg-cover bg-center relative"
-                  style={{backgroundImage: `url('${project.hero_image}')`}}
+                <div
+                  className="h-56 bg-cover bg-center relative"
+                  style={{ backgroundImage: `url('${project.hero_image}')` }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-deep)] to-transparent"></div>
-                  <div className="absolute bottom-6 left-6">
-                    <Icon className="text-[var(--accent-gold)] mb-2" size={32} />
-                    <span className="text-[var(--accent-gold)] text-xs tracking-[0.2em] uppercase font-bold">
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#1F2933] to-transparent opacity-70"></div>
+                  <div className="absolute bottom-5 left-5">
+                    <Icon className="mb-2" style={{ color: '#C6A15B' }} size={28} />
+                    <span className="text-xs tracking-[0.2em] uppercase font-bold" style={{ color: '#C6A15B' }}>
                       {project.category}
                     </span>
                   </div>
                 </div>
 
-                <div className="p-8">
-                  <h3 
-                    className="text-2xl font-medium mb-4 text-[var(--text-primary)]"
-                    style={{fontFamily: 'Cormorant Garamond, serif'}}
+                <div className="p-7">
+                  <h3
+                    className="text-xl font-medium mb-3"
+                    style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}
                   >
                     {project.title}
                   </h3>
-                  <p className="text-[var(--text-muted)] text-sm leading-relaxed mb-6">
+                  <p className="text-sm leading-relaxed mb-5" style={{ color: 'var(--text-muted)' }}>
                     {project.description}
                   </p>
 
                   {/* Progress Bar */}
-                  <div className="mb-6">
+                  <div className="mb-5">
                     <div className="flex justify-between text-sm mb-2">
-                      <span className="text-[var(--text-muted)]">
+                      <span style={{ color: 'var(--text-muted)' }}>
                         ₹{project.raised_amount.toLocaleString()} raised
                       </span>
-                      <span className="text-[var(--accent-gold)] font-semibold">
+                      <span className="font-semibold" style={{ color: 'var(--accent-teal)' }}>
                         {progress.toFixed(0)}%
                       </span>
                     </div>
-                    <div className="w-full bg-[var(--bg-card)] rounded-full h-2 overflow-hidden">
-                      <div 
-                        className="bg-gradient-to-r from-[var(--accent-gold)] to-[var(--accent-warm-light)] h-full transition-all duration-500"
-                        style={{width: `${progress}%`}}
+                    <div className="w-full rounded-full h-2 overflow-hidden" style={{ background: 'var(--bg-surface)' }}>
+                      <div
+                        className="h-full transition-all duration-500 rounded-full"
+                        style={{ width: `${progress}%`, background: 'linear-gradient(90deg, var(--accent-teal), var(--accent-teal-light))' }}
                       ></div>
                     </div>
-                    <p className="text-[var(--text-muted)] text-xs mt-2">
+                    <p className="text-xs mt-2" style={{ color: 'var(--text-muted)' }}>
                       Goal: ₹{project.target_amount.toLocaleString()}
                     </p>
                   </div>
 
-                  <Link 
+                  <Link
                     to={`/donate?project=${project.id}`}
                     data-testid={`donate-to-${project.id}`}
                   >
-                    <button className="btn-gold w-full">
+                    <button className="btn-gold w-full text-sm" style={{ padding: '12px 24px' }}>
                       Donate to this Cause
                     </button>
                   </Link>

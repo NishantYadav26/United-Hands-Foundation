@@ -92,10 +92,10 @@ const Home = () => {
 
     if (statsRef.current && stats.patients_served > 0) {
       const statElements = statsRef.current.querySelectorAll('.stat-number');
-      
+
       statElements.forEach((element) => {
         const finalValue = parseInt(element.dataset.value);
-        
+
         ScrollTrigger.create({
           trigger: statsRef.current,
           start: 'top 80%',
@@ -105,7 +105,7 @@ const Home = () => {
               duration: 2,
               snap: { innerText: 1 },
               ease: 'power2.out',
-              onUpdate: function() {
+              onUpdate: function () {
                 element.innerText = Math.ceil(this.targets()[0].innerText).toLocaleString();
               }
             });
@@ -138,50 +138,64 @@ const Home = () => {
   }, [stats]);
 
   return (
-    <div className="min-h-screen" style={{background: 'var(--bg-deep)'}}>
+    <div className="min-h-screen" style={{ background: 'var(--bg-deep)' }}>
       <Navbar />
 
-      {/* Hero Section */}
-      <section 
+      {/* Hero Section - keeps dark overlay for image visibility */}
+      <section
         ref={heroRef}
-        className="relative min-h-screen flex items-center justify-center pt-20 px-6"
+        className="relative min-h-screen flex items-center justify-center pt-16 px-6"
         style={{
-          background: siteAssets.hero_background 
-            ? `linear-gradient(180deg, rgba(11,31,58,0.85) 0%, rgba(15,38,52,0.9) 50%, rgba(17,43,60,0.95) 100%), url(${siteAssets.hero_background}) center/cover no-repeat`
-            : 'linear-gradient(180deg, var(--bg-deep) 0%, #0F2634 50%, #112B3C 100%)'
+          background: siteAssets.hero_background
+            ? `url(${siteAssets.hero_background}) center/cover no-repeat`
+            : 'linear-gradient(135deg, #0B1F3A 0%, #163455 100%)'
         }}
         data-testid="hero-section"
       >
-        <div className="max-w-5xl mx-auto text-center">
-          <h1 
-            className="text-5xl sm:text-6xl lg:text-7xl font-medium tracking-tight leading-none mb-6 text-gradient-gold"
-            style={{fontFamily: 'Cormorant Garamond, serif'}}
+        {/* Gradient overlay - lighter to show people */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: siteAssets.hero_background
+              ? 'linear-gradient(180deg, rgba(10,25,47,0.35) 0%, rgba(10,25,47,0.45) 40%, rgba(10,25,47,0.55) 100%)'
+              : 'linear-gradient(135deg, rgba(11,31,58,0.95) 0%, rgba(22,52,85,0.95) 100%)'
+          }}
+        />
+
+        <div className="max-w-5xl mx-auto text-center relative z-10">
+          <h1
+            className="text-5xl sm:text-6xl lg:text-7xl font-medium tracking-tight leading-none mb-6"
+            style={{
+              fontFamily: 'Cormorant Garamond, serif',
+              color: '#F6F3ED',
+              textShadow: '0 2px 20px rgba(0,0,0,0.3)'
+            }}
             data-testid="hero-title"
           >
             Hands United,<br />Hearts Connected
           </h1>
-          <p className="text-lg sm:text-xl leading-relaxed max-w-3xl mx-auto mb-12 tracking-wide" style={{color: 'var(--text-soft)'}}>
-            Empowering communities through healthcare, education, disaster relief, 
-            and elderly care across Maharashtra. Every contribution builds dignity, 
+          <p className="text-lg sm:text-xl leading-relaxed max-w-3xl mx-auto mb-12 tracking-wide" style={{ color: 'rgba(246,243,237,0.9)', textShadow: '0 1px 8px rgba(0,0,0,0.2)' }}>
+            Empowering communities through healthcare, education, disaster relief,
+            and elderly care across Maharashtra. Every contribution builds dignity,
             hope, and a brighter future.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link to="/donate" data-testid="hero-donate-btn">
               <button className="btn-gold">Support Our Cause</button>
             </Link>
-            <a 
-              href="#impact" 
-              className="px-8 py-4 border-2 text-sm font-semibold tracking-[0.1em] uppercase transition-all"
-              style={{borderColor: 'var(--accent-teal)', color: 'var(--accent-teal)'}}
-              onMouseEnter={e => {e.target.style.background = 'var(--accent-teal)'; e.target.style.color = '#fff'}}
-              onMouseLeave={e => {e.target.style.background = 'transparent'; e.target.style.color = 'var(--accent-teal)'}}
+            <a
+              href="#impact"
+              className="px-8 py-4 border-2 text-sm font-semibold tracking-[0.1em] uppercase transition-all rounded"
+              style={{ borderColor: 'rgba(246,243,237,0.6)', color: '#F6F3ED' }}
+              onMouseEnter={e => { e.target.style.background = 'rgba(246,243,237,0.15)'; }}
+              onMouseLeave={e => { e.target.style.background = 'transparent'; }}
             >
               See Our Impact
             </a>
           </div>
 
-          <div className="mt-12 inline-block glass-morph px-6 py-3 rounded">
-            <p className="text-sm" style={{color: 'var(--text-primary)'}}>
+          <div className="mt-12 inline-block px-6 py-3 rounded" style={{ background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(10px)' }}>
+            <p className="text-sm" style={{ color: '#F6F3ED' }}>
               Indian Donors Only (INR) | 80G Tax Exemption Available
             </p>
           </div>
@@ -189,18 +203,18 @@ const Home = () => {
       </section>
 
       {/* Trust Bar - Districts */}
-      <section className="py-12 bg-section-alt" data-testid="trust-bar">
+      <section className="py-10 bg-section-alt" data-testid="trust-bar">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-8">
-            <p className="text-xs tracking-[0.2em] uppercase font-bold mb-2" style={{color: 'var(--accent-warm)'}}>
+          <div className="text-center mb-6">
+            <p className="text-xs tracking-[0.2em] uppercase font-bold" style={{ color: 'var(--accent-teal)' }}>
               Serving Communities Across
             </p>
           </div>
-          <div className="flex flex-wrap justify-center items-center gap-12">
+          <div className="flex flex-wrap justify-center items-center gap-10">
             {['Dharashiv', 'Solapur', 'Latur', 'Palghar', 'Panchgani'].map((district) => (
               <div key={district} className="text-center">
-                <MapPin className="mx-auto mb-2" style={{color: 'var(--accent-teal)'}} size={24} />
-                <span className="font-semibold" style={{color: 'var(--text-primary)'}}>{district}</span>
+                <MapPin className="mx-auto mb-2" style={{ color: 'var(--accent-teal)' }} size={22} />
+                <span className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{district}</span>
               </div>
             ))}
           </div>
@@ -212,42 +226,42 @@ const Home = () => {
 
       {/* Heartiest Moments Gallery */}
       {galleryImages.length > 0 && (
-        <section className="py-24 px-6 reveal-section" data-testid="heartiest-moments-section">
+        <section className="py-20 px-6 reveal-section" style={{ background: 'var(--bg-surface)' }} data-testid="heartiest-moments-section">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-4">
-              <Heart className="mx-auto mb-4" style={{color: 'var(--accent-warm)'}} size={36} fill="var(--accent-warm)" />
-              <h2 
+              <Heart className="mx-auto mb-4" style={{ color: 'var(--accent-gold)' }} size={32} fill="var(--accent-gold)" />
+              <h2
                 className="text-4xl sm:text-5xl font-medium tracking-tight mb-4"
-                style={{fontFamily: 'Cormorant Garamond, serif'}}
+                style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}
               >
                 Heartiest <span className="text-gradient-orange">Moments</span>
               </h2>
-              <p className="text-lg mb-16" style={{color: 'var(--text-muted)'}}>
+              <p className="text-base mb-14" style={{ color: 'var(--text-muted)' }}>
                 Glimpses of hope, service, and transformation from the field
               </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {galleryImages.map((image, index) => (
-                <div 
-                  key={image.id} 
-                  className="rounded overflow-hidden hover-lift glass-morph"
-                  style={{animationDelay: `${index * 0.1}s`}}
+                <div
+                  key={image.id}
+                  className="rounded-lg overflow-hidden hover-lift card-elevated"
+                  style={{ animationDelay: `${index * 0.1}s` }}
                   data-testid={`gallery-image-${image.id}`}
                 >
-                  <div className="h-64 overflow-hidden" style={{background: 'var(--bg-card)'}}>
-                    <img 
-                      src={image.image_url} 
-                      alt={image.title} 
+                  <div className="h-64 overflow-hidden">
+                    <img
+                      src={image.image_url}
+                      alt={image.title}
                       className="w-full h-full object-cover identity-lock transition-transform duration-500 hover:scale-105"
                     />
                   </div>
                   <div className="p-5">
-                    <h3 className="font-semibold mb-1" style={{color: 'var(--text-primary)'}}>{image.title}</h3>
+                    <h3 className="font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>{image.title}</h3>
                     {image.description && (
-                      <p className="text-sm line-clamp-2" style={{color: 'var(--text-muted)'}}>{image.description}</p>
+                      <p className="text-sm line-clamp-2" style={{ color: 'var(--text-muted)' }}>{image.description}</p>
                     )}
-                    <span className="inline-block mt-2 text-xs px-2 py-1 rounded" style={{background: 'var(--bg-deep)', color: 'var(--accent-teal)'}}>
+                    <span className="inline-block mt-2 text-xs px-2 py-1 rounded" style={{ background: 'var(--bg-surface)', color: 'var(--accent-teal)' }}>
                       {image.category}
                     </span>
                   </div>
@@ -259,47 +273,47 @@ const Home = () => {
       )}
 
       {/* Impact Stats */}
-      <section ref={statsRef} id="impact" className="py-24 px-6 reveal-section" data-testid="impact-stats-section">
+      <section ref={statsRef} id="impact" className="py-20 px-6 reveal-section" data-testid="impact-stats-section">
         <div className="max-w-7xl mx-auto">
-          <h2 
+          <h2
             className="text-4xl sm:text-5xl font-medium tracking-tight text-center mb-4"
-            style={{fontFamily: 'Cormorant Garamond, serif'}}
+            style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}
           >
             Our <span className="text-gradient-blue">Impact</span>
           </h2>
-          <p className="text-center text-lg mb-16" style={{color: 'var(--text-muted)'}}>Transforming lives across communities, one step at a time</p>
+          <p className="text-center text-base mb-14" style={{ color: 'var(--text-muted)' }}>Transforming lives across communities, one step at a time</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="glass-morph p-12 rounded hover-lift text-center" data-testid="stat-patients">
-              <Users className="mx-auto mb-6" style={{color: 'var(--accent-warm)'}} size={48} />
-              <div className="stat-number text-5xl font-medium mb-3" data-value={stats.patients_served} style={{fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)'}}>
+            <div className="card-elevated p-10 rounded-lg hover-lift text-center" data-testid="stat-patients">
+              <Users className="mx-auto mb-5" style={{ color: 'var(--accent-teal)' }} size={44} />
+              <div className="stat-number text-5xl font-medium mb-3" data-value={stats.patients_served} style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                 0
               </div>
-              <p className="text-xs tracking-[0.2em] uppercase font-bold" style={{color: 'var(--accent-warm)'}}>Lives Touched</p>
+              <p className="text-xs tracking-[0.2em] uppercase font-bold" style={{ color: 'var(--accent-teal)' }}>Lives Touched</p>
             </div>
 
-            <div className="glass-morph p-12 rounded hover-lift text-center" data-testid="stat-districts">
-              <MapPin className="mx-auto mb-6" style={{color: 'var(--accent-teal)'}} size={48} />
-              <div className="stat-number text-5xl font-medium mb-3" data-value={stats.districts_covered} style={{fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)'}}>
+            <div className="card-elevated p-10 rounded-lg hover-lift text-center" data-testid="stat-districts">
+              <MapPin className="mx-auto mb-5" style={{ color: 'var(--accent-gold)' }} size={44} />
+              <div className="stat-number text-5xl font-medium mb-3" data-value={stats.districts_covered} style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                 0
               </div>
-              <p className="text-xs tracking-[0.2em] uppercase font-bold" style={{color: 'var(--accent-teal)'}}>Districts Covered</p>
+              <p className="text-xs tracking-[0.2em] uppercase font-bold" style={{ color: 'var(--accent-gold)' }}>Districts Covered</p>
             </div>
 
-            <div className="glass-morph p-12 rounded hover-lift text-center" data-testid="stat-donations">
-              <Heart className="mx-auto mb-6" style={{color: 'var(--accent-warm)'}} size={48} />
-              <div className="stat-number text-5xl font-medium mb-3" data-value={stats.total_donations} style={{fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)'}}>
+            <div className="card-elevated p-10 rounded-lg hover-lift text-center" data-testid="stat-donations">
+              <Heart className="mx-auto mb-5" style={{ color: 'var(--accent-teal)' }} size={44} />
+              <div className="stat-number text-5xl font-medium mb-3" data-value={stats.total_donations} style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                 0
               </div>
-              <p className="text-xs tracking-[0.2em] uppercase font-bold" style={{color: 'var(--accent-warm)'}}>Donations Received</p>
+              <p className="text-xs tracking-[0.2em] uppercase font-bold" style={{ color: 'var(--accent-teal)' }}>Donations Received</p>
             </div>
 
-            <div className="glass-morph p-12 rounded hover-lift text-center" data-testid="stat-amount">
-              <TrendingUp className="mx-auto mb-6" style={{color: 'var(--accent-gold)'}} size={48} />
-              <div className="stat-number text-5xl font-medium mb-3" data-value={stats.total_amount} style={{fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)'}}>
+            <div className="card-elevated p-10 rounded-lg hover-lift text-center" data-testid="stat-amount">
+              <TrendingUp className="mx-auto mb-5" style={{ color: 'var(--accent-gold)' }} size={44} />
+              <div className="stat-number text-5xl font-medium mb-3" data-value={stats.total_amount} style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                 0
               </div>
-              <p className="text-xs tracking-[0.2em] uppercase font-bold" style={{color: 'var(--accent-gold)'}}>Total Raised (INR)</p>
+              <p className="text-xs tracking-[0.2em] uppercase font-bold" style={{ color: 'var(--accent-gold)' }}>Total Raised (INR)</p>
             </div>
           </div>
         </div>
@@ -307,24 +321,24 @@ const Home = () => {
 
       {/* Success Stories */}
       {successStories.length > 0 && (
-        <section className="py-24 px-6 reveal-section" data-testid="success-stories-section">
+        <section className="py-20 px-6 reveal-section" style={{ background: 'var(--bg-surface)' }} data-testid="success-stories-section">
           <div className="max-w-7xl mx-auto">
-            <h2 
-              className="text-4xl sm:text-5xl font-medium tracking-tight text-center mb-16"
-              style={{fontFamily: 'Cormorant Garamond, serif'}}
+            <h2
+              className="text-4xl sm:text-5xl font-medium tracking-tight text-center mb-14"
+              style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}
             >
               Stories of <span className="text-gradient-orange">Hope</span>
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {successStories.map((story) => (
-                <div key={story.id} className="glass-morph p-8 rounded hover-lift" data-testid={`story-${story.id}`}>
+                <div key={story.id} className="card-elevated p-8 rounded-lg hover-lift" data-testid={`story-${story.id}`}>
                   <div className="flex items-center gap-2 mb-4">
-                    <MapPin style={{color: 'var(--accent-teal)'}} size={20} />
-                    <span className="text-sm font-semibold" style={{color: 'var(--accent-teal)'}}>{story.location}</span>
+                    <MapPin style={{ color: 'var(--accent-teal)' }} size={18} />
+                    <span className="text-sm font-semibold" style={{ color: 'var(--accent-teal)' }}>{story.location}</span>
                   </div>
-                  <p className="leading-relaxed mb-6" style={{color: 'var(--text-primary)'}}>{story.story_text}</p>
-                  <div className="flex justify-between items-center text-xs" style={{color: 'var(--text-muted)'}}>
+                  <p className="leading-relaxed mb-6" style={{ color: 'var(--text-primary)' }}>{story.story_text}</p>
+                  <div className="flex justify-between items-center text-xs" style={{ color: 'var(--text-muted)' }}>
                     <span>{story.patient_count} beneficiaries</span>
                     <span>{new Date(story.date).toLocaleDateString()}</span>
                   </div>
@@ -336,44 +350,44 @@ const Home = () => {
       )}
 
       {/* Founders Section */}
-      <section className="py-24 px-6 reveal-section" data-testid="founders-section">
+      <section className="py-20 px-6 reveal-section" data-testid="founders-section">
         <div className="max-w-7xl mx-auto">
-          <h2 
+          <h2
             className="text-4xl sm:text-5xl font-medium tracking-tight text-center mb-4"
-            style={{fontFamily: 'Cormorant Garamond, serif'}}
+            style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}
           >
             Meet Our <span className="text-gradient-blue">Founders</span>
           </h2>
-          <p className="text-center text-lg mb-16" style={{color: 'var(--text-muted)'}}>Ex-Government of India doctors dedicated to community service</p>
+          <p className="text-center text-base mb-14" style={{ color: 'var(--text-muted)' }}>Ex-Government of India doctors dedicated to community service</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
             {siteAssets.founder_1 && (
               <div className="text-center" data-testid="founder-rahul">
-                <div className="mb-6 overflow-hidden rounded">
-                  <img 
+                <div className="mb-6 overflow-hidden rounded-lg card-elevated">
+                  <img
                     src={siteAssets.founder_1}
                     alt="Dr. Rahul Sarwade"
                     className="w-full h-96 object-cover identity-lock"
                   />
                 </div>
-                <h3 className="text-2xl font-medium mb-2" style={{fontFamily: 'Cormorant Garamond, serif'}}>Dr. Rahul Sarwade</h3>
-                <p className="text-xs tracking-[0.2em] uppercase font-bold mb-3" style={{color: 'var(--accent-warm)'}}>Co-Founder</p>
-                <p className="text-sm leading-relaxed" style={{color: 'var(--text-muted)'}}>Former Government of India medical officer bringing decades of healthcare expertise to community service.</p>
+                <h3 className="text-2xl font-medium mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>Dr. Rahul Sarwade</h3>
+                <p className="text-xs tracking-[0.2em] uppercase font-bold mb-3" style={{ color: 'var(--accent-gold)' }}>Co-Founder</p>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>Former Government of India medical officer bringing decades of healthcare expertise to community service.</p>
               </div>
             )}
 
             {siteAssets.founder_2 && (
               <div className="text-center" data-testid="founder-jagruti">
-                <div className="mb-6 overflow-hidden rounded">
-                  <img 
+                <div className="mb-6 overflow-hidden rounded-lg card-elevated">
+                  <img
                     src={siteAssets.founder_2}
                     alt="Dr. Jagruti Hankare"
                     className="w-full h-96 object-cover identity-lock"
                   />
                 </div>
-                <h3 className="text-2xl font-medium mb-2" style={{fontFamily: 'Cormorant Garamond, serif'}}>Dr. Jagruti Hankare</h3>
-                <p className="text-xs tracking-[0.2em] uppercase font-bold mb-3" style={{color: 'var(--accent-warm)'}}>Co-Founder</p>
-                <p className="text-sm leading-relaxed" style={{color: 'var(--text-muted)'}}>Dedicated healthcare professional committed to improving quality of life for underserved communities.</p>
+                <h3 className="text-2xl font-medium mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>Dr. Jagruti Hankare</h3>
+                <p className="text-xs tracking-[0.2em] uppercase font-bold mb-3" style={{ color: 'var(--accent-gold)' }}>Co-Founder</p>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>Dedicated healthcare professional committed to improving quality of life for underserved communities.</p>
               </div>
             )}
           </div>
@@ -381,18 +395,18 @@ const Home = () => {
           {/* Team Pillars */}
           {pillars.length > 0 && (
             <div className="mt-16">
-              <h3 className="text-2xl font-medium text-center mb-10" style={{fontFamily: 'Cormorant Garamond, serif'}}>
+              <h3 className="text-2xl font-medium text-center mb-10" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                 Our <span className="text-gradient-orange">Pillars</span>
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {pillars.map(pillar => (
-                  <div key={pillar.id} className="glass-morph p-6 rounded hover-lift text-center" data-testid={`pillar-${pillar.id}`}>
+                  <div key={pillar.id} className="card-elevated p-6 rounded-lg hover-lift text-center" data-testid={`pillar-${pillar.id}`}>
                     {pillar.image_url && (
                       <img src={pillar.image_url} alt={pillar.name} className="w-24 h-24 rounded-full mx-auto mb-4 object-cover identity-lock" />
                     )}
-                    <h4 className="text-lg font-medium mb-1" style={{fontFamily: 'Cormorant Garamond, serif'}}>{pillar.name}</h4>
-                    <p className="text-xs tracking-[0.15em] uppercase font-bold mb-2" style={{color: 'var(--accent-teal)'}}>{pillar.role}</p>
-                    {pillar.specialty && <p className="text-xs" style={{color: 'var(--text-muted)'}}>{pillar.specialty}</p>}
+                    <h4 className="text-lg font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{pillar.name}</h4>
+                    <p className="text-xs tracking-[0.15em] uppercase font-bold mb-2" style={{ color: 'var(--accent-teal)' }}>{pillar.role}</p>
+                    {pillar.specialty && <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{pillar.specialty}</p>}
                   </div>
                 ))}
               </div>
@@ -402,17 +416,17 @@ const Home = () => {
       </section>
 
       {/* Authority Ticker */}
-      <section className="py-12 bg-section-alt overflow-hidden" data-testid="authority-ticker">
+      <section className="py-10 bg-section-alt overflow-hidden" data-testid="authority-ticker">
         <div className="flex whitespace-nowrap">
           <div className="flex items-center gap-16 marquee">
             {[...Array(2)].map((_, idx) => (
               <div key={idx} className="flex items-center gap-16">
-                <span className="text-sm tracking-[0.2em] uppercase" style={{color: 'var(--text-muted)'}}>Featured In</span>
-                <span className="font-semibold text-lg" style={{color: 'var(--text-primary)'}}>Sakal</span>
-                <span className="font-semibold text-lg" style={{color: 'var(--text-primary)'}}>Lokmat</span>
-                <span className="font-semibold text-lg" style={{color: 'var(--text-primary)'}}>Maharashtra Times</span>
-                <span className="font-semibold text-lg" style={{color: 'var(--text-primary)'}}>The Hindu</span>
-                <span className="font-semibold text-lg" style={{color: 'var(--text-primary)'}}>Indian Express</span>
+                <span className="text-sm tracking-[0.2em] uppercase" style={{ color: 'var(--text-muted)' }}>Featured In</span>
+                <span className="font-semibold text-lg" style={{ color: 'var(--text-primary)' }}>Sakal</span>
+                <span className="font-semibold text-lg" style={{ color: 'var(--text-primary)' }}>Lokmat</span>
+                <span className="font-semibold text-lg" style={{ color: 'var(--text-primary)' }}>Maharashtra Times</span>
+                <span className="font-semibold text-lg" style={{ color: 'var(--text-primary)' }}>The Hindu</span>
+                <span className="font-semibold text-lg" style={{ color: 'var(--text-primary)' }}>Indian Express</span>
               </div>
             ))}
           </div>
@@ -420,15 +434,15 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 px-6 reveal-section" data-testid="cta-section">
-        <div className="max-w-4xl mx-auto text-center glass-morph p-16 rounded">
-          <h2 
+      <section className="py-20 px-6 reveal-section" data-testid="cta-section">
+        <div className="max-w-4xl mx-auto text-center card-elevated p-16 rounded-lg">
+          <h2
             className="text-4xl sm:text-5xl font-medium tracking-tight mb-6"
-            style={{fontFamily: 'Cormorant Garamond, serif'}}
+            style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}
           >
             Be the <span className="text-gradient-gold">Change</span>
           </h2>
-          <p className="text-lg leading-relaxed mb-10" style={{color: 'var(--text-muted)'}}>
+          <p className="text-base leading-relaxed mb-10" style={{ color: 'var(--text-muted)' }}>
             Your contribution provides healthcare, education, disaster relief, and dignity to communities who need it most.
           </p>
           <Link to="/donate" data-testid="cta-donate-btn">

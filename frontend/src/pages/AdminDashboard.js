@@ -297,9 +297,9 @@ const AdminDashboard = () => {
                           <td className="py-4 px-4 text-sm" style={{color: 'var(--text-muted)'}}>{donation.utr_number}</td>
                           <td className="py-4 px-4">
                             <span className={`inline-block px-3 py-1 rounded text-xs font-semibold ${
-                              donation.status === 'pending' ? 'bg-yellow-900/20 text-yellow-400' :
-                              donation.status === 'approved' ? 'bg-green-900/20 text-green-400' :
-                              'bg-red-900/20 text-red-400'
+                              donation.status === 'pending' ? 'bg-amber-100 text-amber-700' :
+                              donation.status === 'approved' ? 'bg-emerald-100 text-emerald-700' :
+                              'bg-red-100 text-red-700'
                             }`}>
                               {donation.status}
                             </span>
@@ -309,14 +309,14 @@ const AdminDashboard = () => {
                               <div className="flex gap-2">
                                 <button
                                   onClick={() => handleApprove(donation.id)}
-                                  className="p-2 bg-green-900/20 hover:bg-green-900/40 text-green-400 rounded transition-colors"
+                                  className="p-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 rounded transition-colors"
                                   data-testid={`approve-${donation.id}`}
                                 >
                                   <CheckCircle size={18} />
                                 </button>
                                 <button
                                   onClick={() => handleReject(donation.id)}
-                                  className="p-2 bg-red-900/20 hover:bg-red-900/40 text-red-400 rounded transition-colors"
+                                  className="p-2 bg-red-100 hover:bg-red-200 text-red-700 rounded transition-colors"
                                   data-testid={`reject-${donation.id}`}
                                 >
                                   <XCircle size={18} />

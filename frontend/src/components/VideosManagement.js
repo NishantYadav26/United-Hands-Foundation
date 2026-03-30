@@ -197,7 +197,7 @@ const VideosManagement = () => {
                       {video.description && <p className="text-sm line-clamp-2" style={{color: 'var(--text-muted)'}}>{video.description}</p>}
                       <span className="inline-block mt-2 text-xs px-2 py-0.5 rounded" style={{background: 'var(--bg-deep)', color: 'var(--accent-teal)'}}>{video.category}</span>
                     </div>
-                    <button onClick={() => handleDelete(video.id)} className="p-2 hover:bg-red-900/20 text-red-400 rounded transition-colors" data-testid={`delete-video-${video.id}`}>
+                    <button onClick={() => handleDelete(video.id)} className="p-2 hover:bg-red-100 text-red-600 rounded transition-colors" data-testid={`delete-video-${video.id}`}>
                       <Trash2 size={16} />
                     </button>
                   </div>

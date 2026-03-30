@@ -285,7 +285,7 @@ const ProjectsManagement = () => {
                     </span>
                   </div>
                   <span className={`px-3 py-1 rounded text-xs font-semibold ${
-                    project.is_active ? 'bg-green-900/20 text-green-400' : 'bg-gray-900/20 text-gray-400'
+                    project.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'
                   }`}>
                     {project.is_active ? 'Active' : 'Inactive'}
                   </span>

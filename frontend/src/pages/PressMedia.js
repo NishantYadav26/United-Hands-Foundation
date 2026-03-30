@@ -68,7 +68,7 @@ const PressMedia = () => {
   const renderPublicEmbed = (video) => {
     const type = getEmbedType(video.video_url);
     const ytId = type === 'youtube' ? extractYoutubeId(video.video_url) : null;
-    
+
     if (type === 'youtube' && ytId) {
       return (
         <div className="aspect-video">
@@ -84,10 +84,10 @@ const PressMedia = () => {
       );
     }
     return (
-      <div className="aspect-video flex items-center justify-center" style={{background: 'var(--bg-card)'}}>
+      <div className="aspect-video flex items-center justify-center" style={{ background: 'var(--bg-surface)' }}>
         <a href={video.video_url} target="_blank" rel="noopener noreferrer" className="text-center">
-          <Video style={{color: 'var(--text-muted)'}} size={48} className="mx-auto mb-2" />
-          <span className="text-sm" style={{color: 'var(--accent-teal)'}}>View on {type === 'instagram' ? 'Instagram' : 'External'}</span>
+          <Video style={{ color: 'var(--text-muted)' }} size={48} className="mx-auto mb-2" />
+          <span className="text-sm" style={{ color: 'var(--accent-teal)' }}>View on {type === 'instagram' ? 'Instagram' : 'External'}</span>
         </a>
       </div>
     );
@@ -98,32 +98,24 @@ const PressMedia = () => {
     setLightboxOpen(true);
   };
 
-  const breakpointColumns = {
-    default: 3,
-    1100: 2,
-    700: 1
-  };
-
-  const lightboxSlides = pressItems.map(item => ({
-    src: item.image_url,
-    alt: item.title
-  }));
+  const breakpointColumns = { default: 3, 1100: 2, 700: 1 };
+  const lightboxSlides = pressItems.map(item => ({ src: item.image_url, alt: item.title }));
 
   return (
-    <div className="min-h-screen bg-[var(--bg-deep)]">
+    <div className="min-h-screen" style={{ background: 'var(--bg-deep)' }}>
       <Navbar />
 
-      <div className="pt-32 pb-24 px-6">
+      <div className="pt-28 pb-24 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h1 
+          <div className="text-center mb-14">
+            <h1
               className="text-5xl sm:text-6xl font-medium tracking-tight mb-6"
-              style={{fontFamily: 'Cormorant Garamond, serif'}}
+              style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}
               data-testid="press-page-title"
             >
-              Press & <span className="text-[var(--accent-gold)]">Media</span>
+              Press & <span className="text-gradient-gold">Media</span>
             </h1>
-            <p className="text-[var(--text-muted)] text-lg max-w-2xl mx-auto">
+            <p style={{ color: 'var(--text-muted)' }} className="text-base max-w-2xl mx-auto">
               Our work across healthcare, education, and community service has been recognized by leading publications
             </p>
           </div>
@@ -132,20 +124,24 @@ const PressMedia = () => {
           <div className="flex gap-4 mb-8 justify-center">
             <button
               onClick={() => setActiveSection('press')}
-              className={`px-6 py-3 text-sm font-semibold tracking-[0.1em] uppercase transition-colors rounded ${
-                activeSection === 'press' ? 'bg-[var(--accent-teal)] text-white' : 'text-[var(--text-muted)]'
-              }`}
-              style={activeSection !== 'press' ? {border: '1px solid var(--border-subtle)'} : {}}
+              className="px-6 py-3 text-sm font-semibold tracking-[0.1em] uppercase transition-colors rounded"
+              style={{
+                background: activeSection === 'press' ? 'var(--accent-teal)' : 'transparent',
+                color: activeSection === 'press' ? '#fff' : 'var(--text-muted)',
+                border: activeSection !== 'press' ? '1px solid var(--border-subtle)' : 'none'
+              }}
               data-testid="press-section-btn"
             >
               Press Clippings
             </button>
             <button
               onClick={() => setActiveSection('videos')}
-              className={`px-6 py-3 text-sm font-semibold tracking-[0.1em] uppercase transition-colors rounded flex items-center gap-2 ${
-                activeSection === 'videos' ? 'bg-[var(--accent-warm)] text-white' : 'text-[var(--text-muted)]'
-              }`}
-              style={activeSection !== 'videos' ? {border: '1px solid var(--border-subtle)'} : {}}
+              className="px-6 py-3 text-sm font-semibold tracking-[0.1em] uppercase transition-colors rounded flex items-center gap-2"
+              style={{
+                background: activeSection === 'videos' ? 'var(--accent-gold)' : 'transparent',
+                color: activeSection === 'videos' ? '#fff' : 'var(--text-muted)',
+                border: activeSection !== 'videos' ? '1px solid var(--border-subtle)' : 'none'
+              }}
               data-testid="videos-section-btn"
             >
               <Video size={16} />
@@ -155,113 +151,84 @@ const PressMedia = () => {
 
           {activeSection === 'press' && (
             <>
-          {/* Filters */}
-          <div className="glass-morph p-6 rounded mb-12 flex flex-col md:flex-row gap-4 items-center" data-testid="filters">
-            <Filter className="text-[var(--accent-gold)]" size={24} />
-            
-            <div className="flex-1">
-              <label className="text-[var(--accent-gold)] text-xs tracking-[0.2em] uppercase font-bold mb-2 block">District</label>
-              <select
-                value={selectedDistrict}
-                onChange={(e) => setSelectedDistrict(e.target.value)}
-                className="w-full bg-[var(--bg-card)] border border-[var(--accent-gold)]/20 rounded px-4 py-2 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-gold)]"
-                data-testid="filter-district"
-              >
-                {districts.map((district) => (
-                  <option key={district} value={district}>{district}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex-1">
-              <label className="text-[var(--accent-gold)] text-xs tracking-[0.2em] uppercase font-bold mb-2 block">Year</label>
-              <select
-                value={selectedYear}
-                onChange={(e) => setSelectedYear(e.target.value)}
-                className="w-full bg-[var(--bg-card)] border border-[var(--accent-gold)]/20 rounded px-4 py-2 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-gold)]"
-                data-testid="filter-year"
-              >
-                {years.map((year) => (
-                  <option key={year} value={year}>{year}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Masonry Grid */}
-          {loading ? (
-            <div className="text-center py-12">
-              <Loader2 className="animate-spin text-[var(--accent-gold)] mx-auto mb-4" size={48} />
-              <p className="text-[var(--text-muted)]">Loading press coverage...</p>
-            </div>
-          ) : pressItems.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-[var(--text-muted)]">No press coverage found</p>
-            </div>
-          ) : (
-            <Masonry
-              breakpointCols={breakpointColumns}
-              className="masonry-grid"
-              columnClassName="masonry-grid_column"
-              data-testid="masonry-grid"
-            >
-              {pressItems.map((item, index) => (
-                <div
-                  key={item.id}
-                  className="glass-morph rounded overflow-hidden hover-lift cursor-pointer"
-                  onClick={() => openLightbox(index)}
-                  data-testid={`press-item-${item.id}`}
-                >
-                  <img
-                    src={item.image_url}
-                    alt={item.title}
-                    className="w-full h-auto"
-                  />
-                  <div className="p-6">
-                    <h3 className="text-[var(--text-primary)] font-semibold mb-2">{item.title}</h3>
-                    <div className="flex items-center justify-between text-xs text-[var(--text-muted)]">
-                      <span>{item.publication}</span>
-                      <span>{item.year}</span>
-                    </div>
-                  </div>
+              {/* Filters */}
+              <div className="card-elevated p-6 rounded-lg mb-12 flex flex-col md:flex-row gap-4 items-center" data-testid="filters">
+                <Filter style={{ color: 'var(--accent-gold)' }} size={24} />
+                <div className="flex-1">
+                  <label className="text-xs tracking-[0.2em] uppercase font-bold mb-2 block" style={{ color: 'var(--accent-teal)' }}>District</label>
+                  <select
+                    value={selectedDistrict}
+                    onChange={(e) => setSelectedDistrict(e.target.value)}
+                    className="w-full rounded px-4 py-2 text-sm focus:outline-none"
+                    style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', color: 'var(--text-primary)' }}
+                    data-testid="filter-district"
+                  >
+                    {districts.map((district) => (<option key={district} value={district}>{district}</option>))}
+                  </select>
                 </div>
-              ))}
-            </Masonry>
-          )}
+                <div className="flex-1">
+                  <label className="text-xs tracking-[0.2em] uppercase font-bold mb-2 block" style={{ color: 'var(--accent-teal)' }}>Year</label>
+                  <select
+                    value={selectedYear}
+                    onChange={(e) => setSelectedYear(e.target.value)}
+                    className="w-full rounded px-4 py-2 text-sm focus:outline-none"
+                    style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', color: 'var(--text-primary)' }}
+                    data-testid="filter-year"
+                  >
+                    {years.map((year) => (<option key={year} value={year}>{year}</option>))}
+                  </select>
+                </div>
+              </div>
 
-          {/* Lightbox */}
-          <Lightbox
-            open={lightboxOpen}
-            close={() => setLightboxOpen(false)}
-            slides={lightboxSlides}
-            index={lightboxIndex}
-            plugins={[Zoom]}
-          />
+              {loading ? (
+                <div className="text-center py-12">
+                  <Loader2 className="animate-spin mx-auto mb-4" style={{ color: 'var(--accent-gold)' }} size={48} />
+                  <p style={{ color: 'var(--text-muted)' }}>Loading press coverage...</p>
+                </div>
+              ) : pressItems.length === 0 ? (
+                <div className="text-center py-12">
+                  <p style={{ color: 'var(--text-muted)' }}>No press coverage found</p>
+                </div>
+              ) : (
+                <Masonry breakpointCols={breakpointColumns} className="masonry-grid" columnClassName="masonry-grid_column" data-testid="masonry-grid">
+                  {pressItems.map((item, index) => (
+                    <div key={item.id} className="card-elevated rounded-lg overflow-hidden hover-lift cursor-pointer" onClick={() => openLightbox(index)} data-testid={`press-item-${item.id}`}>
+                      <img src={item.image_url} alt={item.title} className="w-full h-auto" />
+                      <div className="p-5">
+                        <h3 className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>{item.title}</h3>
+                        <div className="flex items-center justify-between text-xs" style={{ color: 'var(--text-muted)' }}>
+                          <span>{item.publication}</span>
+                          <span>{item.year}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </Masonry>
+              )}
+
+              <Lightbox open={lightboxOpen} close={() => setLightboxOpen(false)} slides={lightboxSlides} index={lightboxIndex} plugins={[Zoom]} />
             </>
           )}
 
-          {/* Video Clips Section */}
           {activeSection === 'videos' && (
             <div data-testid="videos-section">
               {videos.length === 0 ? (
-                <div className="text-center py-16 glass-morph rounded">
-                  <Video className="mx-auto mb-4" style={{color: 'var(--text-muted)'}} size={48} />
-                  <p style={{color: 'var(--text-muted)'}}>No video clips available yet</p>
+                <div className="text-center py-16 card-elevated rounded-lg">
+                  <Video className="mx-auto mb-4" style={{ color: 'var(--text-muted)' }} size={48} />
+                  <p style={{ color: 'var(--text-muted)' }}>No video clips available yet</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {videos.map(video => {
-                    return (
-                      <div key={video.id} className="glass-morph rounded overflow-hidden hover-lift" data-testid={`video-public-${video.id}`}>
-                        {renderPublicEmbed(video)}
-                        <div className="p-5">
-                          <h3 className="font-semibold mb-1" style={{color: 'var(--text-primary)'}}>{video.title}</h3>
-                          {video.description && <p className="text-sm line-clamp-2" style={{color: 'var(--text-muted)'}}>{video.description}</p>}
-                          <span className="inline-block mt-3 text-xs px-2 py-1 rounded" style={{background: 'var(--bg-deep)', color: 'var(--accent-warm)'}}>{video.category}</span>
-                        </div>
+                  {videos.map(video => (
+                    <div key={video.id} className="card-elevated rounded-lg overflow-hidden hover-lift" data-testid={`video-public-${video.id}`}>
+                      {renderPublicEmbed(video)}
+                      <div className="p-5">
+                        <h3 className="font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>{video.title}</h3>
+                        {video.description && <p className="text-sm line-clamp-2" style={{ color: 'var(--text-muted)' }}>{video.description}</p>}
+                        <span className="inline-block mt-3 text-xs px-2 py-1 rounded" style={{ background: 'var(--bg-surface)', color: 'var(--accent-teal)' }}>{video.category}</span>
                       </div>
-                    );
-                  })}
+                    </div>
+                  ))}
                 </div>
               )}
             </div>

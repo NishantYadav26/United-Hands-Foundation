@@ -1,22 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --bg-deep: #0B1F3A;
-  --bg-card: #102A43;
-  --bg-surface: #163455;
+  --bg-deep: #F6F3ED;
+  --bg-card: #FFFFFF;
+  --bg-surface: #ECE6DB;
   --accent-gold: #C6A15B;
   --accent-gold-light: #D4B876;
-  --accent-teal: #3FA7A3;
-  --accent-teal-light: #5DBFBB;
+  --accent-teal: #1F6F6D;
+  --accent-teal-light: #5FA8A6;
   --accent-warm: #C6A15B;
   --accent-warm-light: #D4B876;
-  --text-primary: #F5F3EE;
-  --text-muted: #A7B1BC;
-  --text-soft: #BFC8D2;
-  --border-subtle: rgba(198, 161, 91, 0.12);
-  --border-warm: rgba(198, 161, 91, 0.2);
-  --glass-bg: rgba(11, 31, 58, 0.6);
-  --glass-border: rgba(198, 161, 91, 0.1);
+  --text-primary: #1F2933;
+  --text-muted: #5B6773;
+  --text-soft: #6B7D8D;
+  --border-subtle: rgba(31, 111, 109, 0.12);
+  --border-warm: rgba(198, 161, 91, 0.25);
+  --glass-bg: rgba(255, 255, 255, 0.82);
+  --glass-border: rgba(31, 111, 109, 0.1);
+  --hero-dark: #0B1F3A;
 }
 
 * {
@@ -41,9 +42,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .glass-morph {
   background: var(--glass-bg);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
+  box-shadow: 0 2px 16px rgba(31, 41, 51, 0.06);
 }
 
 .hover-lift {
@@ -52,11 +54,11 @@ h1, h2, h3, h4, h5, h6 {
 
 .hover-lift:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(198, 161, 91, 0.12);
+  box-shadow: 0 12px 32px rgba(31, 111, 109, 0.10);
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent-teal) 0%, #348F8C 100%);
+  background: linear-gradient(135deg, var(--accent-teal) 0%, #185856 100%);
   color: #FFFFFF;
   border: none;
   padding: 14px 32px;
@@ -73,12 +75,12 @@ h1, h2, h3, h4, h5, h6 {
 .btn-primary:hover {
   background: linear-gradient(135deg, var(--accent-teal-light) 0%, var(--accent-teal) 100%);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(63, 167, 163, 0.3);
+  box-shadow: 0 8px 24px rgba(31, 111, 109, 0.25);
 }
 
 .btn-orange {
   background: linear-gradient(135deg, var(--accent-gold) 0%, #A8873D 100%);
-  color: #0B1F3A;
+  color: #FFFFFF;
   border: none;
   padding: 14px 32px;
   font-family: 'Outfit', sans-serif;
@@ -99,7 +101,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .btn-gold {
   background: linear-gradient(135deg, var(--accent-gold) 0%, #A8873D 100%);
-  color: #0B1F3A;
+  color: #FFFFFF;
   border: none;
   padding: 14px 32px;
   font-family: 'Outfit', sans-serif;
@@ -130,14 +132,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .text-gradient-orange {
-  background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-gold-light) 100%);
+  background: linear-gradient(135deg, var(--accent-gold) 0%, #A8873D 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .text-gradient-gold {
-  background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-gold-light) 100%);
+  background: linear-gradient(135deg, var(--accent-gold) 0%, #A8873D 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -184,17 +186,46 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .bg-peaceful-gradient {
-  background: linear-gradient(180deg, var(--bg-deep) 0%, #0E2540 50%, #102A43 100%);
+  background: linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-surface) 50%, var(--bg-deep) 100%);
 }
 
 .bg-section-alt {
-  background: var(--bg-card);
+  background: var(--bg-surface);
   border-top: 1px solid var(--border-subtle);
   border-bottom: 1px solid var(--border-subtle);
 }
 
 .logo-see-through {
   opacity: 0.95;
-  mix-blend-mode: luminosity;
-  filter: brightness(1.15) contrast(1.08);
+  filter: brightness(1.05) contrast(1.05);
+}
+
+/* Card styles for light theme */
+.card-elevated {
+  background: var(--bg-card);
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(31, 41, 51, 0.06), 0 1px 4px rgba(31, 41, 51, 0.04);
+  border: 1px solid rgba(31, 111, 109, 0.06);
+}
+
+/* Input focus on light theme */
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent-teal) !important;
+  box-shadow: 0 0 0 2px rgba(31, 111, 109, 0.1);
+}
+
+/* Masonry styles */
+.masonry-grid {
+  display: flex;
+  margin-left: -16px;
+  width: auto;
+}
+
+.masonry-grid_column {
+  padding-left: 16px;
+  background-clip: padding-box;
+}
+
+.masonry-grid_column > div {
+  margin-bottom: 16px;
 }

@@ -31,45 +31,45 @@ const AboutUs = () => {
   }, []);
 
   return (
-    <div className="min-h-screen" style={{background: 'var(--bg-deep)'}}>
+    <div className="min-h-screen" style={{ background: 'var(--bg-deep)' }}>
       <Navbar />
 
       {/* Hero */}
-      <section className="pt-32 pb-16 px-6" data-testid="about-hero">
+      <section className="pt-28 pb-16 px-6" data-testid="about-hero">
         <div className="max-w-5xl mx-auto text-center">
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-medium tracking-tight mb-6 text-gradient-gold" style={{fontFamily: 'Cormorant Garamond, serif'}}>
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-medium tracking-tight mb-6 text-gradient-gold" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
             About Us
           </h1>
-          <p className="text-lg leading-relaxed max-w-3xl mx-auto" style={{color: 'var(--text-soft)'}}>
-            United Hands Foundation is a registered non-profit committed to healthcare, 
+          <p className="text-lg leading-relaxed max-w-3xl mx-auto" style={{ color: 'var(--text-muted)' }}>
+            United Hands Foundation is a registered non-profit committed to healthcare,
             education, disaster relief, and community upliftment across Maharashtra since 2020.
           </p>
         </div>
       </section>
 
       {/* Mission & Vision */}
-      <section className="py-16 px-6" data-testid="about-mission">
+      <section className="py-16 px-6" style={{ background: 'var(--bg-surface)' }} data-testid="about-mission">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <div className="glass-morph p-10 rounded">
-            <Target className="mb-6" style={{color: 'var(--accent-teal)'}} size={40} />
-            <h2 className="text-3xl font-medium mb-4" style={{fontFamily: 'Cormorant Garamond, serif'}}>
+          <div className="card-elevated p-10 rounded-lg">
+            <Target className="mb-6" style={{ color: 'var(--accent-teal)' }} size={40} />
+            <h2 className="text-3xl font-medium mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               Our <span className="text-gradient-blue">Mission</span>
             </h2>
-            <p className="leading-relaxed" style={{color: 'var(--text-muted)'}}>
-              To provide compassionate healthcare, quality education, and emergency relief to 
-              underserved communities. We believe in hands-on service, operating medical camps, 
-              distributing essential supplies, and building sustainable support systems that 
+            <p className="leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+              To provide compassionate healthcare, quality education, and emergency relief to
+              underserved communities. We believe in hands-on service, operating medical camps,
+              distributing essential supplies, and building sustainable support systems that
               restore dignity and hope.
             </p>
           </div>
-          <div className="glass-morph p-10 rounded">
-            <Award className="mb-6" style={{color: 'var(--accent-warm)'}} size={40} />
-            <h2 className="text-3xl font-medium mb-4" style={{fontFamily: 'Cormorant Garamond, serif'}}>
+          <div className="card-elevated p-10 rounded-lg">
+            <Award className="mb-6" style={{ color: 'var(--accent-gold)' }} size={40} />
+            <h2 className="text-3xl font-medium mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               Our <span className="text-gradient-orange">Vision</span>
             </h2>
-            <p className="leading-relaxed" style={{color: 'var(--text-muted)'}}>
-              A Maharashtra where every individual has access to healthcare, education, and 
-              a life of dignity. We envision a network of community-driven programs spanning 
+            <p className="leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+              A Maharashtra where every individual has access to healthcare, education, and
+              a life of dignity. We envision a network of community-driven programs spanning
               every district, powered by local volunteers and transparent governance.
             </p>
           </div>
@@ -79,24 +79,24 @@ const AboutUs = () => {
       {/* Founder Photos - Dynamic from CMS */}
       <section className="py-16 px-6" data-testid="about-founders">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-medium text-center mb-4" style={{fontFamily: 'Cormorant Garamond, serif'}}>
+          <h2 className="text-4xl font-medium text-center mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
             Our <span className="text-gradient-blue">Founders</span>
           </h2>
-          <p className="text-center text-lg mb-12" style={{color: 'var(--text-muted)'}}>
+          <p className="text-center text-base mb-12" style={{ color: 'var(--text-muted)' }}>
             Ex-Government of India doctors serving communities with dedication
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-4xl mx-auto">
             {siteAssets.founder_1 && (
-              <div className="glass-morph rounded overflow-hidden hover-lift" data-testid="about-founder-1">
+              <div className="card-elevated rounded-lg overflow-hidden hover-lift" data-testid="about-founder-1">
                 <div className="h-80 overflow-hidden">
                   <img src={siteAssets.founder_1} alt="Dr. Rahul Sarwade" className="w-full h-full object-cover identity-lock" />
                 </div>
                 <div className="p-6">
-                  <h3 className="text-2xl font-medium mb-1" style={{fontFamily: 'Cormorant Garamond, serif'}}>Dr. Rahul Sarwade</h3>
-                  <p className="text-xs tracking-[0.15em] uppercase font-bold mb-3" style={{color: 'var(--accent-warm)'}}>Co-Founder & President</p>
-                  <p className="text-sm leading-relaxed" style={{color: 'var(--text-muted)'}}>
-                    Former Government of India medical officer with decades of healthcare expertise. 
+                  <h3 className="text-2xl font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>Dr. Rahul Sarwade</h3>
+                  <p className="text-xs tracking-[0.15em] uppercase font-bold mb-3" style={{ color: 'var(--accent-gold)' }}>Co-Founder & President</p>
+                  <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                    Former Government of India medical officer with decades of healthcare expertise.
                     Dedicated to extending medical access to rural Maharashtra's most underserved populations.
                   </p>
                 </div>
@@ -104,15 +104,15 @@ const AboutUs = () => {
             )}
 
             {siteAssets.founder_2 && (
-              <div className="glass-morph rounded overflow-hidden hover-lift" data-testid="about-founder-2">
+              <div className="card-elevated rounded-lg overflow-hidden hover-lift" data-testid="about-founder-2">
                 <div className="h-80 overflow-hidden">
                   <img src={siteAssets.founder_2} alt="Dr. Jagruti Hankare" className="w-full h-full object-cover identity-lock" />
                 </div>
                 <div className="p-6">
-                  <h3 className="text-2xl font-medium mb-1" style={{fontFamily: 'Cormorant Garamond, serif'}}>Dr. Jagruti Hankare</h3>
-                  <p className="text-xs tracking-[0.15em] uppercase font-bold mb-3" style={{color: 'var(--accent-warm)'}}>Co-Founder & Secretary</p>
-                  <p className="text-sm leading-relaxed" style={{color: 'var(--text-muted)'}}>
-                    Healthcare professional committed to improving quality of life for underserved communities 
+                  <h3 className="text-2xl font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>Dr. Jagruti Hankare</h3>
+                  <p className="text-xs tracking-[0.15em] uppercase font-bold mb-3" style={{ color: 'var(--accent-gold)' }}>Co-Founder & Secretary</p>
+                  <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                    Healthcare professional committed to improving quality of life for underserved communities
                     through medical camps, health awareness drives, and community outreach programs.
                   </p>
                 </div>
@@ -124,19 +124,19 @@ const AboutUs = () => {
 
       {/* Field Work Gallery from CMS */}
       {(siteAssets.hero_background || siteAssets.center_photo) && (
-        <section className="py-16 px-6" data-testid="about-fieldwork">
+        <section className="py-16 px-6" style={{ background: 'var(--bg-surface)' }} data-testid="about-fieldwork">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-4xl font-medium text-center mb-12" style={{fontFamily: 'Cormorant Garamond, serif'}}>
+            <h2 className="text-4xl font-medium text-center mb-12" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               In the <span className="text-gradient-gold">Field</span>
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {siteAssets.hero_background && (
-                <div className="rounded overflow-hidden hover-lift">
+                <div className="rounded-lg overflow-hidden hover-lift card-elevated">
                   <img src={siteAssets.hero_background} alt="Field Work" className="w-full h-72 object-cover identity-lock" />
                 </div>
               )}
               {siteAssets.center_photo && (
-                <div className="rounded overflow-hidden hover-lift">
+                <div className="rounded-lg overflow-hidden hover-lift card-elevated">
                   <img src={siteAssets.center_photo} alt="Community Service" className="w-full h-72 object-cover identity-lock" />
                 </div>
               )}
@@ -149,23 +149,23 @@ const AboutUs = () => {
       {pillars.length > 0 && (
         <section className="py-16 px-6" data-testid="about-pillars">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-4xl font-medium text-center mb-12" style={{fontFamily: 'Cormorant Garamond, serif'}}>
+            <h2 className="text-4xl font-medium text-center mb-12" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               Our <span className="text-gradient-orange">Pillars</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {pillars.map(pillar => (
-                <div key={pillar.id} className="glass-morph p-8 rounded hover-lift text-center" data-testid={`about-pillar-${pillar.id}`}>
+                <div key={pillar.id} className="card-elevated p-8 rounded-lg hover-lift text-center" data-testid={`about-pillar-${pillar.id}`}>
                   {pillar.image_url ? (
                     <img src={pillar.image_url} alt={pillar.name} className="w-20 h-20 rounded-full mx-auto mb-5 object-cover identity-lock" />
                   ) : (
-                    <div className="w-20 h-20 rounded-full mx-auto mb-5 flex items-center justify-center" style={{background: 'var(--bg-surface)'}}>
-                      <Users style={{color: 'var(--accent-teal)'}} size={32} />
+                    <div className="w-20 h-20 rounded-full mx-auto mb-5 flex items-center justify-center" style={{ background: 'var(--bg-surface)' }}>
+                      <Users style={{ color: 'var(--accent-teal)' }} size={32} />
                     </div>
                   )}
-                  <h3 className="text-xl font-medium mb-1" style={{fontFamily: 'Cormorant Garamond, serif'}}>{pillar.name}</h3>
-                  <p className="text-xs tracking-[0.15em] uppercase font-bold mb-3" style={{color: 'var(--accent-teal)'}}>{pillar.role}</p>
-                  {pillar.specialty && <p className="text-sm" style={{color: 'var(--text-muted)'}}>{pillar.specialty}</p>}
-                  {pillar.bio_detailed && <p className="text-sm mt-2 leading-relaxed" style={{color: 'var(--text-muted)'}}>{pillar.bio_detailed}</p>}
+                  <h3 className="text-xl font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{pillar.name}</h3>
+                  <p className="text-xs tracking-[0.15em] uppercase font-bold mb-3" style={{ color: 'var(--accent-teal)' }}>{pillar.role}</p>
+                  {pillar.specialty && <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{pillar.specialty}</p>}
+                  {pillar.bio_detailed && <p className="text-sm mt-2 leading-relaxed" style={{ color: 'var(--text-muted)' }}>{pillar.bio_detailed}</p>}
                 </div>
               ))}
             </div>
@@ -174,9 +174,9 @@ const AboutUs = () => {
       )}
 
       {/* Where We Work */}
-      <section className="py-16 px-6" data-testid="about-locations">
+      <section className="py-16 px-6" style={{ background: 'var(--bg-surface)' }} data-testid="about-locations">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-medium text-center mb-12" style={{fontFamily: 'Cormorant Garamond, serif'}}>
+          <h2 className="text-4xl font-medium text-center mb-12" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
             Where We <span className="text-gradient-blue">Work</span>
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
@@ -187,10 +187,10 @@ const AboutUs = () => {
               { name: 'Palghar', desc: 'Tribal healthcare outreach' },
               { name: 'Panchgani', desc: 'Rural health programs' }
             ].map(loc => (
-              <div key={loc.name} className="glass-morph p-6 rounded text-center hover-lift">
-                <MapPin className="mx-auto mb-3" style={{color: 'var(--accent-warm)'}} size={28} />
-                <h3 className="font-semibold mb-1">{loc.name}</h3>
-                <p className="text-xs" style={{color: 'var(--text-muted)'}}>{loc.desc}</p>
+              <div key={loc.name} className="card-elevated p-6 rounded-lg text-center hover-lift">
+                <MapPin className="mx-auto mb-3" style={{ color: 'var(--accent-gold)' }} size={28} />
+                <h3 className="font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>{loc.name}</h3>
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{loc.desc}</p>
               </div>
             ))}
           </div>
@@ -199,8 +199,8 @@ const AboutUs = () => {
 
       {/* Legal & Registration */}
       <section className="py-16 px-6" data-testid="about-legal">
-        <div className="max-w-4xl mx-auto glass-morph p-10 rounded">
-          <h2 className="text-3xl font-medium text-center mb-8" style={{fontFamily: 'Cormorant Garamond, serif'}}>
+        <div className="max-w-4xl mx-auto card-elevated p-10 rounded-lg">
+          <h2 className="text-3xl font-medium text-center mb-8" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
             Legal <span className="text-gradient-gold">Registration</span>
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -212,9 +212,9 @@ const AboutUs = () => {
               { label: 'Registered Date', value: '04 August 2020' },
               { label: 'Address', value: 'Ratnai Niwas, Kaikadi Chal, Bhoi Galli, Latur, MH - 413512' }
             ].map(item => (
-              <div key={item.label} className="p-4 rounded" style={{background: 'var(--bg-surface)'}}>
-                <span className="text-xs tracking-[0.15em] uppercase font-bold block mb-1" style={{color: 'var(--accent-teal)'}}>{item.label}</span>
-                <span className="text-sm" style={{color: 'var(--text-primary)'}}>{item.value}</span>
+              <div key={item.label} className="p-4 rounded" style={{ background: 'var(--bg-surface)' }}>
+                <span className="text-xs tracking-[0.15em] uppercase font-bold block mb-1" style={{ color: 'var(--accent-teal)' }}>{item.label}</span>
+                <span className="text-sm" style={{ color: 'var(--text-primary)' }}>{item.value}</span>
               </div>
             ))}
           </div>
@@ -222,14 +222,14 @@ const AboutUs = () => {
       </section>
 
       {/* CTA */}
-      <section className="py-16 px-6" data-testid="about-cta">
+      <section className="py-16 px-6" style={{ background: 'var(--bg-surface)' }} data-testid="about-cta">
         <div className="max-w-4xl mx-auto text-center">
-          <Heart className="mx-auto mb-6" style={{color: 'var(--accent-warm)'}} size={48} fill="var(--accent-warm)" />
-          <h2 className="text-4xl font-medium mb-6" style={{fontFamily: 'Cormorant Garamond, serif'}}>
+          <Heart className="mx-auto mb-6" style={{ color: 'var(--accent-gold)' }} size={48} fill="var(--accent-gold)" />
+          <h2 className="text-4xl font-medium mb-6" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
             Join Our <span className="text-gradient-orange">Mission</span>
           </h2>
-          <p className="text-lg mb-8 max-w-2xl mx-auto" style={{color: 'var(--text-muted)'}}>
-            Whether through donations, volunteering, or spreading awareness — every act of 
+          <p className="text-base mb-8 max-w-2xl mx-auto" style={{ color: 'var(--text-muted)' }}>
+            Whether through donations, volunteering, or spreading awareness — every act of
             kindness strengthens the foundation of hope we're building together.
           </p>
           <a href="/donate">

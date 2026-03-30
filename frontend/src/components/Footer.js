@@ -26,69 +26,69 @@ const Footer = () => {
   }, []);
 
   return (
-    <footer className="mt-24" style={{background: 'var(--bg-card)', borderTop: '1px solid var(--border-subtle)'}} data-testid="main-footer">
+    <footer style={{ background: '#1F2933', marginTop: '0' }} data-testid="main-footer">
       <div className="max-w-7xl mx-auto px-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           {/* About */}
           <div>
             <div className="flex items-center gap-3 mb-6">
-              <Heart style={{color: 'var(--accent-warm)'}} size={28} fill="var(--accent-warm)" />
-              <h3 className="text-2xl font-medium" style={{fontFamily: 'Cormorant Garamond, serif'}}>United Hands</h3>
+              <Heart style={{ color: '#C6A15B' }} size={28} fill="#C6A15B" />
+              <h3 className="text-2xl font-medium" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#F6F3ED' }}>United Hands</h3>
             </div>
-            <p className="text-sm leading-relaxed" style={{color: 'var(--text-muted)'}}>
+            <p className="text-sm leading-relaxed" style={{ color: '#A7B1BC' }}>
               Empowering communities through healthcare, education, disaster relief, and elderly care across Dharashiv, Solapur, Latur, Palghar, and Panchgani since 2020.
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-xs tracking-[0.2em] uppercase font-bold mb-6" style={{color: 'var(--accent-warm)'}}>Quick Links</h4>
+            <h4 className="text-xs tracking-[0.2em] uppercase font-bold mb-6" style={{ color: '#C6A15B' }}>Quick Links</h4>
             <div className="flex flex-col gap-3">
-              <Link to="/" className="text-sm transition-colors" style={{color: 'var(--text-primary)'}}>Home</Link>
-              <Link to="/about" className="text-sm transition-colors" style={{color: 'var(--text-primary)'}}>About Us</Link>
-              <Link to="/donate" className="text-sm transition-colors" style={{color: 'var(--text-primary)'}}>Donate</Link>
-              <Link to="/press" className="text-sm transition-colors" style={{color: 'var(--text-primary)'}}>Press & Media</Link>
-              <Link to="/transparency" className="text-sm transition-colors" style={{color: 'var(--text-primary)'}}>Transparency</Link>
-              <Link to="/login" className="text-sm transition-colors" style={{color: 'var(--text-primary)'}}>Login / Register</Link>
+              <Link to="/" className="text-sm transition-colors hover:text-white" style={{ color: '#A7B1BC' }}>Home</Link>
+              <Link to="/about" className="text-sm transition-colors hover:text-white" style={{ color: '#A7B1BC' }}>About Us</Link>
+              <Link to="/donate" className="text-sm transition-colors hover:text-white" style={{ color: '#A7B1BC' }}>Donate</Link>
+              <Link to="/press" className="text-sm transition-colors hover:text-white" style={{ color: '#A7B1BC' }}>Press & Media</Link>
+              <Link to="/transparency" className="text-sm transition-colors hover:text-white" style={{ color: '#A7B1BC' }}>Transparency</Link>
+              <Link to="/login" className="text-sm transition-colors hover:text-white" style={{ color: '#A7B1BC' }}>Login / Register</Link>
             </div>
           </div>
 
           {/* Contact */}
           <div>
-            <h4 className="text-xs tracking-[0.2em] uppercase font-bold mb-6" style={{color: 'var(--accent-warm)'}}>Contact Us</h4>
+            <h4 className="text-xs tracking-[0.2em] uppercase font-bold mb-6" style={{ color: '#C6A15B' }}>Contact Us</h4>
             <div className="flex flex-col gap-4">
               <div className="flex items-start gap-3">
-                <Mail className="mt-1" style={{color: 'var(--accent-teal)'}} size={16} />
-                <span className="text-sm" style={{color: 'var(--text-muted)'}}>Uniteduhf@gmail.com</span>
+                <Mail className="mt-1 flex-shrink-0" style={{ color: '#5FA8A6' }} size={16} />
+                <span className="text-sm" style={{ color: '#A7B1BC' }}>Uniteduhf@gmail.com</span>
               </div>
               <div className="flex items-start gap-3">
-                <Phone className="mt-1" style={{color: 'var(--accent-teal)'}} size={16} />
-                <span className="text-sm" style={{color: 'var(--text-muted)'}}>+91 9730267630</span>
+                <Phone className="mt-1 flex-shrink-0" style={{ color: '#5FA8A6' }} size={16} />
+                <span className="text-sm" style={{ color: '#A7B1BC' }}>+91 9730267630</span>
               </div>
               <div className="flex items-start gap-3">
-                <MapPin className="mt-1" style={{color: 'var(--accent-warm)'}} size={16} />
-                <span className="text-sm" style={{color: 'var(--text-muted)'}}>Ratnai Niwas, Kaikadi Chal, Bhoi Galli, Latur, Maharashtra - 413512</span>
+                <MapPin className="mt-1 flex-shrink-0" style={{ color: '#C6A15B' }} size={16} />
+                <span className="text-sm" style={{ color: '#A7B1BC' }}>Ratnai Niwas, Kaikadi Chal, Bhoi Galli, Latur, Maharashtra - 413512</span>
               </div>
             </div>
 
             {/* Social Links */}
             {(socialLinks.facebook_url || socialLinks.instagram_url || socialLinks.youtube_url) && (
               <div className="mt-6" data-testid="footer-social-links">
-                <h4 className="text-xs tracking-[0.2em] uppercase font-bold mb-4" style={{color: 'var(--accent-warm)'}}>Follow Us</h4>
+                <h4 className="text-xs tracking-[0.2em] uppercase font-bold mb-4" style={{ color: '#C6A15B' }}>Follow Us</h4>
                 <div className="flex items-center gap-4">
                   {socialLinks.facebook_url && (
-                    <a href={socialLinks.facebook_url} target="_blank" rel="noopener noreferrer" className="p-2 rounded transition-all hover:scale-110" style={{background: 'var(--bg-surface)'}} data-testid="social-facebook">
-                      <Facebook size={20} style={{color: 'var(--accent-teal)'}} />
+                    <a href={socialLinks.facebook_url} target="_blank" rel="noopener noreferrer" className="p-2 rounded transition-all hover:scale-110" style={{ background: 'rgba(255,255,255,0.08)' }} data-testid="social-facebook">
+                      <Facebook size={20} style={{ color: '#5FA8A6' }} />
                     </a>
                   )}
                   {socialLinks.instagram_url && (
-                    <a href={socialLinks.instagram_url} target="_blank" rel="noopener noreferrer" className="p-2 rounded transition-all hover:scale-110" style={{background: 'var(--bg-surface)'}} data-testid="social-instagram">
-                      <Instagram size={20} style={{color: 'var(--accent-teal)'}} />
+                    <a href={socialLinks.instagram_url} target="_blank" rel="noopener noreferrer" className="p-2 rounded transition-all hover:scale-110" style={{ background: 'rgba(255,255,255,0.08)' }} data-testid="social-instagram">
+                      <Instagram size={20} style={{ color: '#5FA8A6' }} />
                     </a>
                   )}
                   {socialLinks.youtube_url && (
-                    <a href={socialLinks.youtube_url} target="_blank" rel="noopener noreferrer" className="p-2 rounded transition-all hover:scale-110" style={{background: 'var(--bg-surface)'}} data-testid="social-youtube">
-                      <Youtube size={20} style={{color: 'var(--accent-teal)'}} />
+                    <a href={socialLinks.youtube_url} target="_blank" rel="noopener noreferrer" className="p-2 rounded transition-all hover:scale-110" style={{ background: 'rgba(255,255,255,0.08)' }} data-testid="social-youtube">
+                      <Youtube size={20} style={{ color: '#5FA8A6' }} />
                     </a>
                   )}
                 </div>
@@ -97,19 +97,19 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-12 pt-8" style={{borderTop: '1px solid var(--border-subtle)'}}>
+        <div className="mt-12 pt-8" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
           <div className="text-center mb-4">
-            <p className="text-sm font-semibold mb-2" style={{color: 'var(--text-primary)'}}>
+            <p className="text-sm font-semibold mb-2" style={{ color: '#F6F3ED' }}>
               PAN: AABTU0797K | 80G: AABTU0797KF20231 | 12A: AABTU0797KE20231
             </p>
-            <p className="text-xs" style={{color: 'var(--text-muted)'}}>
+            <p className="text-xs" style={{ color: '#A7B1BC' }}>
               Societies Reg: Latur/0000171/2020 | Registered: 04/08/2020
             </p>
           </div>
-          <p className="text-sm text-center" style={{color: 'var(--text-muted)'}}>
+          <p className="text-sm text-center" style={{ color: '#A7B1BC' }}>
             &copy; {new Date().getFullYear()} United Hands Foundation. Registered under Section 80G & 12A. All rights reserved.
           </p>
-          <p className="text-xs text-center mt-2" style={{color: 'var(--text-muted)'}}>
+          <p className="text-xs text-center mt-2" style={{ color: '#A7B1BC' }}>
             Ratnai Niwas, Kaikadi Chal, Bhoi Galli, Latur, Maharashtra - 413512
           </p>
         </div>

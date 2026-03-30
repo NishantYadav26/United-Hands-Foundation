@@ -148,10 +148,10 @@ const SuccessStoriesManagement = () => {
                   <span className="text-xs px-2 py-1 rounded" style={{background: 'var(--bg-deep)', color: 'var(--accent-warm)'}}>{story.category || 'General'}</span>
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={() => handleEdit(story)} className="p-1.5 hover:bg-blue-900/20 rounded transition-colors" style={{color: 'var(--accent-teal)'}}>
+                  <button onClick={() => handleEdit(story)} className="p-1.5 hover:bg-sky-100 rounded transition-colors" style={{color: 'var(--accent-teal)'}}>
                     <Edit2 size={14} />
                   </button>
-                  <button onClick={() => handleDelete(story.id)} className="p-1.5 hover:bg-red-900/20 text-red-400 rounded transition-colors">
+                  <button onClick={() => handleDelete(story.id)} className="p-1.5 hover:bg-red-100 text-red-600 rounded transition-colors">
                     <Trash2 size={14} />
                   </button>
                 </div>
