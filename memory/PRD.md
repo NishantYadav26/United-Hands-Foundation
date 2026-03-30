@@ -20,12 +20,12 @@ Build a production-grade NGO ecosystem for United Hands Foundation using React, 
 - **File Storage**: Cloudinary (cloud_name: dvmb3mzcy, preset: uhf_unsigned)
 - **Color System**: CSS custom properties in App.css (:root variables)
 
-## What's Been Implemented (as of March 29, 2026)
+## What's Been Implemented (as of March 30, 2026)
 
 ### Core Pages
 - [x] Homepage with dynamic sections (Hero, Heartiest Moments Gallery, Impact Stats, Founders from CMS, Pillars, Authority Ticker, CTA)
 - [x] About Us page
-- [x] Donate page with Multi-cause selector and Manual QR mode
+- [x] Donate page with Multi-cause selector, QR code from CMS, Manual QR mode
 - [x] Press & Media page
 - [x] Transparency page
 - [x] Track My Impact page (Email + PAN based)
@@ -34,41 +34,34 @@ Build a production-grade NGO ecosystem for United Hands Foundation using React, 
 ### Admin Dashboard (/uhf-admin/dashboard)
 - [x] JWT-protected with admin email restriction
 - [x] 6 CMS tabs: Donations, Projects, Gallery, Media Library, Team Pillars, Settings
-- [x] **Projects Management**: Full CRUD (Add/Edit/Delete) with Cloudinary image upload
-- [x] **Gallery Management**: "Heartiest Moments" CRUD with Cloudinary upload
-- [x] **Media Library**: Site assets management (logo, QR code, hero, founders, etc.)
-- [x] **Team Pillars**: Team member management with photos
-- [x] **Donations**: Approve/Reject pending donations
+- [x] **Projects Management**: Full CRUD with Cloudinary upload + old image auto-deletion
+- [x] **Gallery Management**: "Heartiest Moments" CRUD with Cloudinary + old image auto-deletion
+- [x] **Media Library**: Site assets management + old image auto-deletion on update
+- [x] **Team Pillars**: Team member management + old image auto-deletion
+- [x] **Donations**: Approve/Reject with JWT auth tokens (receipt generation working)
 - [x] **Settings**: Payment mode toggle (Manual QR / Razorpay)
 
 ### Authentication
 - [x] Unified login at /login (admin auto-detected by email, redirected to dashboard)
+- [x] No separate "Admin Login" button — single entry point
 - [x] User registration with JWT tokens
-- [x] Admin logout clears all tokens
-- [x] User logout clears session
+- [x] Full logout clearing all tokens
 
-### Dynamic Content Pipeline
-- [x] Homepage fetches site_assets for founder photos (no hardcoded URLs)
-- [x] Homepage fetches gallery images for "Heartiest Moments" section
-- [x] Homepage fetches pillars for "Our Pillars" section  
-- [x] Homepage fetches projects for "Pillars of Impact" with progress bars
-- [x] All admin CMS changes reflect live on the public website
+### Database
+- [x] Connected to MongoDB Atlas (cluster0.qrcpjs1.mongodb.net)
+- [x] Cloudinary old image cleanup on update/delete across all entities
 
 ### Visual Design
 - [x] Peaceful color palette (teal #4DA8A0, warm amber #D4A373, gold #C9B458)
-- [x] CSS custom properties for consistent theming
-- [x] Glass-morphism effects
-- [x] Identity Lock CSS on all founder/field photos
-- [x] See-through logo effect
-- [x] GSAP scroll animations
+- [x] Larger see-through UHF logo
+- [x] QR code dynamically loaded from CMS on donate page
 
 ## Pending / Backlog
 
 ### P1 - High Priority
 - [ ] AI "Chief of Staff" PDF OCR (Gemini 1.5 Flash via Emergent LLM key)
 - [ ] Video Clips Section in Press & Media
-- [ ] Automated 80G Receipt Delivery via Resend (email + PDF)
-- [ ] MongoDB Atlas connection (needs IP whitelist 0.0.0.0/0 in Atlas Network Access)
+- [ ] Automated 80G Receipt Delivery via Resend (needs real API key from user)
 
 ### P2 - Medium Priority
 - [ ] Razorpay Standard Checkout SDK integration (when KYC complete)
