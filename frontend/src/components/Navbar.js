@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, LogIn, LogOut, User } from 'lucide-react';
+import { Menu, X, LogIn, LogOut, User, Phone } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import AnimatedLogo from '@/components/AnimatedLogo';
 
@@ -34,7 +34,7 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2 sm:gap-3 cursor-pointer" onClick={() => navigate('/')} data-testid="logo-link">
-            <AnimatedLogo size="sm" />
+            <AnimatedLogo size="md" />
             <div className="hidden sm:block">
               <h1 className="text-lg sm:text-2xl font-medium tracking-tight" style={{fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)'}}>
                 United Hands
@@ -50,6 +50,10 @@ const Navbar = () => {
             <Link to="/press" className="text-sm transition-colors" style={{color: 'var(--text-primary)'}} data-testid="nav-press">Press</Link>
             <Link to="/transparency" className="text-sm transition-colors" style={{color: 'var(--text-primary)'}} data-testid="nav-transparency">Transparency</Link>
             <Link to="/track-impact" className="text-sm font-semibold transition-colors" style={{color: 'var(--accent-warm)'}} data-testid="nav-track">Track Impact</Link>
+            <a href="#contact" onClick={(e) => { e.preventDefault(); const footer = document.querySelector('[data-testid="main-footer"]'); if(footer) footer.scrollIntoView({behavior: 'smooth'}); }} className="text-sm transition-colors flex items-center gap-1" style={{color: 'var(--text-primary)'}} data-testid="nav-contact">
+              <Phone size={14} />
+              Contact Us
+            </a>
             
             {user ? (
               <div className="flex items-center gap-3">
@@ -100,6 +104,10 @@ const Navbar = () => {
             <Link to="/press" className="py-2 transition-colors" style={{color: 'var(--text-primary)'}} onClick={() => setMobileMenuOpen(false)}>Press</Link>
             <Link to="/transparency" className="py-2 transition-colors" style={{color: 'var(--text-primary)'}} onClick={() => setMobileMenuOpen(false)}>Transparency</Link>
             <Link to="/track-impact" className="font-semibold py-2 transition-colors" style={{color: 'var(--accent-warm)'}} onClick={() => setMobileMenuOpen(false)}>Track My Impact</Link>
+            <a href="#contact" onClick={(e) => { e.preventDefault(); const footer = document.querySelector('[data-testid="main-footer"]'); if(footer) footer.scrollIntoView({behavior: 'smooth'}); setMobileMenuOpen(false); }} className="py-2 transition-colors flex items-center gap-1" style={{color: 'var(--text-primary)'}}>
+              <Phone size={14} />
+              Contact Us
+            </a>
             
             {user ? (
               <div className="flex items-center justify-between py-2">

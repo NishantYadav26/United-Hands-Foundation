@@ -134,7 +134,7 @@ const Donate = () => {
           email: formData.donor_email,
           contact: formData.donor_phone
         },
-        theme: { color: '#4DA8A0' }
+        theme: { color: '#0B1F3A' }
       };
       
       const rzp = new window.Razorpay(options);

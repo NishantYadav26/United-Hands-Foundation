@@ -41,7 +41,7 @@ const AboutUs = () => {
             About Us
           </h1>
           <p className="text-lg leading-relaxed max-w-3xl mx-auto" style={{color: 'var(--text-soft)'}}>
-            United Hands Foundation TA JI Latur is a registered non-profit committed to healthcare, 
+            United Hands Foundation is a registered non-profit committed to healthcare, 
             education, disaster relief, and community upliftment across Maharashtra since 2020.
           </p>
         </div>
@@ -210,7 +210,7 @@ const AboutUs = () => {
               { label: '12A Registration', value: 'AABTU0797KE20231' },
               { label: 'Society Registration', value: 'Latur/0000171/2020' },
               { label: 'Registered Date', value: '04 August 2020' },
-              { label: 'Address', value: 'New Bhagya Nagar, Ring Road, Latur, MH - 413512' }
+              { label: 'Address', value: 'Ratnai Niwas, Kaikadi Chal, Bhoi Galli, Latur, MH - 413512' }
             ].map(item => (
               <div key={item.label} className="p-4 rounded" style={{background: 'var(--bg-surface)'}}>
                 <span className="text-xs tracking-[0.15em] uppercase font-bold block mb-1" style={{color: 'var(--accent-teal)'}}>{item.label}</span>

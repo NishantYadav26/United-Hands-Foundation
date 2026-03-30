@@ -146,7 +146,9 @@ const Home = () => {
         ref={heroRef}
         className="relative min-h-screen flex items-center justify-center pt-20 px-6"
         style={{
-          background: 'linear-gradient(180deg, var(--bg-deep) 0%, #0F2634 50%, #112B3C 100%)'
+          background: siteAssets.hero_background 
+            ? `linear-gradient(180deg, rgba(11,31,58,0.85) 0%, rgba(15,38,52,0.9) 50%, rgba(17,43,60,0.95) 100%), url(${siteAssets.hero_background}) center/cover no-repeat`
+            : 'linear-gradient(180deg, var(--bg-deep) 0%, #0F2634 50%, #112B3C 100%)'
         }}
         data-testid="hero-section"
       >

@@ -449,6 +449,66 @@ const AdminDashboard = () => {
                   )}
                 </div>
               </div>
+
+              {/* Social Media Links */}
+              <div className="p-8 rounded mb-6" style={{background: 'var(--bg-card)', border: '1px solid var(--border-subtle)'}}>
+                <h3 className="font-semibold text-lg mb-2" style={{color: 'var(--text-primary)'}}>Social Media Links</h3>
+                <p className="text-sm mb-6" style={{color: 'var(--text-muted)'}}>
+                  Add your social media profile URLs. These will appear in the website footer.
+                </p>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs tracking-[0.15em] uppercase font-bold mb-2" style={{color: 'var(--accent-teal)'}}>
+                      Facebook URL
+                    </label>
+                    <input
+                      type="url"
+                      placeholder="https://facebook.com/..."
+                      value={settings.facebook_url || ''}
+                      onChange={e => setSettings({...settings, facebook_url: e.target.value})}
+                      className="w-full rounded px-4 py-3 text-sm focus:outline-none"
+                      style={{background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', color: 'var(--text-primary)'}}
+                      data-testid="facebook-url-input"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs tracking-[0.15em] uppercase font-bold mb-2" style={{color: 'var(--accent-teal)'}}>
+                      Instagram URL
+                    </label>
+                    <input
+                      type="url"
+                      placeholder="https://instagram.com/..."
+                      value={settings.instagram_url || ''}
+                      onChange={e => setSettings({...settings, instagram_url: e.target.value})}
+                      className="w-full rounded px-4 py-3 text-sm focus:outline-none"
+                      style={{background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', color: 'var(--text-primary)'}}
+                      data-testid="instagram-url-input"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs tracking-[0.15em] uppercase font-bold mb-2" style={{color: 'var(--accent-teal)'}}>
+                      YouTube URL
+                    </label>
+                    <input
+                      type="url"
+                      placeholder="https://youtube.com/..."
+                      value={settings.youtube_url || ''}
+                      onChange={e => setSettings({...settings, youtube_url: e.target.value})}
+                      className="w-full rounded px-4 py-3 text-sm focus:outline-none"
+                      style={{background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', color: 'var(--text-primary)'}}
+                      data-testid="youtube-url-input"
+                    />
+                  </div>
+                  <button
+                    onClick={handleSaveSettings}
+                    className="btn-primary"
+                    data-testid="save-social-btn"
+                  >
+                    Save Social Links
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 

@@ -1,53 +1,8 @@
-import { FileText, Shield, Award, Download } from 'lucide-react';
+import { Shield } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
 const Transparency = () => {
-  const documents = [
-    {
-      title: 'Society Registration',
-      icon: FileText,
-      description: 'Official registration certificate',
-      link: '#'
-    },
-    {
-      title: 'PAN Card',
-      icon: Shield,
-      description: 'Permanent Account Number',
-      link: '#'
-    },
-    {
-      title: '12A Certificate',
-      icon: Award,
-      description: 'Income Tax exemption certificate',
-      link: '#'
-    },
-    {
-      title: '80G Certificate',
-      icon: Award,
-      description: 'Tax deduction certificate for donors',
-      link: '#'
-    },
-    {
-      title: 'Board Resolution',
-      icon: FileText,
-      description: 'Organizational governance document',
-      link: '#'
-    },
-    {
-      title: 'Annual Report 2023-24',
-      icon: FileText,
-      description: 'Comprehensive annual report',
-      link: '#'
-    },
-    {
-      title: 'Audited Financials',
-      icon: FileText,
-      description: 'Certified financial statements',
-      link: '#'
-    }
-  ];
-
   return (
     <div className="min-h-screen bg-[var(--bg-deep)]">
       <Navbar />
@@ -63,7 +18,7 @@ const Transparency = () => {
               Transparency & <span className="text-[var(--accent-gold)]">Governance</span>
             </h1>
             <p className="text-[var(--text-muted)] text-lg max-w-2xl mx-auto">
-              We believe in complete transparency. Access all our legal and financial documents.
+              We believe in complete transparency and regulatory compliance.
             </p>
           </div>
 
@@ -73,38 +28,32 @@ const Transparency = () => {
             <h2 className="text-2xl font-medium mb-4" style={{fontFamily: 'Cormorant Garamond, serif'}}>
               Legally Registered NGO
             </h2>
-            <p className="text-[var(--text-muted)] max-w-3xl mx-auto">
+            <p className="text-[var(--text-muted)] max-w-3xl mx-auto mb-6">
               United Hands Foundation is registered under Section 12A and 80G of the Income Tax Act, 1961. 
               All donations are eligible for 50% tax deduction.
             </p>
-          </div>
-
-          {/* Documents Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {documents.map((doc, index) => (
-              <div 
-                key={index}
-                className="glass-morph p-8 rounded hover-lift"
-                data-testid={`document-${index}`}
-              >
-                <doc.icon className="text-[var(--accent-gold)] mb-6" size={40} />
-                <h3 className="text-xl font-medium mb-3 text-[var(--text-primary)]" style={{fontFamily: 'Cormorant Garamond, serif'}}>
-                  {doc.title}
-                </h3>
-                <p className="text-[var(--text-muted)] text-sm mb-6">{doc.description}</p>
-                <a
-                  href={doc.link}
-                  className="inline-flex items-center gap-2 text-[var(--accent-gold)] hover:text-[var(--accent-warm-light)] transition-colors text-sm font-semibold"
-                >
-                  <Download size={16} />
-                  Download PDF
-                </a>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
+              <div className="p-4 rounded" style={{background: 'var(--bg-surface)'}}>
+                <span className="text-xs tracking-[0.15em] uppercase font-bold block mb-1" style={{color: 'var(--accent-teal)'}}>PAN</span>
+                <span className="text-sm" style={{color: 'var(--text-primary)'}}>AABTU0797K</span>
               </div>
-            ))}
+              <div className="p-4 rounded" style={{background: 'var(--bg-surface)'}}>
+                <span className="text-xs tracking-[0.15em] uppercase font-bold block mb-1" style={{color: 'var(--accent-teal)'}}>80G</span>
+                <span className="text-sm" style={{color: 'var(--text-primary)'}}>AABTU0797KF20231</span>
+              </div>
+              <div className="p-4 rounded" style={{background: 'var(--bg-surface)'}}>
+                <span className="text-xs tracking-[0.15em] uppercase font-bold block mb-1" style={{color: 'var(--accent-teal)'}}>12A</span>
+                <span className="text-sm" style={{color: 'var(--text-primary)'}}>AABTU0797KE20231</span>
+              </div>
+              <div className="p-4 rounded" style={{background: 'var(--bg-surface)'}}>
+                <span className="text-xs tracking-[0.15em] uppercase font-bold block mb-1" style={{color: 'var(--accent-teal)'}}>Society Reg</span>
+                <span className="text-sm" style={{color: 'var(--text-primary)'}}>Latur/0000171/2020</span>
+              </div>
+            </div>
           </div>
 
           {/* FCRA Notice */}
-          <div className="mt-16 bg-[var(--bg-card)] border border-[var(--accent-gold)]/20 p-8 rounded" data-testid="fcra-notice">
+          <div className="bg-[var(--bg-card)] border border-[var(--accent-gold)]/20 p-8 rounded mb-12" data-testid="fcra-notice">
             <h3 className="text-2xl font-medium mb-4 text-[var(--accent-gold)]" style={{fontFamily: 'Cormorant Garamond, serif'}}>
               FCRA Compliance Notice
             </h3>
@@ -118,7 +67,7 @@ const Transparency = () => {
           </div>
 
           {/* Contact for Queries */}
-          <div className="mt-12 text-center glass-morph p-8 rounded">
+          <div className="text-center glass-morph p-8 rounded">
             <h3 className="text-2xl font-medium mb-4" style={{fontFamily: 'Cormorant Garamond, serif'}}>
               Questions or Queries?
             </h3>
@@ -126,7 +75,7 @@ const Transparency = () => {
               For any questions about our governance, finances, or operations, please contact us.
             </p>
             <a
-              href="mailto:transparency@unitedhands.org"
+              href="mailto:Uniteduhf@gmail.com"
               className="inline-block btn-gold"
             >
               Contact Us
