@@ -72,6 +72,57 @@ const VideosManagement = () => {
     return match ? match[1] : null;
   };
 
+  const getEmbedType = (url) => {
+    if (!url) return 'unknown';
+    if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube';
+    if (url.includes('facebook.com') || url.includes('fb.watch')) return 'facebook';
+    if (url.includes('instagram.com')) return 'instagram';
+    return 'direct';
+  };
+
+  const renderVideoEmbed = (video) => {
+    const type = getEmbedType(video.video_url);
+    const ytId = type === 'youtube' ? extractYoutubeId(video.video_url) : null;
+    
+    if (type === 'youtube' && ytId) {
+      return (
+        <div className="aspect-video">
+          <iframe src={`https://www.youtube.com/embed/${ytId}`} title={video.title} className="w-full h-full" allowFullScreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" />
+        </div>
+      );
+    }
+    if (type === 'facebook') {
+      return (
+        <div className="aspect-video">
+          <iframe src={`https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(video.video_url)}&show_text=false&width=560`} className="w-full h-full" allowFullScreen allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" />
+        </div>
+      );
+    }
+    if (type === 'instagram') {
+      return (
+        <div className="p-4" style={{background: 'var(--bg-card)'}}>
+          <a href={video.video_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <div className="w-12 h-12 rounded flex items-center justify-center" style={{background: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)'}}>
+              <Video size={20} className="text-white" />
+            </div>
+            <div>
+              <p className="font-medium" style={{color: 'var(--text-primary)'}}>{video.title}</p>
+              <p className="text-xs" style={{color: 'var(--accent-warm)'}}>View on Instagram</p>
+            </div>
+          </a>
+        </div>
+      );
+    }
+    return (
+      <div className="aspect-video flex items-center justify-center" style={{background: 'var(--bg-card)'}}>
+        <a href={video.video_url} target="_blank" rel="noopener noreferrer" className="text-center">
+          <Video style={{color: 'var(--text-muted)'}} size={48} className="mx-auto mb-2" />
+          <span className="text-sm" style={{color: 'var(--accent-teal)'}}>Open Video</span>
+        </a>
+      </div>
+    );
+  };
+
   return (
     <div data-testid="videos-panel">
       <div className="flex justify-between items-center mb-8">
@@ -96,7 +147,7 @@ const VideosManagement = () => {
             data-testid="video-title-input"
           />
           <input
-            placeholder="YouTube URL * (e.g. https://youtube.com/watch?v=...)"
+            placeholder="Video URL * (YouTube, Facebook, or Instagram)"
             value={formData.video_url}
             onChange={e => setFormData({...formData, video_url: e.target.value})}
             className="w-full rounded px-4 py-3 text-sm focus:outline-none"
@@ -136,24 +187,9 @@ const VideosManagement = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {videos.map(video => {
-            const ytId = extractYoutubeId(video.video_url);
             return (
               <div key={video.id} className="glass-morph rounded overflow-hidden" data-testid={`video-card-${video.id}`}>
-                {ytId ? (
-                  <div className="aspect-video">
-                    <iframe
-                      src={`https://www.youtube.com/embed/${ytId}`}
-                      title={video.title}
-                      className="w-full h-full"
-                      allowFullScreen
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    />
-                  </div>
-                ) : (
-                  <div className="aspect-video flex items-center justify-center" style={{background: 'var(--bg-card)'}}>
-                    <Video style={{color: 'var(--text-muted)'}} size={48} />
-                  </div>
-                )}
+                {renderVideoEmbed(video)}
                 <div className="p-4">
                   <div className="flex justify-between items-start">
                     <div>

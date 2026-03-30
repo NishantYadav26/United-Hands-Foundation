@@ -57,6 +57,42 @@ const PressMedia = () => {
     return match ? match[1] : null;
   };
 
+  const getEmbedType = (url) => {
+    if (!url) return 'unknown';
+    if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube';
+    if (url.includes('facebook.com') || url.includes('fb.watch')) return 'facebook';
+    if (url.includes('instagram.com')) return 'instagram';
+    return 'direct';
+  };
+
+  const renderPublicEmbed = (video) => {
+    const type = getEmbedType(video.video_url);
+    const ytId = type === 'youtube' ? extractYoutubeId(video.video_url) : null;
+    
+    if (type === 'youtube' && ytId) {
+      return (
+        <div className="aspect-video">
+          <iframe src={`https://www.youtube.com/embed/${ytId}`} title={video.title} className="w-full h-full" allowFullScreen />
+        </div>
+      );
+    }
+    if (type === 'facebook') {
+      return (
+        <div className="aspect-video">
+          <iframe src={`https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(video.video_url)}&show_text=false&width=560`} className="w-full h-full" allowFullScreen />
+        </div>
+      );
+    }
+    return (
+      <div className="aspect-video flex items-center justify-center" style={{background: 'var(--bg-card)'}}>
+        <a href={video.video_url} target="_blank" rel="noopener noreferrer" className="text-center">
+          <Video style={{color: 'var(--text-muted)'}} size={48} className="mx-auto mb-2" />
+          <span className="text-sm" style={{color: 'var(--accent-teal)'}}>View on {type === 'instagram' ? 'Instagram' : 'External'}</span>
+        </a>
+      </div>
+    );
+  };
+
   const openLightbox = (index) => {
     setLightboxIndex(index);
     setLightboxOpen(true);
@@ -215,24 +251,9 @@ const PressMedia = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {videos.map(video => {
-                    const ytId = extractYoutubeId(video.video_url);
                     return (
                       <div key={video.id} className="glass-morph rounded overflow-hidden hover-lift" data-testid={`video-public-${video.id}`}>
-                        {ytId ? (
-                          <div className="aspect-video">
-                            <iframe
-                              src={`https://www.youtube.com/embed/${ytId}`}
-                              title={video.title}
-                              className="w-full h-full"
-                              allowFullScreen
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            />
-                          </div>
-                        ) : (
-                          <div className="aspect-video flex items-center justify-center" style={{background: 'var(--bg-card)'}}>
-                            <Video style={{color: 'var(--text-muted)'}} size={48} />
-                          </div>
-                        )}
+                        {renderPublicEmbed(video)}
                         <div className="p-5">
                           <h3 className="font-semibold mb-1" style={{color: 'var(--text-primary)'}}>{video.title}</h3>
                           {video.description && <p className="text-sm line-clamp-2" style={{color: 'var(--text-muted)'}}>{video.description}</p>}

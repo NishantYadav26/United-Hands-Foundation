@@ -214,6 +214,7 @@ class SuccessStoryCreate(BaseModel):
     patient_count: int
     date: str
     story_text: str
+    category: str = "General"
     images: List[str] = []
 
 class PressMedia(BaseModel):
@@ -709,7 +710,7 @@ async def update_admin_settings(settings: AdminSettings, admin_email: str = Depe
     return {"status": "success", "message": "Settings updated"}
 
 @api_router.post("/success-stories", response_model=SuccessStory)
-async def create_success_story(story: SuccessStoryCreate):
+async def create_success_story(story: SuccessStoryCreate, admin_email: str = Depends(verify_token)):
     story_obj = SuccessStory(**story.model_dump())
     doc = story_obj.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
@@ -718,7 +719,7 @@ async def create_success_story(story: SuccessStoryCreate):
     return story_obj
 
 @api_router.get("/success-stories", response_model=List[SuccessStory])
-async def get_success_stories(limit: int = 10):
+async def get_success_stories(limit: int = 50):
     stories = await db.success_stories.find({}, {"_id": 0}).sort("created_at", -1).limit(limit).to_list(limit)
     
     for story in stories:
@@ -726,6 +727,90 @@ async def get_success_stories(limit: int = 10):
             story['created_at'] = datetime.fromisoformat(story['created_at'])
     
     return stories
+
+@api_router.put("/success-stories/{story_id}")
+async def update_success_story(story_id: str, story: SuccessStoryCreate, admin_email: str = Depends(verify_token)):
+    await db.success_stories.update_one({"id": story_id}, {"$set": story.model_dump()})
+    return {"status": "success", "message": "Story updated"}
+
+@api_router.delete("/success-stories/{story_id}")
+async def delete_success_story(story_id: str, admin_email: str = Depends(verify_token)):
+    result = await db.success_stories.delete_one({"id": story_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Story not found")
+    return {"status": "success", "message": "Story deleted"}
+
+# ===== RAZORPAY PAYMENT =====
+
+@api_router.post("/razorpay/create-order")
+async def create_razorpay_order(data: dict = Body(...)):
+    settings = await db.admin_settings.find_one({"id": "settings"}, {"_id": 0})
+    if not settings or not settings.get("razorpay_key_id") or not settings.get("razorpay_key_secret"):
+        raise HTTPException(status_code=400, detail="Razorpay not configured")
+    
+    import razorpay
+    client = razorpay.Client(auth=(settings["razorpay_key_id"], settings["razorpay_key_secret"]))
+    
+    amount_paise = int(data.get("amount", 0)) * 100
+    if amount_paise < 100:
+        raise HTTPException(status_code=400, detail="Minimum amount is ₹1")
+    
+    order = client.order.create({
+        "amount": amount_paise,
+        "currency": "INR",
+        "payment_capture": 1,
+        "notes": {
+            "donor_name": data.get("donor_name", ""),
+            "donor_email": data.get("donor_email", ""),
+            "project_id": data.get("project_id", "")
+        }
+    })
+    
+    return {
+        "order_id": order["id"],
+        "amount": order["amount"],
+        "currency": order["currency"],
+        "key_id": settings["razorpay_key_id"]
+    }
+
+@api_router.post("/razorpay/verify")
+async def verify_razorpay_payment(data: dict = Body(...)):
+    settings = await db.admin_settings.find_one({"id": "settings"}, {"_id": 0})
+    if not settings or not settings.get("razorpay_key_id") or not settings.get("razorpay_key_secret"):
+        raise HTTPException(status_code=400, detail="Razorpay not configured")
+    
+    import razorpay
+    client = razorpay.Client(auth=(settings["razorpay_key_id"], settings["razorpay_key_secret"]))
+    
+    try:
+        client.utility.verify_payment_signature({
+            "razorpay_order_id": data.get("razorpay_order_id"),
+            "razorpay_payment_id": data.get("razorpay_payment_id"),
+            "razorpay_signature": data.get("razorpay_signature")
+        })
+    except Exception:
+        raise HTTPException(status_code=400, detail="Payment verification failed")
+    
+    # Auto-create and approve donation
+    donation_doc = {
+        "id": str(uuid.uuid4()),
+        "donor_name": data.get("donor_name", ""),
+        "donor_email": data.get("donor_email", ""),
+        "donor_phone": data.get("donor_phone", ""),
+        "donor_pan": data.get("donor_pan", ""),
+        "amount": data.get("amount", 0),
+        "utr_number": data.get("razorpay_payment_id"),
+        "project_id": data.get("project_id", ""),
+        "status": "approved",
+        "payment_method": "razorpay",
+        "razorpay_order_id": data.get("razorpay_order_id"),
+        "razorpay_payment_id": data.get("razorpay_payment_id"),
+        "screenshot_url": "",
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.donations.insert_one(donation_doc)
+    
+    return {"status": "success", "message": "Payment verified and donation recorded", "donation_id": donation_doc["id"]}
 
 @api_router.post("/ai/extract-story")
 async def extract_story_from_pdf(file: UploadFile = File(...), admin_email: str = Depends(verify_token)):

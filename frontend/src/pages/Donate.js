@@ -28,10 +28,12 @@ const Donate = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState('');
+  const [paymentMode, setPaymentMode] = useState('manual_qr');
 
   useEffect(() => {
     fetchProjects();
     fetchQrCode();
+    fetchPaymentMode();
   }, []);
 
   const fetchQrCode = async () => {
@@ -40,6 +42,15 @@ const Donate = () => {
       setQrCodeUrl(response.data.asset_url);
     } catch (error) {
       console.error('Failed to fetch QR code:', error);
+    }
+  };
+
+  const fetchPaymentMode = async () => {
+    try {
+      const response = await axios.get(`${API}/admin/settings`);
+      setPaymentMode(response.data.payment_mode || 'manual_qr');
+    } catch (error) {
+      console.error('Failed to fetch payment mode:', error);
     }
   };
 
@@ -73,6 +84,65 @@ const Donate = () => {
       setScreenshot(file);
       // Create local preview without Cloudinary
       setScreenshotPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleRazorpayCheckout = async () => {
+    if (!formData.donor_name || !formData.donor_email || !formData.amount) {
+      toast.error('Please fill name, email and amount');
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const response = await axios.post(`${API}/razorpay/create-order`, {
+        amount: parseInt(formData.amount),
+        donor_name: formData.donor_name,
+        donor_email: formData.donor_email,
+        project_id: formData.project_id
+      });
+      
+      const { order_id, key_id } = response.data;
+      
+      const options = {
+        key: key_id,
+        amount: parseInt(formData.amount) * 100,
+        currency: 'INR',
+        name: 'United Hands Foundation',
+        description: 'Donation',
+        order_id: order_id,
+        handler: async function (razorpayResponse) {
+          try {
+            await axios.post(`${API}/razorpay/verify`, {
+              razorpay_order_id: razorpayResponse.razorpay_order_id,
+              razorpay_payment_id: razorpayResponse.razorpay_payment_id,
+              razorpay_signature: razorpayResponse.razorpay_signature,
+              donor_name: formData.donor_name,
+              donor_email: formData.donor_email,
+              donor_phone: formData.donor_phone,
+              donor_pan: formData.donor_pan,
+              amount: parseInt(formData.amount),
+              project_id: formData.project_id
+            });
+            setSubmitted(true);
+            toast.success('Payment successful! 80G receipt will be sent to your email.');
+          } catch (err) {
+            toast.error('Payment verification failed');
+          }
+        },
+        prefill: {
+          name: formData.donor_name,
+          email: formData.donor_email,
+          contact: formData.donor_phone
+        },
+        theme: { color: '#4DA8A0' }
+      };
+      
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to initiate payment');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -148,38 +218,64 @@ const Donate = () => {
           </div>
 
           <div className="grid md:grid-cols-2 gap-12">
-            {/* QR Code Section */}
-            <div className="glass-morph p-12 rounded" data-testid="qr-section">
-              <h2 
-                className="text-3xl font-medium mb-6"
-                style={{fontFamily: 'Cormorant Garamond, serif'}}
-              >
-                Scan & Pay
-              </h2>
-              
-              <div className="bg-white p-8 rounded mb-6 flex items-center justify-center">
-                <div className="text-center">
-                  {qrCodeUrl ? (
-                    <img src={qrCodeUrl} alt="UPI QR Code" className="w-64 h-64 object-contain mx-auto mb-4" data-testid="qr-code-image" />
-                  ) : (
-                    <div className="w-64 h-64 bg-gray-200 flex items-center justify-center mb-4">
-                      <span className="text-gray-400 text-sm">Loading QR Code...</span>
+            {/* Payment Section */}
+            <div className="glass-morph p-12 rounded" data-testid="payment-section">
+              {paymentMode === 'razorpay' ? (
+                <>
+                  <h2 className="text-3xl font-medium mb-6" style={{fontFamily: 'Cormorant Garamond, serif'}}>
+                    Secure <span className="text-gradient-blue">Payment</span>
+                  </h2>
+                  <div className="p-8 rounded mb-6 text-center" style={{background: 'var(--bg-card)', border: '1px solid var(--border-subtle)'}}>
+                    <div className="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center" style={{background: 'var(--bg-surface)'}}>
+                      <CheckCircle2 style={{color: 'var(--accent-teal)'}} size={40} />
                     </div>
-                  )}
-                  <p className="text-gray-600 text-sm font-mono mb-4">UPI: unitedhands@upi</p>
-                  
-                  {/* UPI Intent Button */}
-                  {formData.amount && (
-                    <a
-                      href={generateUPIIntent()}
-                      className="inline-block bg-[var(--accent-gold)] hover:bg-[var(--accent-warm-light)] text-[var(--bg-deep)] px-6 py-3 rounded font-semibold text-sm transition-colors"
-                      data-testid="upi-intent-btn"
+                    <h3 className="text-xl font-medium mb-2" style={{fontFamily: 'Cormorant Garamond, serif'}}>Razorpay Checkout</h3>
+                    <p className="text-sm mb-6" style={{color: 'var(--text-muted)'}}>
+                      Pay securely with UPI, Cards, Net Banking, or Wallets. Your 80G receipt will be emailed automatically.
+                    </p>
+                    <button
+                      onClick={handleRazorpayCheckout}
+                      disabled={submitting || !formData.amount || !formData.donor_name}
+                      className="btn-gold w-full"
+                      data-testid="razorpay-pay-btn"
                     >
-                      Pay ₹{formData.amount} via UPI
-                    </a>
-                  )}
-                </div>
-              </div>
+                      {submitting ? 'Processing...' : `Pay ₹${formData.amount || '0'} Now`}
+                    </button>
+                  </div>
+                  <div className="p-4 rounded" style={{background: 'var(--bg-card)'}}>
+                    <p className="text-xs text-center" style={{color: 'var(--text-muted)'}}>
+                      Indian Donors Only (INR) | 80G Tax Exemption | PAN Required for Tax Benefits
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h2 className="text-3xl font-medium mb-6" style={{fontFamily: 'Cormorant Garamond, serif'}}>
+                    Scan & Pay
+                  </h2>
+                  
+                  <div className="bg-white p-8 rounded mb-6 flex items-center justify-center">
+                    <div className="text-center">
+                      {qrCodeUrl ? (
+                        <img src={qrCodeUrl} alt="UPI QR Code" className="w-64 h-64 object-contain mx-auto mb-4" data-testid="qr-code-image" />
+                      ) : (
+                        <div className="w-64 h-64 bg-gray-200 flex items-center justify-center mb-4">
+                          <span className="text-gray-400 text-sm">Loading QR Code...</span>
+                        </div>
+                      )}
+                      <p className="text-gray-600 text-sm font-mono mb-4">UPI: unitedhands@upi</p>
+                      
+                      {formData.amount && (
+                        <a
+                          href={generateUPIIntent()}
+                          className="inline-block bg-[var(--accent-gold)] hover:bg-[var(--accent-warm-light)] text-[var(--bg-deep)] px-6 py-3 rounded font-semibold text-sm transition-colors"
+                          data-testid="upi-intent-btn"
+                        >
+                          Pay ₹{formData.amount} via UPI
+                        </a>
+                      )}
+                    </div>
+                  </div>
 
               <div className="bg-[var(--bg-card)] border border-[var(--accent-gold)]/20 p-6 rounded">
                 <div className="flex items-start gap-3">
@@ -195,6 +291,8 @@ const Donate = () => {
                   </div>
                 </div>
               </div>
+                </>
+              )}
             </div>
 
             {/* Donation Form */}
@@ -317,55 +415,59 @@ const Donate = () => {
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-[var(--accent-gold)] text-xs tracking-[0.2em] uppercase font-bold mb-3">
-                      UTR / Transaction ID *
-                    </label>
-                    <input
-                      type="text"
-                      name="utr_number"
-                      value={formData.utr_number}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full bg-[var(--bg-card)] border border-[var(--accent-gold)]/20 rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-gold)]"
-                      data-testid="input-utr"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[var(--accent-gold)] text-xs tracking-[0.2em] uppercase font-bold mb-3">
-                      Payment Screenshot *
-                    </label>
-                    <div className="border-2 border-dashed border-[var(--accent-gold)]/20 rounded p-8 text-center">
-                      {screenshotPreview ? (
-                        <div className="relative" data-testid="screenshot-preview">
-                          <img src={screenshotPreview} alt="Screenshot" className="max-h-48 mx-auto rounded" />
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setScreenshot(null);
-                              setScreenshotPreview('');
-                            }}
-                            className="mt-4 text-[var(--accent-gold)] text-sm hover:underline"
-                          >
-                            Change Screenshot
-                          </button>
-                        </div>
-                      ) : (
-                        <label className="cursor-pointer" data-testid="upload-area">
-                          <Upload className="text-[var(--accent-gold)] mx-auto mb-4" size={48} />
-                          <p className="text-[var(--text-primary)] mb-2">Click to upload</p>
-                          <p className="text-[var(--text-muted)] text-sm">PNG, JPG up to 10MB</p>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFileChange}
-                            className="hidden"
-                          />
+                  {paymentMode === 'manual_qr' && (
+                    <>
+                      <div>
+                        <label className="block text-[var(--accent-gold)] text-xs tracking-[0.2em] uppercase font-bold mb-3">
+                          UTR / Transaction ID *
                         </label>
-                      )}
-                    </div>
-                  </div>
+                        <input
+                          type="text"
+                          name="utr_number"
+                          value={formData.utr_number}
+                          onChange={handleInputChange}
+                          required
+                          className="w-full bg-[var(--bg-card)] border border-[var(--accent-gold)]/20 rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-gold)]"
+                          data-testid="input-utr"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[var(--accent-gold)] text-xs tracking-[0.2em] uppercase font-bold mb-3">
+                          Payment Screenshot *
+                        </label>
+                        <div className="border-2 border-dashed border-[var(--accent-gold)]/20 rounded p-8 text-center">
+                          {screenshotPreview ? (
+                            <div className="relative" data-testid="screenshot-preview">
+                              <img src={screenshotPreview} alt="Screenshot" className="max-h-48 mx-auto rounded" />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setScreenshot(null);
+                                  setScreenshotPreview('');
+                                }}
+                                className="mt-4 text-[var(--accent-gold)] text-sm hover:underline"
+                              >
+                                Change Screenshot
+                              </button>
+                            </div>
+                          ) : (
+                            <label className="cursor-pointer" data-testid="upload-area">
+                              <Upload className="text-[var(--accent-gold)] mx-auto mb-4" size={48} />
+                              <p className="text-[var(--text-primary)] mb-2">Click to upload</p>
+                              <p className="text-[var(--text-muted)] text-sm">PNG, JPG up to 10MB</p>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFileChange}
+                                className="hidden"
+                              />
+                            </label>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
 
                   <button
                     type="submit"
