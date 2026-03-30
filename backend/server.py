@@ -566,8 +566,9 @@ async def root():
 
 @api_router.get("/cloudinary/signature")
 async def generate_cloudinary_signature(resource_type: str = "image", folder: str = "uploads"):
-    ALLOWED_FOLDERS = ("donations/", "press/", "uploads/", "success_stories/", "qr_codes/", "videos/")
-    if not folder.startswith(ALLOWED_FOLDERS):
+    ALLOWED_FOLDERS = ("donations", "press", "uploads", "success_stories", "qr_codes", "videos", "projects", "gallery", "site_assets", "team_pillars")
+    folder_base = folder.rstrip("/")
+    if folder_base not in ALLOWED_FOLDERS:
         raise HTTPException(status_code=400, detail="Invalid folder path")
     
     timestamp = int(time.time())
