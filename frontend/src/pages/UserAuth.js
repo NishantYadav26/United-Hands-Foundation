@@ -195,12 +195,6 @@ const UserAuth = () => {
                 {loading ? 'Please wait...' : isLogin ? 'Login' : 'Create Account'}
               </button>
             </form>
-
-            <div className="mt-6 text-center">
-              <Link to="/uhf-admin" className="text-xs transition-colors" style={{color: 'var(--text-muted)'}} data-testid="admin-login-link">
-                Admin Login
-              </Link>
-            </div>
           </div>
         </div>
       </div>

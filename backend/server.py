@@ -14,6 +14,7 @@ from datetime import datetime, timezone, timedelta
 import time
 import cloudinary
 import cloudinary.utils
+import cloudinary.uploader
 import asyncio
 import resend
 from reportlab.lib.pagesizes import letter
@@ -62,6 +63,24 @@ SENDER_EMAIL = os.getenv("SENDER_EMAIL", "onboarding@resend.dev")
 
 # Security
 security = HTTPBearer()
+
+def delete_cloudinary_image(image_url: str):
+    """Delete an image from Cloudinary given its URL."""
+    if not image_url or 'res.cloudinary.com' not in image_url:
+        return
+    try:
+        parts = image_url.split('/upload/')
+        if len(parts) == 2:
+            path = parts[1]
+            # Remove version prefix (v1234567890/)
+            if path.startswith('v') and '/' in path:
+                path = path.split('/', 1)[1]
+            # Remove file extension
+            public_id = path.rsplit('.', 1)[0]
+            cloudinary.uploader.destroy(public_id)
+            logger.info(f"Deleted Cloudinary image: {public_id}")
+    except Exception as e:
+        logger.error(f"Failed to delete Cloudinary image: {e}")
 
 # Create the main app
 app = FastAPI()
@@ -814,6 +833,9 @@ async def get_project(project_id: str):
 
 @api_router.put("/projects/{project_id}")
 async def update_project(project_id: str, project: ProjectCreate, admin_email: str = Depends(verify_token)):
+    old = await db.projects.find_one({"id": project_id}, {"_id": 0})
+    if old and old.get('hero_image') and old['hero_image'] != project.hero_image:
+        delete_cloudinary_image(old['hero_image'])
     await db.projects.update_one(
         {"id": project_id},
         {"$set": project.model_dump()}
@@ -822,6 +844,9 @@ async def update_project(project_id: str, project: ProjectCreate, admin_email: s
 
 @api_router.delete("/projects/{project_id}")
 async def delete_project(project_id: str, admin_email: str = Depends(verify_token)):
+    old = await db.projects.find_one({"id": project_id}, {"_id": 0})
+    if old:
+        delete_cloudinary_image(old.get('hero_image', ''))
     result = await db.projects.delete_one({"id": project_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Project not found")
@@ -874,11 +899,15 @@ async def get_site_asset(asset_key: str):
 @api_router.post("/site-assets", response_model=SiteAsset)
 async def update_site_asset(asset: SiteAssetUpdate, admin_email: str = Depends(verify_token)):
     """Update or create a site asset"""
+    # Delete old Cloudinary image if exists
+    old_asset = await db.site_assets.find_one({"asset_key": asset.asset_key}, {"_id": 0})
+    if old_asset and old_asset.get('asset_url') and old_asset['asset_url'] != asset.asset_url:
+        delete_cloudinary_image(old_asset['asset_url'])
+    
     asset_obj = SiteAsset(**asset.model_dump())
     doc = asset_obj.model_dump()
     doc['updated_at'] = doc['updated_at'].isoformat()
     
-    # Upsert - update if exists, insert if not
     await db.site_assets.update_one(
         {"asset_key": asset.asset_key},
         {"$set": doc},
@@ -967,6 +996,9 @@ async def create_pillar(pillar: PillarCreate, admin_email: str = Depends(verify_
 @api_router.put("/pillars/{pillar_id}")
 async def update_pillar(pillar_id: str, pillar: PillarCreate, admin_email: str = Depends(verify_token)):
     """Update a pillar"""
+    old = await db.pillars.find_one({"id": pillar_id}, {"_id": 0})
+    if old and old.get('image_url') and old['image_url'] != pillar.image_url:
+        delete_cloudinary_image(old['image_url'])
     await db.pillars.update_one(
         {"id": pillar_id},
         {"$set": pillar.model_dump()}
@@ -976,6 +1008,9 @@ async def update_pillar(pillar_id: str, pillar: PillarCreate, admin_email: str =
 @api_router.delete("/pillars/{pillar_id}")
 async def delete_pillar(pillar_id: str, admin_email: str = Depends(verify_token)):
     """Delete a pillar"""
+    old = await db.pillars.find_one({"id": pillar_id}, {"_id": 0})
+    if old:
+        delete_cloudinary_image(old.get('image_url', ''))
     result = await db.pillars.delete_one({"id": pillar_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Pillar not found")
@@ -1052,6 +1087,9 @@ async def create_gallery_image(image: GalleryImageCreate, admin_email: str = Dep
 @api_router.put("/gallery/{image_id}")
 async def update_gallery_image(image_id: str, image: GalleryImageCreate, admin_email: str = Depends(verify_token)):
     """Update a gallery image"""
+    old = await db.gallery.find_one({"id": image_id}, {"_id": 0})
+    if old and old.get('image_url') and old['image_url'] != image.image_url:
+        delete_cloudinary_image(old['image_url'])
     await db.gallery.update_one(
         {"id": image_id},
         {"$set": image.model_dump()}
@@ -1061,6 +1099,9 @@ async def update_gallery_image(image_id: str, image: GalleryImageCreate, admin_e
 @api_router.delete("/gallery/{image_id}")
 async def delete_gallery_image(image_id: str, admin_email: str = Depends(verify_token)):
     """Delete a gallery image"""
+    old = await db.gallery.find_one({"id": image_id}, {"_id": 0})
+    if old:
+        delete_cloudinary_image(old.get('image_url', ''))
     result = await db.gallery.delete_one({"id": image_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Gallery image not found")

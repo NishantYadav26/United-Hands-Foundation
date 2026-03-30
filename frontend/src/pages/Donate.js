@@ -27,10 +27,21 @@ const Donate = () => {
   const [screenshotPreview, setScreenshotPreview] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [qrCodeUrl, setQrCodeUrl] = useState('');
 
   useEffect(() => {
     fetchProjects();
+    fetchQrCode();
   }, []);
+
+  const fetchQrCode = async () => {
+    try {
+      const response = await axios.get(`${API}/site-assets/qr_code`);
+      setQrCodeUrl(response.data.asset_url);
+    } catch (error) {
+      console.error('Failed to fetch QR code:', error);
+    }
+  };
 
   const fetchProjects = async () => {
     try {
@@ -132,7 +143,7 @@ const Donate = () => {
               Make a <span className="text-[var(--accent-gold)]">Difference</span>
             </h1>
             <p className="text-[var(--text-muted)] text-lg max-w-2xl mx-auto">
-              Every contribution helps us provide dignity and care to elderly individuals across Maharashtra
+              Every contribution helps us provide healthcare, education, disaster relief, and elderly care across Maharashtra
             </p>
           </div>
 
@@ -148,10 +159,13 @@ const Donate = () => {
               
               <div className="bg-white p-8 rounded mb-6 flex items-center justify-center">
                 <div className="text-center">
-                  <div className="w-64 h-64 bg-gray-200 flex items-center justify-center mb-4">
-                    {/* Placeholder QR Code */}
-                    <span className="text-gray-400 text-sm">UPI QR Code</span>
-                  </div>
+                  {qrCodeUrl ? (
+                    <img src={qrCodeUrl} alt="UPI QR Code" className="w-64 h-64 object-contain mx-auto mb-4" data-testid="qr-code-image" />
+                  ) : (
+                    <div className="w-64 h-64 bg-gray-200 flex items-center justify-center mb-4">
+                      <span className="text-gray-400 text-sm">Loading QR Code...</span>
+                    </div>
+                  )}
                   <p className="text-gray-600 text-sm font-mono mb-4">UPI: unitedhands@upi</p>
                   
                   {/* UPI Intent Button */}

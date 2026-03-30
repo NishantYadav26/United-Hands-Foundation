@@ -64,11 +64,6 @@ const Footer = () => {
           <p className="text-xs text-center mt-2" style={{color: 'var(--text-muted)'}}>
             New Bhagya Nagar, Ring Road, Latur, Maharashtra - 413512
           </p>
-          <div className="text-center mt-4">
-            <Link to="/uhf-admin" className="text-xs transition-colors" style={{color: 'var(--text-muted)'}}>
-              Admin Login
-            </Link>
-          </div>
         </div>
       </div>
     </footer>

@@ -57,10 +57,11 @@ const AdminDashboard = () => {
 
   const handleApprove = async (donationId) => {
     try {
+      const token = localStorage.getItem('uhf_admin_token');
       await axios.post(`${API}/donations/approve`, {
         donation_id: donationId,
         status: 'approved'
-      });
+      }, { headers: { Authorization: `Bearer ${token}` } });
       toast.success('Donation approved and receipt sent!');
       fetchDonations();
     } catch (error) {
@@ -71,10 +72,11 @@ const AdminDashboard = () => {
 
   const handleReject = async (donationId) => {
     try {
+      const token = localStorage.getItem('uhf_admin_token');
       await axios.post(`${API}/donations/approve`, {
         donation_id: donationId,
         status: 'rejected'
-      });
+      }, { headers: { Authorization: `Bearer ${token}` } });
       toast.success('Donation rejected');
       fetchDonations();
     } catch (error) {
