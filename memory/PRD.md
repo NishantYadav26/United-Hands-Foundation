@@ -1,70 +1,47 @@
 # United Hands Foundation - Omni-Platform PRD
 
 ## Original Problem Statement
-Build a production-grade NGO ecosystem for United Hands Foundation using React, FastAPI, MongoDB. Features include Multi-Cause Architecture, Admin CMS, Dual-mode payments, Automated 80G Receipts, AI Chief of Staff, and Identity Lock CSS protocol.
-
-## Core Requirements
-- **Multi-Cause Architecture**: Projects module with categories (Healthcare, Education, Disaster Relief, Elderly Care, General)
-- **Admin Command Center CMS**: Dynamic asset management for Pillars, Projects, Gallery, Media
-- **Dual-mode Payments**: Manual QR (default) + Razorpay (ready toggle)
-- **80G Receipts**: Automated via Resend email
-- **AI Chief of Staff**: Gemini for PDF/News extraction
-- **Identity Lock CSS**: `filter: contrast(1.05) sepia(0.1) brightness(1.02)` for founder photos
-- **Color Scheme**: Peaceful teal + warm amber gradients (updated from Blue/Orange)
-- **UHF Logo**: See-through effect with `mix-blend-mode: luminosity`
+Build a production-grade NGO ecosystem for United Hands Foundation using React, FastAPI, MongoDB Atlas. Features include Multi-Cause Architecture, Admin CMS, Dual-mode payments, Automated 80G Receipts via Resend, AI Chief of Staff (Gemini), Video Clips, and Identity Lock CSS protocol.
 
 ## Architecture
-- **Frontend**: React + Tailwind + Shadcn/UI + GSAP animations
-- **Backend**: FastAPI + Motor (MongoDB) + JWT Auth
-- **Database**: MongoDB (local, Atlas ready)
-- **File Storage**: Cloudinary (cloud_name: dvmb3mzcy, preset: uhf_unsigned)
-- **Color System**: CSS custom properties in App.css (:root variables)
+- **Frontend**: React + Tailwind + Shadcn/UI + GSAP
+- **Backend**: FastAPI + Motor (MongoDB Atlas) + JWT Auth
+- **Database**: MongoDB Atlas (cluster0.qrcpjs1.mongodb.net)
+- **File Storage**: Cloudinary (dvmb3mzcy, preset: uhf_unsigned)
+- **Email**: Resend (real key active)
+- **AI**: Gemini 2.5 Flash via emergentintegrations
 
-## What's Been Implemented (as of March 30, 2026)
+## Implemented (as of March 30, 2026)
 
-### Core Pages
-- [x] Homepage with dynamic sections (Hero, Heartiest Moments Gallery, Impact Stats, Founders from CMS, Pillars, Authority Ticker, CTA)
-- [x] About Us page
-- [x] Donate page with Multi-cause selector, QR code from CMS, Manual QR mode
-- [x] Press & Media page
-- [x] Transparency page
-- [x] Track My Impact page (Email + PAN based)
-- [x] Unified Login/Register page (/login) — works for both users and admin
+### Public Pages
+- [x] Homepage: Hero, Heartiest Moments Gallery, Impact Stats, Founders (from CMS), Pillars, Authority Ticker, CTA
+- [x] Donate: Multi-cause selector, QR code from CMS, Manual QR mode
+- [x] Press & Media: Press Clippings + Video Clips toggle sections
+- [x] About Us, Transparency, Track My Impact
+- [x] Unified Login/Register (/login) for both users and admin
 
-### Admin Dashboard (/uhf-admin/dashboard)
-- [x] JWT-protected with admin email restriction
-- [x] 6 CMS tabs: Donations, Projects, Gallery, Media Library, Team Pillars, Settings
-- [x] **Projects Management**: Full CRUD with Cloudinary upload + old image auto-deletion
-- [x] **Gallery Management**: "Heartiest Moments" CRUD with Cloudinary + old image auto-deletion
-- [x] **Media Library**: Site assets management + old image auto-deletion on update
-- [x] **Team Pillars**: Team member management + old image auto-deletion
-- [x] **Donations**: Approve/Reject with JWT auth tokens (receipt generation working)
-- [x] **Settings**: Payment mode toggle (Manual QR / Razorpay)
+### Admin Dashboard (9 CMS Tabs)
+- [x] **Donations**: Approve/Reject with JWT auth + 80G receipt email via Resend
+- [x] **Projects**: Full CRUD + Cloudinary upload + old image auto-deletion
+- [x] **Gallery**: "Heartiest Moments" CRUD + Cloudinary + auto-cleanup
+- [x] **Media Library**: Site assets (logo, QR, founders, hero) + auto-cleanup
+- [x] **Team Pillars**: Team members + photos + auto-cleanup
+- [x] **Videos**: YouTube video clips CRUD
+- [x] **AI Staff**: Upload PDF/image → Gemini extracts data → Save as Story or Press Entry
+- [x] **Settings**: Payment mode toggle + Razorpay key_id/secret config (future-ready)
 
-### Authentication
-- [x] Unified login at /login (admin auto-detected by email, redirected to dashboard)
-- [x] No separate "Admin Login" button — single entry point
-- [x] User registration with JWT tokens
-- [x] Full logout clearing all tokens
-
-### Database
-- [x] Connected to MongoDB Atlas (cluster0.qrcpjs1.mongodb.net)
-- [x] Cloudinary old image cleanup on update/delete across all entities
-
-### Visual Design
-- [x] Peaceful color palette (teal #4DA8A0, warm amber #D4A373, gold #C9B458)
-- [x] Larger see-through UHF logo
-- [x] QR code dynamically loaded from CMS on donate page
+### Infrastructure
+- [x] MongoDB Atlas connected (IP whitelisted)
+- [x] Resend 80G receipt emails working (PDF attachment)
+- [x] Cloudinary old image auto-deletion on update/delete
+- [x] Peaceful color scheme (teal + warm amber + gold)
+- [x] Identity Lock CSS on all founder/field photos
+- [x] See-through logo effect
 
 ## Pending / Backlog
 
-### P1 - High Priority
-- [ ] AI "Chief of Staff" PDF OCR (Gemini 1.5 Flash via Emergent LLM key)
-- [ ] Video Clips Section in Press & Media
-- [ ] Automated 80G Receipt Delivery via Resend (needs real API key from user)
-
 ### P2 - Medium Priority
-- [ ] Razorpay Standard Checkout SDK integration (when KYC complete)
+- [ ] Razorpay Standard Checkout SDK (when user gets account + adds credentials in Settings)
 - [ ] Success Stories CMS management in admin
 
 ### P3 - Low Priority
@@ -72,16 +49,9 @@ Build a production-grade NGO ecosystem for United Hands Foundation using React, 
 - [ ] PWA support for mobile
 
 ## Key API Endpoints
-- POST /api/auth/login (unified: admin + user)
-- POST /api/auth/register
-- GET/POST/PUT/DELETE /api/projects
-- GET/POST/PUT/DELETE /api/gallery
-- GET/POST/PUT/DELETE /api/pillars
-- GET/POST /api/site-assets
-- GET /api/stats
-- POST /api/donate
-- POST /api/donor/track
-
-## Admin Credentials
-- Email: avdhut456@gmail.com
-- Password: Omkar@123123
+- POST /api/auth/login (unified), POST /api/auth/register
+- GET/POST/PUT/DELETE /api/projects, /api/gallery, /api/pillars
+- GET/POST/DELETE /api/videos
+- POST /api/ai/extract-story (multipart file upload)
+- POST /api/donations, POST /api/donations/approve
+- GET/POST /api/site-assets, GET/PUT /api/admin/settings
