@@ -10,6 +10,9 @@ import axios from 'axios';
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Add this helper to prevent .map crashes
+const ensureArray = (data) => (Array.isArray(data) ? data : []);
+
 const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
 const API = `${BACKEND_URL}/api`;
 
@@ -45,7 +48,7 @@ const Home = () => {
         setSuccessStories(ensureArray(response.data));
       } catch (error) {
         console.error('Failed to fetch success stories:', error);
-in
+
       }
     };
 
@@ -55,7 +58,7 @@ in
         setGalleryImages(ensureArray(response.data));
       } catch (error) {
         console.error('Failed to fetch gallery:', error);
-ain
+
       }
     };
 
