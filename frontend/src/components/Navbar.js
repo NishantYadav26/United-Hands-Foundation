@@ -6,7 +6,6 @@ import AnimatedLogo from '@/components/AnimatedLogo';
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
-  const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,12 +19,6 @@ const Navbar = () => {
         localStorage.removeItem('uhf_user_data');
       }
     }
-  }, []);
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 30);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const handleLogout = () => {
@@ -48,21 +41,21 @@ const Navbar = () => {
     <nav
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
       style={{
-        background: scrolled ? 'rgba(236,230,219,0.97)' : 'rgba(236,230,219,0.92)',
+        background: 'rgba(236,230,219,0.95)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
-        boxShadow: scrolled ? '0 2px 20px rgba(31,41,51,0.08)' : '0 1px 8px rgba(31,41,51,0.04)',
+        boxShadow: '0 2px 20px rgba(31,41,51,0.08)',
         borderBottom: '1px solid rgba(31,111,109,0.06)'
       }}
       data-testid="main-navbar"
     >
       <div
         className="max-w-7xl mx-auto px-4 sm:px-6 transition-all duration-300"
-        style={{ paddingTop: scrolled ? '8px' : '12px', paddingBottom: scrolled ? '8px' : '12px' }}
+        style={{ paddingTop: '12px', paddingBottom: '12px' }}
       >
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2 sm:gap-3 cursor-pointer" onClick={() => navigate('/')} data-testid="logo-link">
-            <AnimatedLogo size={scrolled ? 'sm' : 'md'} />
+            <AnimatedLogo size="lg" />
             <div className="hidden sm:block">
               <h1
                 className="text-lg sm:text-xl font-medium tracking-tight transition-all duration-300"
@@ -76,12 +69,12 @@ const Navbar = () => {
 
           {/* Desktop Menu */}
           <div className="hidden lg:flex items-center gap-5 xl:gap-7">
-            <Link to="/" className="text-sm transition-colors hover:text-[var(--accent-teal)]" style={{ color: 'var(--text-muted)' }} data-testid="nav-home">Home</Link>
-            <Link to="/about" className="text-sm transition-colors hover:text-[var(--accent-teal)]" style={{ color: 'var(--text-muted)' }} data-testid="nav-about">About</Link>
-            <Link to="/press" className="text-sm transition-colors hover:text-[var(--accent-teal)]" style={{ color: 'var(--text-muted)' }} data-testid="nav-press">Press</Link>
-            <Link to="/transparency" className="text-sm transition-colors hover:text-[var(--accent-teal)]" style={{ color: 'var(--text-muted)' }} data-testid="nav-transparency">Transparency</Link>
+            <Link to="/" className="text-sm font-semibold transition-colors hover:opacity-80" style={{ color: 'var(--accent-teal)' }} data-testid="nav-home">Home</Link>
+            <Link to="/about" className="text-sm font-semibold transition-colors hover:opacity-80" style={{ color: 'var(--accent-teal)' }} data-testid="nav-about">About</Link>
+            <Link to="/press" className="text-sm font-semibold transition-colors hover:opacity-80" style={{ color: 'var(--accent-teal)' }} data-testid="nav-press">Press</Link>
+            <Link to="/transparency" className="text-sm font-semibold transition-colors hover:opacity-80" style={{ color: 'var(--accent-teal)' }} data-testid="nav-transparency">Transparency</Link>
             <Link to="/track-impact" className="text-sm font-semibold transition-colors" style={{ color: 'var(--accent-teal)' }} data-testid="nav-track">Track Impact</Link>
-            <a href="#contact" onClick={scrollToFooter} className="text-sm transition-colors hover:text-[var(--accent-teal)] flex items-center gap-1" style={{ color: 'var(--text-muted)' }} data-testid="nav-contact">
+            <a href="#contact" onClick={scrollToFooter} className="text-sm font-semibold transition-colors hover:opacity-80 flex items-center gap-1" style={{ color: 'var(--accent-teal)' }} data-testid="nav-contact">
               <Phone size={13} />
               Contact
             </a>
@@ -138,12 +131,12 @@ const Navbar = () => {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="lg:hidden mt-3 pb-4 flex flex-col gap-2 pt-3" style={{ borderTop: '1px solid var(--border-subtle)' }} data-testid="mobile-menu">
-            <Link to="/" className="py-2 text-sm transition-colors" style={{ color: 'var(--text-primary)' }} onClick={() => setMobileMenuOpen(false)}>Home</Link>
-            <Link to="/about" className="py-2 text-sm transition-colors" style={{ color: 'var(--text-primary)' }} onClick={() => setMobileMenuOpen(false)}>About</Link>
-            <Link to="/press" className="py-2 text-sm transition-colors" style={{ color: 'var(--text-primary)' }} onClick={() => setMobileMenuOpen(false)}>Press</Link>
-            <Link to="/transparency" className="py-2 text-sm transition-colors" style={{ color: 'var(--text-primary)' }} onClick={() => setMobileMenuOpen(false)}>Transparency</Link>
+            <Link to="/" className="font-semibold py-2 text-sm transition-colors" style={{ color: 'var(--accent-teal)' }} onClick={() => setMobileMenuOpen(false)}>Home</Link>
+            <Link to="/about" className="font-semibold py-2 text-sm transition-colors" style={{ color: 'var(--accent-teal)' }} onClick={() => setMobileMenuOpen(false)}>About</Link>
+            <Link to="/press" className="font-semibold py-2 text-sm transition-colors" style={{ color: 'var(--accent-teal)' }} onClick={() => setMobileMenuOpen(false)}>Press</Link>
+            <Link to="/transparency" className="font-semibold py-2 text-sm transition-colors" style={{ color: 'var(--accent-teal)' }} onClick={() => setMobileMenuOpen(false)}>Transparency</Link>
             <Link to="/track-impact" className="font-semibold py-2 text-sm transition-colors" style={{ color: 'var(--accent-teal)' }} onClick={() => setMobileMenuOpen(false)}>Track My Impact</Link>
-            <a href="#contact" onClick={(e) => { scrollToFooter(e); setMobileMenuOpen(false); }} className="py-2 text-sm transition-colors flex items-center gap-1" style={{ color: 'var(--text-primary)' }}>
+            <a href="#contact" onClick={(e) => { scrollToFooter(e); setMobileMenuOpen(false); }} className="font-semibold py-2 text-sm transition-colors flex items-center gap-1" style={{ color: 'var(--accent-teal)' }}>
               <Phone size={14} />
               Contact Us
             </a>

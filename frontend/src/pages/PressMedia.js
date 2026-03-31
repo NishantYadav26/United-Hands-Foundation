@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Filter, Loader2, Video } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -24,12 +24,7 @@ const PressMedia = () => {
   const districts = ['All', 'Dharashiv', 'Solapur', 'Latur', 'Palghar', 'Panchgani'];
   const years = ['All', '2026', '2025', '2024', '2023', '2022', '2021', '2020'];
 
-  useEffect(() => {
-    fetchPressMedia();
-    fetchVideos();
-  }, [selectedDistrict, selectedYear]);
-
-  const fetchPressMedia = async () => {
+  const fetchPressMedia = useCallback(async () => {
     try {
       const params = {};
       if (selectedDistrict && selectedDistrict !== 'All') params.district = selectedDistrict;
@@ -41,16 +36,21 @@ const PressMedia = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedDistrict, selectedYear]);
 
-  const fetchVideos = async () => {
+  const fetchVideos = useCallback(async () => {
     try {
       const response = await axios.get(`${API}/videos`);
       setVideos(response.data);
     } catch (error) {
       console.error('Failed to fetch videos:', error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchPressMedia();
+    fetchVideos();
+  }, [selectedDistrict, selectedYear, fetchPressMedia, fetchVideos]);
 
   const extractYoutubeId = (url) => {
     const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
