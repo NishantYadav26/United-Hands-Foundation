@@ -9,6 +9,7 @@ import {
   Image,
   Loader2,
   LogOut,
+  Newspaper,
   Users,
   UsersRound,
   Video,
@@ -20,6 +21,7 @@ import MediaLibrary from '@/components/MediaLibrary';
 import TeamPillars from '@/components/TeamPillars';
 import ProjectsManagement from '@/components/ProjectsManagement';
 import GalleryManagement from '@/components/GalleryManagement';
+import PressManagement from '@/components/PressManagement';
 import VideosManagement from '@/components/VideosManagement';
 import SuccessStoriesManagement from '@/components/SuccessStoriesManagement';
 import axios from 'axios';
@@ -232,6 +234,16 @@ const AdminDashboard = () => {
             >
               <UsersRound size={16} />
               Team Pillars
+            </button>
+            <button
+              onClick={() => setActiveTab('press')}
+              className={`pb-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold tracking-[0.1em] uppercase transition-colors whitespace-nowrap flex items-center gap-2 ${
+                activeTab === 'press' ? 'text-[var(--accent-gold)] border-b-2 border-[var(--accent-gold)]' : 'text-[var(--text-muted)]'
+              }`}
+              data-testid="tab-press"
+            >
+              <Newspaper size={16} />
+              Press
             </button>
             <button
               onClick={() => setActiveTab('videos')}
@@ -520,6 +532,9 @@ const AdminDashboard = () => {
 
           {/* Team Pillars Tab */}
           {activeTab === 'pillars' && <TeamPillars />}
+
+          {/* Videos Tab */}
+          {activeTab === 'press' && <PressManagement />}
 
           {/* Videos Tab */}
           {activeTab === 'videos' && <VideosManagement />}
