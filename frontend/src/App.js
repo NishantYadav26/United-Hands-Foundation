@@ -4,7 +4,6 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Home from "@/pages/Home";
 import Donate from "@/pages/Donate";
-import AdminLogin from "@/pages/AdminLogin";
 import AdminDashboard from "@/pages/AdminDashboard";
 import PressMedia from "@/pages/PressMedia";
 import Transparency from "@/pages/Transparency";
