@@ -326,6 +326,7 @@ if (document.querySelector('.founder-card')) {
     }
   );
 }
+
     return () => {
       ScrollTrigger.getAll().forEach(trigger => trigger.kill());
     };
