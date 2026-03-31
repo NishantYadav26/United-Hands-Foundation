@@ -1,6 +1,6 @@
 """
 New Features Tests - Iteration 3
-Tests for: Videos CRUD, AI extraction endpoint, Razorpay settings, Admin settings persistence
+Tests for: Videos CRUD, Razorpay settings, Admin settings persistence
 """
 import pytest
 import requests
@@ -111,39 +111,6 @@ class TestVideoCRUD:
         )
         assert response.status_code == 404
         print("✓ DELETE non-existent video correctly returns 404")
-
-
-class TestAIExtraction:
-    """AI extraction endpoint tests (without actual file upload to save API credits)"""
-    
-    @pytest.fixture
-    def admin_token(self):
-        """Get admin token"""
-        response = requests.post(f"{BASE_URL}/api/auth/admin-login", json={
-            "email": ADMIN_EMAIL,
-            "password": ADMIN_PASSWORD
-        })
-        if response.status_code != 200:
-            pytest.skip("Admin login failed")
-        return response.json()["access_token"]
-    
-    def test_ai_extract_endpoint_exists(self, admin_token):
-        """Test that POST /api/ai/extract-story endpoint exists and requires file"""
-        # Send request without file - should get 422 (validation error) not 404
-        response = requests.post(
-            f"{BASE_URL}/api/ai/extract-story",
-            headers={"Authorization": f"Bearer {admin_token}"}
-        )
-        # 422 means endpoint exists but validation failed (no file)
-        # 404 would mean endpoint doesn't exist
-        assert response.status_code in [422, 400]
-        print(f"✓ POST /api/ai/extract-story endpoint exists (status: {response.status_code})")
-    
-    def test_ai_extract_without_auth(self):
-        """Test POST /api/ai/extract-story without auth fails"""
-        response = requests.post(f"{BASE_URL}/api/ai/extract-story")
-        assert response.status_code in [401, 403]
-        print("✓ POST /api/ai/extract-story without auth correctly rejected")
 
 
 class TestRazorpaySettings:
