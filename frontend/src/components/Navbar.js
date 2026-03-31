@@ -54,8 +54,8 @@ const Navbar = () => {
         style={{ paddingTop: '12px', paddingBottom: '12px' }}
       >
         <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2 sm:gap-3 cursor-pointer" onClick={() => navigate('/')} data-testid="logo-link">
-            <AnimatedLogo size="lg" />
+          <div className="flex items-center gap-2 sm:gap-3 cursor-pointer overflow-visible" onClick={() => navigate('/')} data-testid="logo-link">
+            <AnimatedLogo size="md" visualScale={1.45} />
             <div className="hidden sm:block">
               <h1
                 className="text-lg sm:text-xl font-medium tracking-tight transition-all duration-300"
