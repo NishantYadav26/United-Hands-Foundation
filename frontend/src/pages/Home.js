@@ -154,7 +154,7 @@ const Home = () => {
         scrollTrigger: {
           trigger: '.pillars-animated-grid',
           start: 'top 82%',
-main
+
         }
       }
     );
