@@ -30,6 +30,20 @@ const Donate = () => {
   const [qrCodeUrl, setQrCodeUrl] = useState('');
   const [paymentMode, setPaymentMode] = useState('manual_qr');
 
+  const loadRazorpayScript = () => new Promise((resolve) => {
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+
   useEffect(() => {
     fetchProjects();
     fetchQrCode();
@@ -89,6 +103,12 @@ const Donate = () => {
     }
     setSubmitting(true);
     try {
+      const sdkLoaded = await loadRazorpayScript();
+      if (!sdkLoaded || !window.Razorpay) {
+        toast.error('Unable to load Razorpay checkout. Please try again in a moment.');
+        return;
+      }
+
       const response = await axios.post(`${API}/razorpay/create-order`, {
         amount: parseInt(formData.amount),
         donor_name: formData.donor_name,
@@ -97,6 +117,10 @@ const Donate = () => {
       });
 
       const { order_id, key_id } = response.data;
+      if (!order_id || !key_id) {
+        toast.error('Razorpay is not configured correctly. Please contact support.');
+        return;
+      }
 
       const options = {
         key: key_id,
