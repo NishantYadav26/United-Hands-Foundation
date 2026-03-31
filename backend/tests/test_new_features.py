@@ -1,7 +1,6 @@
 """
 New Features Tests - Iteration 3
-Tests for: Videos CRUD, Razorpay settings, Admin settings persistence
-"""
+
 import pytest
 import requests
 import os
@@ -111,6 +110,7 @@ class TestVideoCRUD:
         )
         assert response.status_code == 404
         print("✓ DELETE non-existent video correctly returns 404")
+
 
 
 class TestRazorpaySettings:

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, DollarSign, CheckCircle, XCircle, Settings, Loader2, LogOut, Image, UsersRound, FolderKanban, Heart, Video, BookOpen } from 'lucide-react';
-import Navbar from '@/components/Navbar';
+
 import Footer from '@/components/Footer';
 import MediaLibrary from '@/components/MediaLibrary';
 import TeamPillars from '@/components/TeamPillars';
@@ -230,6 +229,7 @@ const AdminDashboard = () => {
               <Video size={16} />
               Videos
             </button>
+
             <button
               onClick={() => setActiveTab('stories')}
               className={`pb-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold tracking-[0.1em] uppercase transition-colors whitespace-nowrap flex items-center gap-2 ${
@@ -509,6 +509,7 @@ const AdminDashboard = () => {
 
           {/* Videos Tab */}
           {activeTab === 'videos' && <VideosManagement />}
+
 
           {/* Success Stories Tab */}
           {activeTab === 'stories' && <SuccessStoriesManagement />}
