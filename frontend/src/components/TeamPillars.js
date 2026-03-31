@@ -128,6 +128,8 @@ const TeamPillars = () => {
     setShowForm(false);
   };
 
+  const isPartnerCategory = formData.category === 'Partner';
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -197,12 +199,17 @@ const TeamPillars = () => {
             
             <select 
               value={formData.category} 
-              onChange={e => setFormData({...formData, category: e.target.value})} 
+              onChange={e => setFormData({
+                ...formData,
+                category: e.target.value,
+                image_url: e.target.value === 'Partner' ? '' : formData.image_url
+              })} 
               className="bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)]"
             >
               <option value="President">President</option>
               <option value="Founder">Founder</option>
               <option value="Team">Team</option>
+              <option value="Partner">Partner</option>
             </select>
             
             <input 
@@ -214,41 +221,42 @@ const TeamPillars = () => {
             />
           </div>
 
-          {/* Photo Upload */}
-          <div className="mt-6 p-6 bg-[var(--bg-surface)] border blue-border rounded">
-            {formData.image_url ? (
-              <div className="flex flex-col sm:flex-row items-center gap-4">
-                <img 
-                  src={formData.image_url} 
-                  alt="Preview" 
-                  className="w-24 h-24 object-cover rounded identity-lock"
-                />
-                <div className="flex-1 text-center sm:text-left">
-                  <p className="text-[var(--text-primary)] text-sm mb-2">Photo uploaded ✓</p>
+          {!isPartnerCategory && (
+            <div className="mt-6 p-6 bg-[var(--bg-surface)] border blue-border rounded">
+              {formData.image_url ? (
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                  <img 
+                    src={formData.image_url} 
+                    alt="Preview" 
+                    className="w-24 h-24 object-cover rounded identity-lock"
+                  />
+                  <div className="flex-1 text-center sm:text-left">
+                    <p className="text-[var(--text-primary)] text-sm mb-2">Photo uploaded ✓</p>
+                    <button 
+                      onClick={uploadImage} 
+                      disabled={uploading}
+                      className="btn-primary px-4 py-2 text-sm"
+                    >
+                      Change Photo
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center">
+                  <Upload className="mx-auto mb-4" style={{color: 'var(--accent-teal)'}} size={48} />
+                  <p className="text-[var(--text-muted)] mb-4">No photo uploaded</p>
                   <button 
                     onClick={uploadImage} 
                     disabled={uploading}
-                    className="btn-primary px-4 py-2 text-sm"
+                    className="btn-primary flex items-center gap-2 mx-auto px-4 py-2"
                   >
-                    Change Photo
+                    {uploading ? <Loader2 className="animate-spin" size={18} /> : <Upload size={18} />}
+                    Upload Photo
                   </button>
                 </div>
-              </div>
-            ) : (
-              <div className="text-center">
-                <Upload className="mx-auto mb-4" style={{color: 'var(--accent-teal)'}} size={48} />
-                <p className="text-[var(--text-muted)] mb-4">No photo uploaded</p>
-                <button 
-                  onClick={uploadImage} 
-                  disabled={uploading}
-                  className="btn-primary flex items-center gap-2 mx-auto px-4 py-2"
-                >
-                  {uploading ? <Loader2 className="animate-spin" size={18} /> : <Upload size={18} />}
-                  Upload Photo
-                </button>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
           {/* Action Buttons */}
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
@@ -278,19 +286,21 @@ const TeamPillars = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {pillars.map(pillar => (
             <div key={pillar.id} className="glass-morph p-6 rounded hover-lift" data-testid={`pillar-${pillar.id}`}>
-              <div className="aspect-square bg-[var(--bg-surface)] rounded mb-4 overflow-hidden">
-                {pillar.image_url ? (
-                  <img 
-                    src={pillar.image_url} 
-                    alt={pillar.name} 
-                    className="w-full h-full object-cover identity-lock"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <Upload style={{color: 'var(--accent-teal)'}} size={48} />
-                  </div>
-                )}
-              </div>
+              {pillar.category !== 'Partner' && (
+                <div className="aspect-square bg-[var(--bg-surface)] rounded mb-4 overflow-hidden">
+                  {pillar.image_url ? (
+                    <img 
+                      src={pillar.image_url} 
+                      alt={pillar.name} 
+                      className="w-full h-full object-cover identity-lock"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Upload style={{color: 'var(--accent-teal)'}} size={48} />
+                    </div>
+                  )}
+                </div>
+              )}
               
               <h3 className="text-[var(--text-primary)] font-semibold text-lg mb-1">{pillar.name}</h3>
               <p className="text-[var(--accent-teal)] text-xs tracking-[0.2em] uppercase font-bold mb-2">{pillar.role}</p>

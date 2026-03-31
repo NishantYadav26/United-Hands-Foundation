@@ -27,6 +27,8 @@ const Home = () => {
   const [galleryImages, setGalleryImages] = useState([]);
   const [siteAssets, setSiteAssets] = useState({});
   const [pillars, setPillars] = useState([]);
+  const teamPillars = pillars.filter((pillar) => pillar.category !== 'Partner');
+  const partners = pillars.filter((pillar) => pillar.category === 'Partner');
 
   const statsRef = useRef(null);
   const heroRef = useRef(null);
@@ -139,6 +141,106 @@ const Home = () => {
       );
     });
 
+    if (gsap.utils.toArray('.pillar-card').length && document.querySelector('.pillars-animated-grid')) {
+      gsap.fromTo(
+        '.pillar-card',
+        { opacity: 0, x: (i) => (i % 2 === 0 ? -90 : 90), rotateY: (i) => (i % 2 === 0 ? -12 : 12) },
+        {
+          opacity: 1,
+          x: 0,
+          rotateY: 0,
+          duration: 0.95,
+          stagger: 0.12,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: '.pillars-animated-grid',
+            start: 'top 82%',
+            toggleActions: 'play reverse play reverse'
+          }
+        }
+      );
+    }
+
+    if (gsap.utils.toArray('.partner-card').length && document.querySelector('.partners-animated-grid')) {
+      gsap.fromTo(
+        '.partner-card',
+        { opacity: 0, x: (i) => (i % 2 === 0 ? 80 : -80), y: 20 },
+        {
+          opacity: 1,
+          x: 0,
+          y: 0,
+          duration: 0.9,
+          stagger: 0.1,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: '.partners-animated-grid',
+            start: 'top 85%',
+            toggleActions: 'play reverse play reverse'
+          }
+        }
+      );
+    }
+
+    if (gsap.utils.toArray('.gallery-card').length && document.querySelector('.gallery-animated-grid')) {
+      gsap.fromTo(
+        '.gallery-card',
+        { opacity: 0, y: 45, scale: 0.93 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.85,
+          stagger: 0.1,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: '.gallery-animated-grid',
+            start: 'top 85%',
+            once: true
+          }
+        }
+      );
+    }
+
+    if (gsap.utils.toArray('.impact-stat-card').length) {
+      gsap.fromTo(
+        '.impact-stat-card',
+        { opacity: 0, y: 36, scale: 0.92 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.8,
+          stagger: 0.1,
+          ease: 'back.out(1.4)',
+          scrollTrigger: {
+            trigger: '#impact',
+            start: 'top 82%',
+            once: true
+          }
+        }
+      );
+    }
+
+    if (gsap.utils.toArray('.founder-card').length && document.querySelector('[data-testid=\"founders-section\"]')) {
+      gsap.fromTo(
+        '.founder-card',
+        { opacity: 0, y: 40, rotateX: 8 },
+        {
+          opacity: 1,
+          y: 0,
+          rotateX: 0,
+          duration: 1,
+          stagger: 0.16,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: '[data-testid=\"founders-section\"]',
+            start: 'top 80%',
+            once: true
+          }
+        }
+      );
+    }
+
     return () => {
       ScrollTrigger.getAll().forEach(trigger => trigger.kill());
     };
@@ -248,11 +350,11 @@ const Home = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 gallery-animated-grid">
               {galleryImages.map((image, index) => (
                 <div
                   key={image.id}
-                  className="rounded-lg overflow-hidden hover-lift card-elevated"
+                  className="rounded-lg overflow-hidden hover-lift card-elevated gallery-card"
                   style={{ animationDelay: `${index * 0.1}s` }}
                   data-testid={`gallery-image-${image.id}`}
                 >
@@ -291,7 +393,7 @@ const Home = () => {
           <p className="text-center text-base mb-14" style={{ color: 'var(--text-muted)' }}>Transforming lives across communities, one step at a time</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="card-elevated p-10 rounded-lg hover-lift text-center" data-testid="stat-patients">
+            <div className="card-elevated p-10 rounded-lg hover-lift text-center impact-stat-card" data-testid="stat-patients">
               <Users className="mx-auto mb-5" style={{ color: 'var(--accent-teal)' }} size={44} />
               <div className="stat-number text-5xl font-medium mb-3" data-value={stats.patients_served} style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                 0
@@ -299,7 +401,7 @@ const Home = () => {
               <p className="text-xs tracking-[0.2em] uppercase font-bold" style={{ color: 'var(--accent-teal)' }}>Lives Touched</p>
             </div>
 
-            <div className="card-elevated p-10 rounded-lg hover-lift text-center" data-testid="stat-districts">
+            <div className="card-elevated p-10 rounded-lg hover-lift text-center impact-stat-card" data-testid="stat-districts">
               <MapPin className="mx-auto mb-5" style={{ color: 'var(--accent-gold)' }} size={44} />
               <div className="stat-number text-5xl font-medium mb-3" data-value={stats.districts_covered} style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                 0
@@ -307,7 +409,7 @@ const Home = () => {
               <p className="text-xs tracking-[0.2em] uppercase font-bold" style={{ color: 'var(--accent-gold)' }}>Districts Covered</p>
             </div>
 
-            <div className="card-elevated p-10 rounded-lg hover-lift text-center" data-testid="stat-donations">
+            <div className="card-elevated p-10 rounded-lg hover-lift text-center impact-stat-card" data-testid="stat-donations">
               <Heart className="mx-auto mb-5" style={{ color: 'var(--accent-teal)' }} size={44} />
               <div className="stat-number text-5xl font-medium mb-3" data-value={stats.total_donations} style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                 0
@@ -315,7 +417,7 @@ const Home = () => {
               <p className="text-xs tracking-[0.2em] uppercase font-bold" style={{ color: 'var(--accent-teal)' }}>Donations Received</p>
             </div>
 
-            <div className="card-elevated p-10 rounded-lg hover-lift text-center" data-testid="stat-amount">
+            <div className="card-elevated p-10 rounded-lg hover-lift text-center impact-stat-card" data-testid="stat-amount">
               <TrendingUp className="mx-auto mb-5" style={{ color: 'var(--accent-gold)' }} size={44} />
               <div className="stat-number text-5xl font-medium mb-3" data-value={stats.total_amount} style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                 0
@@ -369,7 +471,7 @@ const Home = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
             {siteAssets.founder_1 && (
-              <div className="text-center" data-testid="founder-rahul">
+              <div className="text-center founder-card" data-testid="founder-rahul">
                 <div className="mb-6 overflow-hidden rounded-lg card-elevated">
                   <img
                     src={siteAssets.founder_1}
@@ -384,7 +486,7 @@ const Home = () => {
             )}
 
             {siteAssets.founder_2 && (
-              <div className="text-center" data-testid="founder-jagruti">
+              <div className="text-center founder-card" data-testid="founder-jagruti">
                 <div className="mb-6 overflow-hidden rounded-lg card-elevated">
                   <img
                     src={siteAssets.founder_2}
@@ -400,20 +502,37 @@ const Home = () => {
           </div>
 
           {/* Team Pillars */}
-          {pillars.length > 0 && (
+          {teamPillars.length > 0 && (
             <div className="mt-16">
               <h3 className="text-2xl font-medium text-center mb-10" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                 Our <span className="text-gradient-orange">Pillars</span>
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {pillars.map(pillar => (
-                  <div key={pillar.id} className="card-elevated p-6 rounded-lg hover-lift text-center" data-testid={`pillar-${pillar.id}`}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 pillars-animated-grid">
+                {teamPillars.map(pillar => (
+                  <div key={pillar.id} className="card-elevated p-6 rounded-lg hover-lift text-center pillar-card" data-testid={`pillar-${pillar.id}`}>
                     {pillar.image_url && (
                       <img src={pillar.image_url} alt={pillar.name} className="w-24 h-24 rounded-full mx-auto mb-4 object-cover identity-lock" />
                     )}
                     <h4 className="text-lg font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{pillar.name}</h4>
                     <p className="text-xs tracking-[0.15em] uppercase font-bold mb-2" style={{ color: 'var(--accent-teal)' }}>{pillar.role}</p>
                     {pillar.specialty && <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{pillar.specialty}</p>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {partners.length > 0 && (
+            <div className="mt-16">
+              <h3 className="text-2xl font-medium text-center mb-10" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+                Our <span className="text-gradient-blue">Partners</span>
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 partners-animated-grid">
+                {partners.map((partner) => (
+                  <div key={partner.id} className="card-elevated p-6 rounded-lg hover-lift text-center partner-card" data-testid={`partner-${partner.id}`}>
+                    <h4 className="text-lg font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{partner.name}</h4>
+                    <p className="text-xs tracking-[0.15em] uppercase font-bold mb-2" style={{ color: 'var(--accent-teal)' }}>{partner.role}</p>
+                    {partner.specialty && <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{partner.specialty}</p>}
                   </div>
                 ))}
               </div>
