@@ -27,6 +27,7 @@ const Home = () => {
 
   const statsRef = useRef(null);
   const heroRef = useRef(null);
+  const ensureArray = (value) => (Array.isArray(value) ? value : []);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -41,18 +42,20 @@ const Home = () => {
     const fetchStories = async () => {
       try {
         const response = await axios.get(`${API}/success-stories?limit=3`);
-        setSuccessStories(response.data);
+        setSuccessStories(ensureArray(response.data));
       } catch (error) {
         console.error('Failed to fetch success stories:', error);
+        setSuccessStories([]);
       }
     };
 
     const fetchGallery = async () => {
       try {
         const response = await axios.get(`${API}/gallery`);
-        setGalleryImages(response.data);
+        setGalleryImages(ensureArray(response.data));
       } catch (error) {
         console.error('Failed to fetch gallery:', error);
+        setGalleryImages([]);
       }
     };
 
@@ -70,9 +73,10 @@ const Home = () => {
     const fetchPillars = async () => {
       try {
         const response = await axios.get(`${API}/pillars`);
-        setPillars(response.data);
+        setPillars(ensureArray(response.data));
       } catch (error) {
         console.error('Failed to fetch pillars:', error);
+        setPillars([]);
       }
     };
 
