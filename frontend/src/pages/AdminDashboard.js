@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, DollarSign, CheckCircle, XCircle, Settings, Loader2, LogOut, Image, UsersRound, FolderKanban, Heart, Video, BookOpen } from 'lucide-react';import Navbar from '@/components/Navbar';
+
 import Footer from '@/components/Footer';
 import MediaLibrary from '@/components/MediaLibrary';
 import TeamPillars from '@/components/TeamPillars';
@@ -12,7 +12,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { Switch } from '@/components/ui/switch';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
 const API = `${BACKEND_URL}/api`;
 
 const AdminDashboard = () => {
@@ -229,7 +229,7 @@ const AdminDashboard = () => {
               <Video size={16} />
               Videos
             </button>
-          
+
             <button
               onClick={() => setActiveTab('stories')}
               className={`pb-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold tracking-[0.1em] uppercase transition-colors whitespace-nowrap flex items-center gap-2 ${
@@ -510,7 +510,6 @@ const AdminDashboard = () => {
           {/* Videos Tab */}
           {activeTab === 'videos' && <VideosManagement />}
 
-       
 
           {/* Success Stories Tab */}
           {activeTab === 'stories' && <SuccessStoriesManagement />}

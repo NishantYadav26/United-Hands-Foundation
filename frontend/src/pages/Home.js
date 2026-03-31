@@ -10,7 +10,7 @@ import axios from 'axios';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
 const API = `${BACKEND_URL}/api`;
 
 const Home = () => {
@@ -27,7 +27,7 @@ const Home = () => {
 
   const statsRef = useRef(null);
   const heroRef = useRef(null);
- const ensureArray = (value) => (Array.isArray(value) ? value : []);
+
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -45,7 +45,7 @@ const Home = () => {
         setSuccessStories(ensureArray(response.data));
       } catch (error) {
         console.error('Failed to fetch success stories:', error);
-                setSuccessStories([]);
+in
       }
     };
 
@@ -55,7 +55,7 @@ const Home = () => {
         setGalleryImages(ensureArray(response.data));
       } catch (error) {
         console.error('Failed to fetch gallery:', error);
-                setGalleryImages([]);
+ain
       }
     };
 
@@ -76,7 +76,7 @@ const Home = () => {
         setPillars(ensureArray(response.data));
       } catch (error) {
         console.error('Failed to fetch pillars:', error);
-                setPillars([]);
+
       }
     };
 

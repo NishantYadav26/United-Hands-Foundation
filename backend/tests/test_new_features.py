@@ -1,6 +1,6 @@
 """
 New Features Tests - Iteration 3
-Tests for: Videos CRUD, Razorpay settings, Admin settings persistence"""
+
 import pytest
 import requests
 import os
