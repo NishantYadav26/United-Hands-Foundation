@@ -239,18 +239,4 @@ input:focus, select:focus, textarea:focus {
   transform: translateY(-8px) scale(1.02);
 }
 
-.gallery-card {
-  will-change: transform, opacity;
-}
 
-.impact-stat-card {
-  will-change: transform, opacity;
-}
-
-.founder-card {
-  will-change: transform, opacity;
-}
-
-.partner-card {
-  will-change: transform, opacity;
-}
