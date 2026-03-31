@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, Form, Body, Depends, status
+from fastapi import FastAPI, APIRouter, HTTPException, Body, Depends, status
 from fastapi.responses import FileResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
@@ -22,7 +22,6 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
 from io import BytesIO
 import razorpay
-from emergentintegrations.llm.chat import LlmChat, UserMessage, FileContentWithMimeType
 import jwt
 import bcrypt
 
@@ -818,94 +817,6 @@ async def verify_razorpay_payment(data: dict = Body(...)):
     await db.donations.insert_one(donation_doc)
     
     return {"status": "success", "message": "Payment verified and donation recorded", "donation_id": donation_doc["id"]}
-@api_router.post("/ai/extract-story")
-async def extract_story_from_pdf(file: UploadFile = File(...), admin_email: str = Depends(verify_token)):
-    try:
-        # Save uploaded file temporarily
-        temp_path = f"/tmp/{uuid.uuid4()}_{file.filename}"
-        with open(temp_path, "wb") as f:
-            content = await file.read()
-            f.write(content)
-
-        # Detect mime type
-        mime = file.content_type or "application/pdf"
-        if file.filename.lower().endswith((".jpg", ".jpeg")):
-            mime = "image/jpeg"
-        elif file.filename.lower().endswith(".png"):
-            mime = "image/png"
-        elif file.filename.lower().endswith(".pdf"):
-            mime = "application/pdf"
-
-        # Create AI chat with higher budget
-        chat = LlmChat(
-            api_key=os.getenv("EMERGENT_LLM_KEY"),
-            session_id=str(uuid.uuid4()),
-            system_message="You extract structured NGO report data. Respond ONLY with valid JSON.",
-            max_budget=0.1
-        ).with_model("gemini", "gemini-2.5-flash", max_tokens=250)
-
-        # Attach file
-        file_content = FileContentWithMimeType(
-            file_path=temp_path,
-            mime_type=mime
-        )
-
-        # Prompt
-        prompt = """
-Extract the following fields from the report:
-
-Location (Dharashiv, Solapur, Latur, Palghar, Panchgani, Other)
-Patient Count
-Date (YYYY-MM-DD)
-Category (Elderly, Education, Health, Disaster Relief, General)
-Title
-Short success story (2 sentences)
-
-Return JSON ONLY:
-
-{
- "location": "",
- "patient_count": 0,
- "date": "",
- "category": "",
- "title": "",
- "story": ""
-}
-"""
-
-        user_message = UserMessage(
-            text=prompt,
-            file_contents=[file_content]
-        )
-
-        response = await chat.send_message(user_message)
-
-        # Remove temp file
-        try:
-            os.remove(temp_path)
-        except:
-            pass
-
-        # Clean markdown formatting
-        clean = response.strip()
-
-        if clean.startswith("```json"):
-            clean = clean.replace("```json", "").replace("```", "")
-        elif clean.startswith("```"):
-            clean = clean.replace("```", "")
-
-        import json
-        result = json.loads(clean.strip())
-
-        return {
-            "status": "success",
-            "data": result
-        }
-
-    except Exception as e:
-        logger.error(f"AI extraction failed: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"AI extraction failed: {str(e)}")
-
 @api_router.post("/press-media", response_model=PressMedia)
 async def create_press_media(media: PressMediaCreate):
     media_obj = PressMedia(**media.model_dump())
