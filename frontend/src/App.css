@@ -229,3 +229,19 @@ input:focus, select:focus, textarea:focus {
 .masonry-grid_column > div {
   margin-bottom: 16px;
 }
+
+.pillar-card {
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+}
+
+.pillar-card:hover {
+  transform: translateY(-8px) scale(1.02);
+}
+
+.gallery-card,
+.impact-stat-card,
+.founder-card,
+.partner-card {
+  will-change: transform, opacity;
+}
