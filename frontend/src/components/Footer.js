@@ -3,7 +3,7 @@ import { Heart, Mail, MapPin, Phone, Facebook, Instagram, Youtube } from 'lucide
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 const Footer = () => {
