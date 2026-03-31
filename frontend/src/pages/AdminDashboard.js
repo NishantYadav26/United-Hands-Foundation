@@ -233,7 +233,7 @@ const AdminDashboard = () => {
               data-testid="tab-pillars"
             >
               <UsersRound size={16} />
-              Team Pillars
+              Team & Partners
             </button>
             <button
               onClick={() => setActiveTab('press')}

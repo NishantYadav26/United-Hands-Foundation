@@ -8,6 +8,7 @@ const API = `${BACKEND_URL}/api`;
 
 const TeamPillars = () => {
   const [pillars, setPillars] = useState([]);
+  const [activeView, setActiveView] = useState('team');
   const [editingPillar, setEditingPillar] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -129,6 +130,9 @@ const TeamPillars = () => {
   };
 
   const isPartnerCategory = formData.category === 'Partner';
+  const teamMembers = pillars.filter((pillar) => pillar.category !== 'Partner');
+  const partners = pillars.filter((pillar) => pillar.category === 'Partner');
+  const visiblePillars = activeView === 'partners' ? partners : teamMembers;
 
   return (
     <div className="space-y-6">
@@ -139,7 +143,7 @@ const TeamPillars = () => {
             Team <span className="text-gradient-orange">Pillars</span>
           </h3>
           <p className="text-[var(--text-muted)] text-sm">
-            Manage your leadership team: President, Founders, and Field Operations
+            Manage your leadership team and our partners from dedicated sections
           </p>
         </div>
         <button 
@@ -277,14 +281,45 @@ const TeamPillars = () => {
         </div>
       )}
 
+      <div className="glass-morph p-4 rounded">
+        <div className="flex gap-2">
+          <button
+            onClick={() => setActiveView('team')}
+            className={`px-4 py-2 rounded text-sm font-medium transition ${
+              activeView === 'team'
+                ? 'bg-[var(--accent-teal)] text-[var(--bg-deep)]'
+                : 'bg-[var(--bg-surface)] text-[var(--text-muted)]'
+            }`}
+            data-testid="team-section-tab"
+          >
+            Team Section ({teamMembers.length})
+          </button>
+          <button
+            onClick={() => setActiveView('partners')}
+            className={`px-4 py-2 rounded text-sm font-medium transition ${
+              activeView === 'partners'
+                ? 'bg-[var(--accent-warm)] text-[var(--bg-deep)]'
+                : 'bg-[var(--bg-surface)] text-[var(--text-muted)]'
+            }`}
+            data-testid="partners-section-tab"
+          >
+            Our Partners Section ({partners.length})
+          </button>
+        </div>
+      </div>
+
       {/* Pillars Grid */}
-      {pillars.length === 0 ? (
+      {visiblePillars.length === 0 ? (
         <div className="glass-morph p-12 rounded text-center">
-          <p className="text-[var(--text-muted)] mb-4">No team pillars yet. Add your first pillar above!</p>
+          <p className="text-[var(--text-muted)] mb-4">
+            {activeView === 'partners'
+              ? 'No partners yet. Add your first partner above!'
+              : 'No team pillars yet. Add your first pillar above!'}
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {pillars.map(pillar => (
+          {visiblePillars.map(pillar => (
             <div key={pillar.id} className="glass-morph p-6 rounded hover-lift" data-testid={`pillar-${pillar.id}`}>
               {pillar.category !== 'Partner' && (
                 <div className="aspect-square bg-[var(--bg-surface)] rounded mb-4 overflow-hidden">
