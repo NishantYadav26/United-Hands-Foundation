@@ -154,25 +154,7 @@ const Home = () => {
         scrollTrigger: {
           trigger: '.pillars-animated-grid',
           start: 'top 82%',
-          toggleActions: 'play reverse play reverse'
-        }
-      }
-    );
 
-    gsap.fromTo(
-      '.partner-card',
-      { opacity: 0, x: (i) => (i % 2 === 0 ? 80 : -80), y: 20 },
-      {
-        opacity: 1,
-        x: 0,
-        y: 0,
-        duration: 0.9,
-        stagger: 0.1,
-        ease: 'power2.out',
-        scrollTrigger: {
-          trigger: '.partners-animated-grid',
-          start: 'top 85%',
-          toggleActions: 'play reverse play reverse'
         }
       }
     );
@@ -498,7 +480,7 @@ const Home = () => {
                 Our <span className="text-gradient-orange">Pillars</span>
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 pillars-animated-grid">
-                {teamPillars.map(pillar => (
+
                   <div key={pillar.id} className="card-elevated p-6 rounded-lg hover-lift text-center pillar-card" data-testid={`pillar-${pillar.id}`}>
                     {pillar.image_url && (
                       <img src={pillar.image_url} alt={pillar.name} className="w-24 h-24 rounded-full mx-auto mb-4 object-cover identity-lock" />
