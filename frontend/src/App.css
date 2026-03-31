@@ -229,7 +229,6 @@ input:focus, select:focus, textarea:focus {
 .masonry-grid_column > div {
   margin-bottom: 16px;
 }
-
 .pillar-card {
   transform-style: preserve-3d;
   will-change: transform, opacity;
@@ -239,8 +238,8 @@ input:focus, select:focus, textarea:focus {
   transform: translateY(-8px) scale(1.02);
 }
 
+/* Fixed: Removed the trailing comma and added the opening brace { */
 .gallery-card,
-.impact-stat-card,
-
+.impact-stat-card {
   will-change: transform, opacity;
 }
