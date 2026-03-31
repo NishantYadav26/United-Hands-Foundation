@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
 const API = `${BACKEND_URL}/api`;
 
-const AnimatedLogo = ({ size = 'md' }) => {
+const AnimatedLogo = ({ size = 'md', visualScale = 1, className = '' }) => {
   const [logoUrl, setLogoUrl] = useState('');
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     const fetchLogo = async () => {
@@ -26,20 +27,24 @@ const AnimatedLogo = ({ size = 'md' }) => {
     xl: 'w-28 h-28'
   };
 
+  const logoScale = useMemo(() => {
+    return isHovered ? visualScale * 1.08 : visualScale;
+  }, [isHovered, visualScale]);
+
   if (!logoUrl) return null;
 
   return (
     <div
-      className={`${sizeClasses[size]} logo-container cursor-pointer transition-all duration-300`}
+      className={`${sizeClasses[size]} ${className} logo-container cursor-pointer overflow-visible transition-all duration-300`}
       data-testid="animated-logo"
     >
       <img
         src={logoUrl}
         alt="United Hands Foundation"
         className="w-full h-full object-contain logo-see-through"
-        style={{ transition: 'transform 0.3s ease' }}
-        onMouseEnter={e => { e.target.style.transform = 'scale(1.08)'; }}
-        onMouseLeave={e => { e.target.style.transform = 'scale(1)'; }}
+        style={{ transform: `scale(${logoScale})`, transition: 'transform 0.3s ease' }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       />
     </div>
   );
