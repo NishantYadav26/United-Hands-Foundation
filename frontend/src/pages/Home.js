@@ -127,15 +127,16 @@ const Home = () => {
     gsap.utils.toArray('.reveal-section').forEach((section) => {
       gsap.fromTo(
         section,
-        { opacity: 0, y: 60 },
+        { opacity: 0, y: 36 },
         {
           opacity: 1,
           y: 0,
-          duration: 1,
+          duration: 1.05,
+          ease: 'power2.out',
           scrollTrigger: {
             trigger: section,
-            start: 'top 85%',
-            once: true
+            start: 'top 88%',
+            toggleActions: 'play none none reverse'
           }
         }
       );
@@ -154,8 +155,8 @@ const Home = () => {
           ease: 'power3.out',
           scrollTrigger: {
             trigger: '.pillars-animated-grid',
-            start: 'top 82%',
-            toggleActions: 'play reverse play reverse'
+            start: 'top 86%',
+            toggleActions: 'play none none reverse'
           }
         }
       );
@@ -174,8 +175,8 @@ const Home = () => {
           ease: 'power2.out',
           scrollTrigger: {
             trigger: '.partners-animated-grid',
-            start: 'top 85%',
-            toggleActions: 'play reverse play reverse'
+            start: 'top 88%',
+            toggleActions: 'play none none reverse'
           }
         }
       );
@@ -254,7 +255,7 @@ const Home = () => {
           ease: 'power2.out',
           scrollTrigger: {
             trigger: '[data-testid=\"trust-bar\"]',
-            start: 'top 88%',
+            start: 'top 92%',
             once: true
           }
         }
@@ -274,7 +275,7 @@ const Home = () => {
           ease: 'power3.out',
           scrollTrigger: {
             trigger: '[data-testid=\"success-stories-section\"]',
-            start: 'top 84%',
+            start: 'top 88%',
             once: true
           }
         }
