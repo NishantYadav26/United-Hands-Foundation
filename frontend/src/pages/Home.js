@@ -127,15 +127,16 @@ const Home = () => {
     gsap.utils.toArray('.reveal-section').forEach((section) => {
       gsap.fromTo(
         section,
-        { opacity: 0, y: 60 },
+        { opacity: 0, y: 36 },
         {
           opacity: 1,
           y: 0,
-          duration: 1,
+          duration: 1.05,
+          ease: 'power2.out',
           scrollTrigger: {
             trigger: section,
-            start: 'top 85%',
-            once: true
+            start: 'top 88%',
+            toggleActions: 'play none none reverse'
           }
         }
       );
@@ -154,8 +155,8 @@ const Home = () => {
           ease: 'power3.out',
           scrollTrigger: {
             trigger: '.pillars-animated-grid',
-            start: 'top 82%',
-            toggleActions: 'play reverse play reverse'
+            start: 'top 86%',
+            toggleActions: 'play none none reverse'
           }
         }
       );
@@ -174,8 +175,8 @@ const Home = () => {
           ease: 'power2.out',
           scrollTrigger: {
             trigger: '.partners-animated-grid',
-            start: 'top 85%',
-            toggleActions: 'play reverse play reverse'
+            start: 'top 88%',
+            toggleActions: 'play none none reverse'
           }
         }
       );
@@ -240,92 +241,65 @@ const Home = () => {
         }
       );
     }
- // 1. Pillar Cards Animation
-if (document.querySelector('.pillar-card')) {
-  gsap.fromTo(
-    '.pillar-card',
-    { 
-      opacity: 0, 
-      x: (i) => (i % 2 === 0 ? -90 : 90), 
-      rotateY: (i) => (i % 2 === 0 ? -12 : 12) 
-    },
-    {
-      opacity: 1,
-      x: 0,
-      rotateY: 0,
-      duration: 0.95,
-      stagger: 0.12,
-      ease: 'power3.out',
-      scrollTrigger: {
-        trigger: '.pillars-animated-grid',
-        start: 'top 82%',
-      }
-    }
-  );
-}
 
-// 2. Gallery Cards Animation
-if (document.querySelector('.gallery-card')) {
-  gsap.fromTo(
-    '.gallery-card',
-    { opacity: 0, y: 45, scale: 0.93 },
-    {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      duration: 0.85,
-      stagger: 0.1,
-      ease: 'power2.out',
-      scrollTrigger: {
-        trigger: '.gallery-animated-grid',
-        start: 'top 85%',
-        once: true
-      }
+    if (gsap.utils.toArray('.district-pill').length && document.querySelector('[data-testid=\"trust-bar\"]')) {
+      gsap.fromTo(
+        '.district-pill',
+        { opacity: 0, y: 20, scale: 0.95 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.7,
+          stagger: 0.08,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: '[data-testid=\"trust-bar\"]',
+            start: 'top 92%',
+            once: true
+          }
+        }
+      );
     }
-  );
-}
 
-// 3. Impact Stats Animation
-if (document.querySelector('.impact-stat-card')) {
-  gsap.fromTo(
-    '.impact-stat-card',
-    { opacity: 0, y: 36, scale: 0.92 },
-    {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      duration: 0.8,
-      stagger: 0.1,
-      ease: 'back.out(1.4)',
-      scrollTrigger: {
-        trigger: '#impact',
-        start: 'top 82%',
-        once: true
-      }
+    if (gsap.utils.toArray('.story-card').length && document.querySelector('[data-testid=\"success-stories-section\"]')) {
+      gsap.fromTo(
+        '.story-card',
+        { opacity: 0, y: 35, rotateX: 8 },
+        {
+          opacity: 1,
+          y: 0,
+          rotateX: 0,
+          duration: 0.9,
+          stagger: 0.12,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: '[data-testid=\"success-stories-section\"]',
+            start: 'top 88%',
+            once: true
+          }
+        }
+      );
     }
-  );
-}
 
-// 4. Founder Cards Animation
-if (document.querySelector('.founder-card')) {
-  gsap.fromTo(
-    '.founder-card',
-    { opacity: 0, y: 40, rotateX: 8 },
-    {
-      opacity: 1,
-      y: 0,
-      rotateX: 0,
-      duration: 1,
-      stagger: 0.16,
-      ease: 'power3.out',
-      scrollTrigger: {
-        trigger: '[data-testid="founders-section"]',
-        start: 'top 80%',
-        once: true
-      }
+    if (document.querySelector('.cta-animated-card') && document.querySelector('[data-testid=\"cta-section\"]')) {
+      gsap.fromTo(
+        '.cta-animated-card',
+        { opacity: 0, y: 40, scale: 0.96 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 1,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: '[data-testid=\"cta-section\"]',
+            start: 'top 86%',
+            once: true
+          }
+        }
+      );
     }
-  );
-}
 
     return () => {
       ScrollTrigger.getAll().forEach(trigger => trigger.kill());
@@ -407,7 +381,7 @@ if (document.querySelector('.founder-card')) {
           </div>
           <div className="flex flex-wrap justify-center items-center gap-10">
             {['Dharashiv', 'Solapur', 'Latur', 'Palghar', 'Panchgani'].map((district) => (
-              <div key={district} className="text-center">
+              <div key={district} className="text-center district-pill">
                 <MapPin className="mx-auto mb-2" style={{ color: 'var(--accent-teal)' }} size={22} />
                 <span className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{district}</span>
               </div>
@@ -527,7 +501,7 @@ if (document.querySelector('.founder-card')) {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {successStories.map((story) => (
-                <div key={story.id} className="card-elevated p-8 rounded-lg hover-lift" data-testid={`story-${story.id}`}>
+                <div key={story.id} className="card-elevated p-8 rounded-lg hover-lift story-card" data-testid={`story-${story.id}`}>
                   <div className="flex items-center gap-2 mb-4">
                     <MapPin style={{ color: 'var(--accent-teal)' }} size={18} />
                     <span className="text-sm font-semibold" style={{ color: 'var(--accent-teal)' }}>{story.location}</span>
@@ -648,7 +622,7 @@ if (document.querySelector('.founder-card')) {
 
       {/* CTA Section */}
       <section className="py-20 px-6 reveal-section" data-testid="cta-section">
-        <div className="max-w-4xl mx-auto text-center card-elevated p-16 rounded-lg">
+        <div className="max-w-4xl mx-auto text-center card-elevated p-16 rounded-lg cta-animated-card">
           <h2
             className="text-4xl sm:text-5xl font-medium tracking-tight mb-6"
             style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}
