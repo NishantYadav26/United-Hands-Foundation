@@ -27,6 +27,8 @@ const Home = () => {
   const [galleryImages, setGalleryImages] = useState([]);
   const [siteAssets, setSiteAssets] = useState({});
   const [pillars, setPillars] = useState([]);
+  const teamPillars = pillars.filter((pillar) => pillar.category !== 'Partner');
+  const partners = pillars.filter((pillar) => pillar.category === 'Partner');
 
   const statsRef = useRef(null);
   const heroRef = useRef(null);
@@ -152,7 +154,7 @@ const Home = () => {
         scrollTrigger: {
           trigger: '.pillars-animated-grid',
           start: 'top 82%',
-          once: true
+main
         }
       }
     );
@@ -472,13 +474,13 @@ const Home = () => {
           </div>
 
           {/* Team Pillars */}
-          {pillars.length > 0 && (
+          {teamPillars.length > 0 && (
             <div className="mt-16">
               <h3 className="text-2xl font-medium text-center mb-10" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                 Our <span className="text-gradient-orange">Pillars</span>
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 pillars-animated-grid">
-                {pillars.map(pillar => (
+
                   <div key={pillar.id} className="card-elevated p-6 rounded-lg hover-lift text-center pillar-card" data-testid={`pillar-${pillar.id}`}>
                     {pillar.image_url && (
                       <img src={pillar.image_url} alt={pillar.name} className="w-24 h-24 rounded-full mx-auto mb-4 object-cover identity-lock" />
@@ -486,6 +488,23 @@ const Home = () => {
                     <h4 className="text-lg font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{pillar.name}</h4>
                     <p className="text-xs tracking-[0.15em] uppercase font-bold mb-2" style={{ color: 'var(--accent-teal)' }}>{pillar.role}</p>
                     {pillar.specialty && <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{pillar.specialty}</p>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {partners.length > 0 && (
+            <div className="mt-16">
+              <h3 className="text-2xl font-medium text-center mb-10" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+                Our <span className="text-gradient-blue">Partners</span>
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 partners-animated-grid">
+                {partners.map((partner) => (
+                  <div key={partner.id} className="card-elevated p-6 rounded-lg hover-lift text-center partner-card" data-testid={`partner-${partner.id}`}>
+                    <h4 className="text-lg font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{partner.name}</h4>
+                    <p className="text-xs tracking-[0.15em] uppercase font-bold mb-2" style={{ color: 'var(--accent-teal)' }}>{partner.role}</p>
+                    {partner.specialty && <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{partner.specialty}</p>}
                   </div>
                 ))}
               </div>

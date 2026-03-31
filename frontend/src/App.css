@@ -241,6 +241,6 @@ input:focus, select:focus, textarea:focus {
 
 .gallery-card,
 .impact-stat-card,
-.founder-card {
+
   will-change: transform, opacity;
 }
