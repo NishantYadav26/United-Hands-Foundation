@@ -10,10 +10,6 @@ const API = `${BACKEND_URL}/api`;
 const AboutUs = () => {
   const [siteAssets, setSiteAssets] = useState({});
   const [pillars, setPillars] = useState([]);
-  const normalizeCategory = (category) => (category || '').toString().trim().toLowerCase();
-  const isPartner = (category) => normalizeCategory(category).startsWith('partner');
-  const teamPillars = pillars.filter((pillar) => !isPartner(pillar.category));
-  const partners = pillars.filter((pillar) => isPartner(pillar.category));
 
   useEffect(() => {
     const fetchAssets = async () => {
@@ -157,7 +153,7 @@ const AboutUs = () => {
               Our <span className="text-gradient-orange">Pillars</span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {teamPillars.map(pillar => (
+              {pillars.map(pillar => (
                 <div key={pillar.id} className="card-elevated p-8 rounded-lg hover-lift text-center" data-testid={`about-pillar-${pillar.id}`}>
                   {pillar.image_url ? (
                     <img src={pillar.image_url} alt={pillar.name} className="w-20 h-20 rounded-full mx-auto mb-5 object-cover identity-lock" />
@@ -172,30 +168,6 @@ const AboutUs = () => {
                   {pillar.bio_detailed && <p className="text-sm mt-2 leading-relaxed" style={{ color: 'var(--text-muted)' }}>{pillar.bio_detailed}</p>}
                 </div>
               ))}
-            </div>
-
-            <div className="mt-14" data-testid="about-partners-section">
-              <h3 className="text-3xl font-medium text-center mb-8" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
-                Our <span className="text-gradient-blue">Partners</span>
-              </h3>
-              {partners.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {partners.map((partner) => (
-                    <div key={partner.id} className="card-elevated p-8 rounded-lg hover-lift text-center" data-testid={`about-partner-${partner.id}`}>
-                      <h4 className="text-xl font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{partner.name}</h4>
-                      <p className="text-xs tracking-[0.15em] uppercase font-bold mb-3" style={{ color: 'var(--accent-teal)' }}>{partner.role}</p>
-                      {partner.specialty && <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{partner.specialty}</p>}
-                      {partner.bio_detailed && <p className="text-sm mt-2 leading-relaxed" style={{ color: 'var(--text-muted)' }}>{partner.bio_detailed}</p>}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="card-elevated p-8 rounded-lg text-center">
-                  <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                    Partner profiles will appear here as soon as they are added from the dashboard.
-                  </p>
-                </div>
-              )}
             </div>
           </div>
         </section>
