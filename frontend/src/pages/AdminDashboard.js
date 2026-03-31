@@ -1,7 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import {
+  BookOpen,
+  CheckCircle,
+  DollarSign,
+  FolderKanban,
+  Heart,
+  Image,
+  Loader2,
+  LogOut,
+  Users,
+  UsersRound,
+  Video,
+  XCircle
+} from 'lucide-react';
 import Footer from '@/components/Footer';
+import Navbar from '@/components/Navbar';
 import MediaLibrary from '@/components/MediaLibrary';
 import TeamPillars from '@/components/TeamPillars';
 import ProjectsManagement from '@/components/ProjectsManagement';
