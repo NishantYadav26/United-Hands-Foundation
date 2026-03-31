@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, DollarSign, CheckCircle, XCircle, Settings, Loader2, LogOut, Image, UsersRound, FolderKanban, Heart, FileText, Video, BookOpen } from 'lucide-react';
+import { Users, DollarSign, CheckCircle, XCircle, Settings, Loader2, LogOut, Image, UsersRound, FolderKanban, Heart, Video, BookOpen } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import MediaLibrary from '@/components/MediaLibrary';
 import TeamPillars from '@/components/TeamPillars';
 import ProjectsManagement from '@/components/ProjectsManagement';
 import GalleryManagement from '@/components/GalleryManagement';
-import AIChiefOfStaff from '@/components/AIChiefOfStaff';
 import VideosManagement from '@/components/VideosManagement';
 import SuccessStoriesManagement from '@/components/SuccessStoriesManagement';
 import axios from 'axios';
@@ -230,16 +229,6 @@ const AdminDashboard = () => {
             >
               <Video size={16} />
               Videos
-            </button>
-            <button
-              onClick={() => setActiveTab('ai')}
-              className={`pb-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold tracking-[0.1em] uppercase transition-colors whitespace-nowrap flex items-center gap-2 ${
-                activeTab === 'ai' ? 'text-[var(--accent-teal)] border-b-2 border-[var(--accent-teal)]' : 'text-[var(--text-muted)]'
-              }`}
-              data-testid="tab-ai"
-            >
-              <FileText size={16} />
-              AI Staff
             </button>
             <button
               onClick={() => setActiveTab('stories')}
@@ -520,9 +509,6 @@ const AdminDashboard = () => {
 
           {/* Videos Tab */}
           {activeTab === 'videos' && <VideosManagement />}
-
-          {/* AI Chief of Staff Tab */}
-          {activeTab === 'ai' && <AIChiefOfStaff />}
 
           {/* Success Stories Tab */}
           {activeTab === 'stories' && <SuccessStoriesManagement />}
