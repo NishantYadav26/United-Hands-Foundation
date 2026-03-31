@@ -27,8 +27,10 @@ const Home = () => {
   const [galleryImages, setGalleryImages] = useState([]);
   const [siteAssets, setSiteAssets] = useState({});
   const [pillars, setPillars] = useState([]);
-  const teamPillars = pillars.filter((pillar) => pillar.category !== 'Partner');
-  const partners = pillars.filter((pillar) => pillar.category === 'Partner');
+  const normalizeCategory = (category) => (category || '').toString().trim().toLowerCase();
+  const isPartner = (category) => normalizeCategory(category).startsWith('partner');
+  const teamPillars = pillars.filter((pillar) => !isPartner(pillar.category));
+  const partners = pillars.filter((pillar) => isPartner(pillar.category));
 
   const statsRef = useRef(null);
   const heroRef = useRef(null);
@@ -583,11 +585,11 @@ const Home = () => {
             </div>
           )}
 
-          {partners.length > 0 && (
-            <div className="mt-16">
-              <h3 className="text-2xl font-medium text-center mb-10" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
-                Our <span className="text-gradient-blue">Partners</span>
-              </h3>
+          <div className="mt-16" data-testid="home-partners-section">
+            <h3 className="text-2xl font-medium text-center mb-10" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+              Our <span className="text-gradient-blue">Partners</span>
+            </h3>
+            {partners.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 partners-animated-grid">
                 {partners.map((partner) => (
                   <div key={partner.id} className="card-elevated p-6 rounded-lg hover-lift text-center partner-card" data-testid={`partner-${partner.id}`}>
@@ -597,8 +599,14 @@ const Home = () => {
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="card-elevated p-8 rounded-lg text-center">
+                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                  Partner profiles will appear here as soon as they are added from the dashboard.
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
