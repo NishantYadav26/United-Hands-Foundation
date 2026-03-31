@@ -18,4 +18,3 @@ cloudinary==1.44.1
 razorpay==2.0.1
 resend==2.26.0
 reportlab==4.4.10
-emergentintegrations==0.1.0
