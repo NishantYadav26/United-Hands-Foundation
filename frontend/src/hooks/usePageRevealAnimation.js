@@ -12,46 +12,27 @@ const usePageRevealAnimation = (rerunKey = 0) => {
       return undefined;
     }
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    if (prefersReducedMotion) {
-      gsap.set(sections, { clearProps: 'all' });
-      return undefined;
-    }
-
-    gsap.set(sections, { autoAlpha: 0, y: 48 });
-
-    const triggers = sections.map((section) => ScrollTrigger.create({
-      trigger: section,
-      start: 'top 88%',
-      end: 'bottom 10%',
-      onEnter: () => {
-        gsap.to(section, {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.95,
-          ease: 'power3.out',
-          overwrite: 'auto'
-        });
-      },
-      onEnterBack: () => {
-        gsap.to(section, {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.75,
-          ease: 'power2.out',
-          overwrite: 'auto'
-        });
-      },
-      onLeave: () => gsap.set(section, { autoAlpha: 1, y: 0 })
-    }));
-
-    ScrollTrigger.refresh();
+    const animations = sections.map((section) => gsap.fromTo(
+      section,
+      { opacity: 0, y: 40 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.95,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: section,
+          start: 'top 88%',
+          toggleActions: 'play none none reverse'
+        }
+      }
+    ));
 
     return () => {
-      triggers.forEach((trigger) => trigger.kill());
-      gsap.killTweensOf(sections);
-      gsap.set(sections, { clearProps: 'all' });
+      animations.forEach((animation) => {
+        animation.scrollTrigger?.kill();
+        animation.kill();
+      });
     };
   }, [rerunKey]);
 };
