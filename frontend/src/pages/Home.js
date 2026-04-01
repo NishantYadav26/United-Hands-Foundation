@@ -45,10 +45,16 @@ const Home = () => {
   const [pillars, setPillars] = useState([]);
   const [locations, setLocations] = useState([]);
   const [isMobileGalleryModalOpen, setIsMobileGalleryModalOpen] = useState(false);
-  const normalizeCategory = (category) => (category || '').toString().trim().toLowerCase();
-  const isPartner = (category) => normalizeCategory(category).startsWith('partner');
-  const teamPillars = pillars.filter((pillar) => !isPartner(pillar.category));
-  const partners = pillars.filter((pillar) => isPartner(pillar.category));
+  const normalizeText = (value) => (value || '').toString().trim().toLowerCase();
+  const isPartner = (pillar) => {
+    const category = normalizeText(pillar?.category);
+    const role = normalizeText(pillar?.role);
+    const name = normalizeText(pillar?.name);
+    return category.startsWith('partner') || role.includes('partner') || name.includes('partner');
+  };
+  const partners = pillars.filter((pillar) => isPartner(pillar));
+  const teamPillars = pillars.filter((pillar) => !isPartner(pillar));
+  const visibleTeamPillars = teamPillars.length > 0 ? teamPillars : pillars;
   const fallbackLocations = ['Dharashiv', 'Solapur', 'Latur', 'Palghar', 'Panchgani'];
   const visibleLocations = locations.length > 0 ? locations : fallbackLocations.map((name) => ({ name }));
 
@@ -648,13 +654,13 @@ const Home = () => {
           </div>
 
           {/* Team Pillars */}
-          {teamPillars.length > 0 && (
+          {visibleTeamPillars.length > 0 && (
             <div className="mt-16">
               <h3 className="text-2xl font-bold text-center mb-10" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                 Our <span className="text-gradient-orange">Pillars</span>
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 pillars-animated-grid">
-                {teamPillars.map(pillar => (
+                {visibleTeamPillars.map(pillar => (
 
                   <div key={pillar.id} className="card-elevated p-6 rounded-lg hover-lift text-center pillar-card" data-testid={`pillar-${pillar.id}`}>
                     {pillar.image_url && (
