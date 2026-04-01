@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Body, Depends, status
+from fastapi import FastAPI, APIRouter, HTTPException, Body, Depends, status, UploadFile, File, Form
 from fastapi.responses import FileResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
@@ -24,6 +24,7 @@ from io import BytesIO
 import razorpay
 import jwt
 import bcrypt
+import hashlib
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -323,13 +324,34 @@ class WorkLocation(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
     description: str
+    image_id: Optional[str] = None
     display_priority: int = 0
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class WorkLocationCreate(BaseModel):
     name: str
     description: str
+    image_id: Optional[str] = None
     display_priority: int = 0
+
+class LocationImageUpdate(BaseModel):
+    image_id: Optional[str] = None
+
+class ImageAsset(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    public_id: str
+    url: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    usage_count: int = 1
+
+class ImageUploadResponse(BaseModel):
+    id: str
+    public_id: str
+    url: str
+    usage_count: int
+    reused: bool
 
 class GalleryImage(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -350,6 +372,65 @@ class GalleryImageCreate(BaseModel):
     display_priority: int = 0
 
 # ===== HELPER FUNCTIONS =====
+
+def generate_image_hash(file_bytes: bytes) -> str:
+    return hashlib.md5(file_bytes).hexdigest()
+
+async def fetch_image_by_id(image_id: str) -> dict:
+    image_doc = await db.images.find_one({"id": image_id}, {"_id": 0})
+    if not image_doc:
+        raise HTTPException(status_code=404, detail="Image not found")
+    return image_doc
+
+async def upload_or_reuse_image(file_bytes: bytes, filename: str, folder: str = "uploads") -> dict:
+    public_id = generate_image_hash(file_bytes)
+    existing_image = await db.images.find_one({"public_id": public_id}, {"_id": 0})
+
+    if existing_image:
+        await db.images.update_one({"id": existing_image["id"]}, {"$inc": {"usage_count": 1}})
+        existing_image["usage_count"] = existing_image.get("usage_count", 0) + 1
+        existing_image["reused"] = True
+        return existing_image
+
+    try:
+        upload_result = await asyncio.to_thread(
+            cloudinary.uploader.upload,
+            file_bytes,
+            folder=folder,
+            public_id=public_id,
+            overwrite=False,
+            unique_filename=False,
+            resource_type="image",
+            filename=filename
+        )
+    except Exception as exc:
+        logger.error(f"Cloudinary upload failed: {exc}")
+        raise HTTPException(status_code=502, detail="Failed to upload image to Cloudinary")
+
+    image_asset = ImageAsset(public_id=public_id, url=upload_result["secure_url"], usage_count=1)
+    image_doc = image_asset.model_dump()
+    image_doc["created_at"] = image_doc["created_at"].isoformat()
+    await db.images.insert_one(image_doc)
+
+    image_doc["reused"] = False
+    return image_doc
+
+async def decrement_image_usage(image_id: str):
+    image_doc = await fetch_image_by_id(image_id)
+    current_usage = max(0, image_doc.get("usage_count", 0))
+    next_usage = current_usage - 1
+
+    if next_usage > 0:
+        await db.images.update_one({"id": image_id}, {"$set": {"usage_count": next_usage}})
+        return
+
+    try:
+        await asyncio.to_thread(cloudinary.uploader.destroy, image_doc["public_id"], resource_type="image")
+    except Exception as exc:
+        logger.error(f"Failed to delete Cloudinary image '{image_doc['public_id']}': {exc}")
+        raise HTTPException(status_code=502, detail="Failed to delete image from Cloudinary")
+
+    await db.images.delete_one({"id": image_id})
 
 async def generate_receipt_number():
     count = await db.donations.count_documents({"status": "approved"})
@@ -606,6 +687,40 @@ async def generate_cloudinary_signature(resource_type: str = "image", folder: st
         "folder": folder,
         "resource_type": resource_type
     }
+
+@api_router.post("/images/upload", response_model=ImageUploadResponse)
+async def upload_image(
+    image_file: UploadFile = File(...),
+    folder: str = Form("uploads"),
+    admin_email: str = Depends(verify_token)
+):
+    if not image_file.content_type or not image_file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="Only image files are allowed")
+
+    file_bytes = await image_file.read()
+    if not file_bytes:
+        raise HTTPException(status_code=400, detail="Empty file upload is not allowed")
+
+    image_doc = await upload_or_reuse_image(file_bytes=file_bytes, filename=image_file.filename or "upload", folder=folder)
+    return ImageUploadResponse(
+        id=image_doc["id"],
+        public_id=image_doc["public_id"],
+        url=image_doc["url"],
+        usage_count=image_doc["usage_count"],
+        reused=image_doc["reused"]
+    )
+
+@api_router.get("/images/{image_id}", response_model=ImageAsset)
+async def get_image(image_id: str):
+    image_doc = await fetch_image_by_id(image_id)
+    if isinstance(image_doc.get("created_at"), str):
+        image_doc["created_at"] = datetime.fromisoformat(image_doc["created_at"])
+    return ImageAsset(**image_doc)
+
+@api_router.delete("/images/{image_id}")
+async def delete_image_safely(image_id: str, admin_email: str = Depends(verify_token)):
+    await decrement_image_usage(image_id)
+    return {"status": "success", "message": "Image usage decremented (deleted from Cloudinary if unused)"}
 
 @api_router.post("/donations", response_model=Donation)
 async def create_donation(donation: DonationCreate):
@@ -1158,6 +1273,8 @@ async def get_locations():
 @api_router.post("/locations", response_model=WorkLocation)
 async def create_location(location: WorkLocationCreate, admin_email: str = Depends(verify_token)):
     """Create a new work location"""
+    if location.image_id:
+        await fetch_image_by_id(location.image_id)
     location_obj = WorkLocation(**location.model_dump())
     doc = location_obj.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
@@ -1168,17 +1285,47 @@ async def create_location(location: WorkLocationCreate, admin_email: str = Depen
 @api_router.put("/locations/{location_id}")
 async def update_location(location_id: str, location: WorkLocationCreate, admin_email: str = Depends(verify_token)):
     """Update a work location"""
-    result = await db.locations.update_one(
+    old_location = await db.locations.find_one({"id": location_id}, {"_id": 0, "image_id": 1})
+    if not old_location:
+        raise HTTPException(status_code=404, detail="Location not found")
+
+    if location.image_id:
+        await fetch_image_by_id(location.image_id)
+
+    if old_location.get("image_id") and old_location.get("image_id") != location.image_id:
+        await decrement_image_usage(old_location["image_id"])
+
+    await db.locations.update_one(
         {"id": location_id},
         {"$set": location.model_dump()}
     )
-    if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Location not found")
     return {"status": "success", "message": "Location updated"}
+
+@api_router.put("/locations/{location_id}/image")
+async def update_location_image_reference(location_id: str, payload: LocationImageUpdate, admin_email: str = Depends(verify_token)):
+    old_location = await db.locations.find_one({"id": location_id}, {"_id": 0, "image_id": 1})
+    if not old_location:
+        raise HTTPException(status_code=404, detail="Location not found")
+
+    if payload.image_id:
+        await fetch_image_by_id(payload.image_id)
+
+    if old_location.get("image_id") and old_location.get("image_id") != payload.image_id:
+        await decrement_image_usage(old_location["image_id"])
+
+    await db.locations.update_one(
+        {"id": location_id},
+        {"$set": {"image_id": payload.image_id}}
+    )
+    return {"status": "success", "message": "Location image updated"}
 
 @api_router.delete("/locations/{location_id}")
 async def delete_location(location_id: str, admin_email: str = Depends(verify_token)):
     """Delete a work location"""
+    old_location = await db.locations.find_one({"id": location_id}, {"_id": 0, "image_id": 1})
+    if old_location and old_location.get("image_id"):
+        await decrement_image_usage(old_location["image_id"])
+
     result = await db.locations.delete_one({"id": location_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Location not found")
@@ -1335,6 +1482,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.on_event("startup")
+async def ensure_indexes():
+    await db.images.create_index("id", unique=True)
+    await db.images.create_index("public_id", unique=True)
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
