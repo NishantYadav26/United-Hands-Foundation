@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { MapPin, Heart, Users, Award, Target } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import usePageRevealAnimation from '@/hooks/usePageRevealAnimation';
 import axios from 'axios';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
@@ -23,6 +24,8 @@ const AboutUs = () => {
     { name: 'Panchgani', description: 'Rural health programs' }
   ];
   const visibleLocations = locations.length > 0 ? locations : fallbackLocations;
+
+  usePageRevealAnimation(`${pillars.length}-${partners.length}-${visibleLocations.length}`);
 
   useEffect(() => {
     const fetchAssets = async () => {
@@ -55,7 +58,7 @@ const AboutUs = () => {
       <Navbar />
 
       {/* Hero */}
-      <section className="pt-28 pb-16 px-6" data-testid="about-hero">
+      <section className="pt-28 pb-16 px-6 reveal-section" data-testid="about-hero">
         <div className="max-w-5xl mx-auto text-center">
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-medium tracking-tight mb-6 text-gradient-gold" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
             About Us
@@ -68,7 +71,7 @@ const AboutUs = () => {
       </section>
 
       {/* Mission & Vision */}
-      <section className="py-16 px-6" style={{ background: 'var(--bg-surface)' }} data-testid="about-mission">
+      <section className="py-16 px-6 reveal-section" style={{ background: 'var(--bg-surface)' }} data-testid="about-mission">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
           <div className="card-elevated p-10 rounded-lg">
             <Target className="mb-6" style={{ color: 'var(--accent-teal)' }} size={40} />
@@ -97,7 +100,7 @@ const AboutUs = () => {
       </section>
 
       {/* Founder Photos - Dynamic from CMS */}
-      <section className="py-16 px-6" data-testid="about-founders">
+      <section className="py-16 px-6 reveal-section" data-testid="about-founders">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-medium text-center mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
             Our <span className="text-gradient-blue">Founders</span>
@@ -144,7 +147,7 @@ const AboutUs = () => {
 
       {/* Field Work Gallery from CMS */}
       {(siteAssets.hero_background || siteAssets.center_photo) && (
-        <section className="py-16 px-6" style={{ background: 'var(--bg-surface)' }} data-testid="about-fieldwork">
+        <section className="py-16 px-6 reveal-section" style={{ background: 'var(--bg-surface)' }} data-testid="about-fieldwork">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-4xl font-medium text-center mb-12" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               In the <span className="text-gradient-gold">Field</span>
@@ -167,7 +170,7 @@ const AboutUs = () => {
 
       {/* Team Pillars - Dynamic */}
       {pillars.length > 0 && (
-        <section className="py-16 px-6" data-testid="about-pillars">
+        <section className="py-16 px-6 reveal-section" data-testid="about-pillars">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-4xl font-medium text-center mb-12" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               Our <span className="text-gradient-orange">Pillars</span>
@@ -227,7 +230,7 @@ const AboutUs = () => {
       )}
 
       {/* Where We Work */}
-      <section className="py-16 px-6" style={{ background: 'var(--bg-surface)' }} data-testid="about-locations">
+      <section className="py-16 px-6 reveal-section" style={{ background: 'var(--bg-surface)' }} data-testid="about-locations">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-medium text-center mb-12" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
             Where We <span className="text-gradient-blue">Work</span>
@@ -269,7 +272,7 @@ const AboutUs = () => {
       </section>
 
       {/* CTA */}
-      <section className="py-16 px-6" style={{ background: 'var(--bg-surface)' }} data-testid="about-cta">
+      <section className="py-16 px-6 reveal-section" style={{ background: 'var(--bg-surface)' }} data-testid="about-cta">
         <div className="max-w-4xl mx-auto text-center">
           <Heart className="mx-auto mb-6" style={{ color: 'var(--accent-gold)' }} size={48} fill="var(--accent-gold)" />
           <h2 className="text-4xl font-medium mb-6" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>

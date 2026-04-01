@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Upload, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import usePageRevealAnimation from '@/hooks/usePageRevealAnimation';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { useSearchParams } from 'react-router-dom';
@@ -29,6 +30,8 @@ const Donate = () => {
   const [submitted, setSubmitted] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState('');
   const [paymentMode, setPaymentMode] = useState('manual_qr');
+
+  usePageRevealAnimation(`${projects.length}-${paymentMode}-${submitted}`);
 
   const loadRazorpayScript = () => new Promise((resolve) => {
     if (window.Razorpay) {
@@ -207,7 +210,7 @@ const Donate = () => {
 
       <div className="pt-28 pb-24 px-6">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-14">
+          <div className="text-center mb-14 reveal-section">
             <h1
               className="text-5xl sm:text-6xl font-medium tracking-tight mb-6"
               style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}
@@ -220,7 +223,7 @@ const Donate = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-10">
+          <div className="grid md:grid-cols-2 gap-10 reveal-section">
             {/* Payment Section */}
             <div className="card-elevated p-10 rounded-lg" data-testid="payment-section">
               {paymentMode === 'razorpay' ? (
