@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { createPortal } from 'react-dom';
 import { Users, MapPin, Heart, TrendingUp } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -557,6 +558,24 @@ const Home = () => {
             </div>
           </div>
         </section>
+      )}
+      {isMobileGalleryModalOpen && createPortal(
+        <div className="gallery-mobile-modal is-open" role="dialog" aria-modal="true" aria-label="All photos">
+          <button type="button" className="gallery-mobile-modal-close" onClick={closeMobileGalleryModal} aria-label="Close gallery">
+            ×
+          </button>
+          <button type="button" className="gallery-mobile-modal-back" onClick={closeMobileGalleryModal}>
+            Back to home
+          </button>
+          <div className="gallery-mobile-modal-content">
+            {galleryImages.map((image, index) => (
+              <div key={`mobile-modal-image-${image.id || index}`} className="gallery-mobile-modal-item">
+                <img src={image.image_url} alt={image.title} className="w-full h-auto object-cover identity-lock" />
+              </div>
+            ))}
+          </div>
+        </div>,
+        document.body
       )}
 
       {/* Impact Stats */}
