@@ -52,10 +52,24 @@ const Home = () => {
 
   const statsRef = useRef(null);
   const heroRef = useRef(null);
+  const openMobileGalleryModal = () => {
+    setIsMobileGalleryModalOpen(true);
+  };
 
   const closeMobileGalleryModal = () => {
     setIsMobileGalleryModalOpen(false);
   };
+
+  useEffect(() => {
+    if (!isMobileGalleryModalOpen) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isMobileGalleryModalOpen]);
 
   useEffect(() => {
     let isMounted = true;
@@ -486,7 +500,7 @@ const Home = () => {
               {galleryImages.map((image, index) => (
                 <div
                   key={image.id}
-                  className="rounded-lg overflow-hidden hover-lift card-elevated gallery-card"
+                  className="rounded-lg overflow-hidden hover-lift card-elevated gallery-card mobile-gallery-preview-card"
                   style={{ animationDelay: `${index * 0.1}s` }}
                   data-testid={`gallery-image-${image.id}`}
                 >
@@ -509,6 +523,9 @@ const Home = () => {
                 </div>
               ))}
             </div>
+            <button type="button" className="gallery-mobile-view-all-btn" onClick={openMobileGalleryModal}>
+              View all heartiest moments
+            </button>
           </div>
         </section>
       )}
