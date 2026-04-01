@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Plus, Edit, Trash2, Upload, X, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
@@ -20,6 +20,7 @@ const ProjectsManagement = () => {
     is_active: true
   });
   const [uploading, setUploading] = useState(false);
+  const formRef = useRef(null);
 
   useEffect(() => {
     fetchProjects();
@@ -164,6 +165,24 @@ const ProjectsManagement = () => {
     return Math.min((raised / target) * 100, 100);
   };
 
+  const openEditForm = (project) => {
+    setEditingProject(project);
+    setFormData({
+      title: project.title,
+      category: project.category,
+      description: project.description,
+      hero_image: project.hero_image,
+      images: project.images || [],
+      target_amount: project.target_amount,
+      is_active: project.is_active
+    });
+    setShowForm(true);
+
+    requestAnimationFrame(() => {
+      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -187,7 +206,7 @@ const ProjectsManagement = () => {
 
       {/* Form */}
       {showForm && (
-        <div className="glass-morph p-6 sm:p-8 rounded">
+        <div ref={formRef} className="glass-morph p-6 sm:p-8 rounded">
           <h4 className="text-xl font-medium mb-6" style={{fontFamily: 'Cormorant Garamond, serif'}}>
             {editingProject ? 'Edit' : 'Create'} Project
           </h4>
@@ -395,19 +414,7 @@ const ProjectsManagement = () => {
 
                 <div className="flex gap-2">
                   <button 
-                    onClick={() => {
-                      setEditingProject(project); 
-                      setFormData({
-                        title: project.title,
-                        category: project.category,
-                        description: project.description,
-                        hero_image: project.hero_image,
-                        images: project.images || [],
-                        target_amount: project.target_amount,
-                        is_active: project.is_active
-                      });
-                      setShowForm(true);
-                    }} 
+                    onClick={() => openEditForm(project)} 
                     className="btn-primary flex-1 py-2 flex items-center justify-center gap-1 text-sm"
                   >
                     <Edit size={16} />

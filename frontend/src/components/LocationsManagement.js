@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Edit, MapPin, Plus, Trash2, X } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
@@ -13,6 +13,7 @@ const LocationsManagement = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingLocation, setEditingLocation] = useState(null);
   const [formData, setFormData] = useState(defaultForm);
+  const formRef = useRef(null);
 
   const fetchLocations = async () => {
     try {
@@ -79,6 +80,20 @@ const LocationsManagement = () => {
     }
   };
 
+  const openEditForm = (location) => {
+    setEditingLocation(location);
+    setFormData({
+      name: location.name || '',
+      description: location.description || '',
+      display_priority: location.display_priority || 0
+    });
+    setShowForm(true);
+
+    requestAnimationFrame(() => {
+      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="glass-morph p-6 rounded flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -101,7 +116,7 @@ const LocationsManagement = () => {
       </div>
 
       {showForm && (
-        <div className="glass-morph p-6 sm:p-8 rounded space-y-4" data-testid="location-form">
+        <div ref={formRef} className="glass-morph p-6 sm:p-8 rounded space-y-4" data-testid="location-form">
           <h4 className="text-xl font-medium" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
             {editingLocation ? 'Edit' : 'Create'} Location
           </h4>
@@ -156,15 +171,7 @@ const LocationsManagement = () => {
               </div>
               <div className="flex gap-2">
                 <button
-                  onClick={() => {
-                    setEditingLocation(location);
-                    setFormData({
-                      name: location.name || '',
-                      description: location.description || '',
-                      display_priority: location.display_priority || 0
-                    });
-                    setShowForm(true);
-                  }}
+                  onClick={() => openEditForm(location)}
                   className="btn-primary flex-1 py-2 flex items-center justify-center gap-1 text-sm"
                 >
                   <Edit size={16} />

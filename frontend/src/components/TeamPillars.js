@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Plus, Edit, Trash2, Upload, X, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
@@ -22,6 +22,7 @@ const TeamPillars = () => {
     display_priority: 0
   });
   const [uploading, setUploading] = useState(false);
+  const formRef = useRef(null);
 
   useEffect(() => {
     fetchPillars();
@@ -133,6 +134,16 @@ const TeamPillars = () => {
   const partners = pillars.filter((pillar) => pillar.category === 'Partner');
   const visiblePillars = activeView === 'partners' ? partners : teamMembers;
 
+  const openEditForm = (pillar) => {
+    setEditingPillar(pillar);
+    setFormData(pillar);
+    setShowForm(true);
+
+    requestAnimationFrame(() => {
+      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -156,7 +167,7 @@ const TeamPillars = () => {
 
       {/* Form */}
       {showForm && (
-        <div className="glass-morph p-6 sm:p-8 rounded">
+        <div ref={formRef} className="glass-morph p-6 sm:p-8 rounded">
           <h4 className="text-xl font-medium mb-6" style={{fontFamily: 'Cormorant Garamond, serif'}}>
             {editingPillar ? 'Edit' : 'Create'} Pillar
           </h4>
@@ -342,11 +353,7 @@ const TeamPillars = () => {
               
               <div className="flex gap-2">
                 <button 
-                  onClick={() => {
-                    setEditingPillar(pillar); 
-                    setFormData(pillar);
-                    setShowForm(true);
-                  }} 
+                  onClick={() => openEditForm(pillar)} 
                   className="btn-primary flex-1 py-2 flex items-center justify-center gap-1 text-sm"
                   data-testid={`edit-${pillar.id}`}
                 >
