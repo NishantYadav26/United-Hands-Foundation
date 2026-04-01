@@ -246,6 +246,34 @@ const Home = () => {
       );
     }
 
+    if (gsap.utils.toArray('.pop-card-lr').length) {
+      gsap.utils.toArray('.pop-card-lr').forEach((card, index) => {
+        gsap.fromTo(
+          card,
+          {
+            opacity: 0,
+            x: index % 2 === 0 ? (isSmallScreen ? -24 : -58) : (isSmallScreen ? 24 : 58),
+            y: isSmallScreen ? 10 : 16,
+            scale: isSmallScreen ? 0.985 : 0.96
+          },
+          {
+            opacity: 1,
+            x: 0,
+            y: 0,
+            scale: 1,
+            duration: isSmallScreen ? 0.62 : 0.82,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: card,
+              start: isSmallScreen ? 'top 94%' : 'top 90%',
+              toggleActions: 'restart none none reset',
+              invalidateOnRefresh: true
+            }
+          }
+        );
+      });
+    }
+
     if (gsap.utils.toArray('.gallery-card').length && document.querySelector('.gallery-animated-grid')) {
       gsap.fromTo(
         '.gallery-card',

@@ -129,7 +129,7 @@ const PillarsOfImpact = () => {
               return (
                 <div
                   key={project.id}
-                  className="card-elevated rounded-lg overflow-hidden hover-lift group"
+                  className="card-elevated rounded-lg overflow-hidden hover-lift group pop-card-lr"
                   data-testid={`project-${project.id}`}
                 >
                   <div
