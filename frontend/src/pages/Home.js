@@ -42,6 +42,7 @@ const Home = () => {
   const [siteAssets, setSiteAssets] = useState({});
   const [pillars, setPillars] = useState([]);
   const [locations, setLocations] = useState([]);
+  const [isMobileGalleryModalOpen, setIsMobileGalleryModalOpen] = useState(false);
   const normalizeCategory = (category) => (category || '').toString().trim().toLowerCase();
   const isPartner = (category) => normalizeCategory(category).startsWith('partner');
   const teamPillars = pillars.filter((pillar) => !isPartner(pillar.category));
@@ -52,6 +53,9 @@ const Home = () => {
   const statsRef = useRef(null);
   const heroRef = useRef(null);
 
+  const closeMobileGalleryModal = () => {
+    setIsMobileGalleryModalOpen(false);
+  };
 
   useEffect(() => {
     let isMounted = true;
