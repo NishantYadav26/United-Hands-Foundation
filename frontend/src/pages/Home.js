@@ -28,6 +28,8 @@ const normalizeStats = (data) => ({
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
 const API = `${BACKEND_URL}/api`;
+const HOME_CACHE_KEY = 'uhf_home_cache_v1';
+const REQUEST_TIMEOUT_MS = 4500;
 
 const Home = () => {
   const [stats, setStats] = useState({
