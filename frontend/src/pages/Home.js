@@ -75,35 +75,20 @@ const Home = () => {
     let isMounted = true;
 
     const fetchHomeData = async () => {
-      const requests = await Promise.allSettled([
+      const criticalRequests = await Promise.allSettled([
         axios.get(`${API}/stats`),
-        axios.get(`${API}/success-stories?limit=3`),
-        axios.get(`${API}/gallery`),
         axios.get(`${API}/site-assets`),
-        axios.get(`${API}/pillars`),
         axios.get(`${API}/locations`)
       ]);
 
       if (!isMounted) return;
 
-      const [statsRes, storiesRes, galleryRes, assetsRes, pillarsRes, locationsRes] = requests;
+      const [statsRes, assetsRes, locationsRes] = criticalRequests;
 
       if (statsRes.status === 'fulfilled') {
         setStats(normalizeStats(statsRes.value.data));
       } else {
         console.error('Failed to fetch stats:', statsRes.reason);
-      }
-
-      if (storiesRes.status === 'fulfilled') {
-        setSuccessStories(ensureArray(storiesRes.value.data));
-      } else {
-        console.error('Failed to fetch success stories:', storiesRes.reason);
-      }
-
-      if (galleryRes.status === 'fulfilled') {
-        setGalleryImages(ensureArray(galleryRes.value.data));
-      } else {
-        console.error('Failed to fetch gallery:', galleryRes.reason);
       }
 
       if (assetsRes.status === 'fulfilled') {
@@ -112,12 +97,6 @@ const Home = () => {
         setSiteAssets(assetsMap);
       } else {
         console.error('Failed to fetch site assets:', assetsRes.reason);
-      }
-
-      if (pillarsRes.status === 'fulfilled') {
-        setPillars(ensureArray(pillarsRes.value.data));
-      } else {
-        console.error('Failed to fetch pillars:', pillarsRes.reason);
       }
 
       if (locationsRes.status === 'fulfilled') {
@@ -365,18 +344,10 @@ const Home = () => {
     <div className="min-h-screen" style={{ background: 'var(--bg-deep)' }}>
       {isLoading && (
         <div
-          className="fixed inset-0 z-[70] flex items-center justify-center transition-opacity duration-300"
-          style={{ background: 'rgba(246,243,237,0.94)', backdropFilter: 'blur(4px)' }}
+          className="fixed top-0 left-0 right-0 z-[70] h-1 transition-opacity duration-300"
+          style={{ background: 'linear-gradient(90deg, var(--accent-teal), var(--accent-gold))' }}
           data-testid="home-loading-overlay"
-        >
-          <div className="flex flex-col items-center gap-3">
-            <div
-              className="w-10 h-10 rounded-full border-4 border-t-transparent animate-spin"
-              style={{ borderColor: 'var(--accent-teal)', borderTopColor: 'transparent' }}
-            />
-            <p className="text-sm tracking-wide" style={{ color: 'var(--text-muted)' }}>Loading United Hands Foundation...</p>
-          </div>
-        </div>
+        />
       )}
       <Navbar />
 
