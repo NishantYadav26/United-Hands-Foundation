@@ -77,33 +77,30 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleApprove = async (donationId) => {
-    try {
-      const token = localStorage.getItem('uhf_admin_token');
-      await axios.post(`${API}/donations/approve`, {
-        donation_id: donationId,
-        status: 'approved'
-      }, { headers: { Authorization: `Bearer ${token}` } });
-      toast.success('Donation approved and receipt sent!');
-      fetchDonations();
-    } catch (error) {
-      console.error('Approval failed:', error);
-      toast.error('Failed to approve donation');
-    }
-  };
+  const handleStatusChange = async (donation, status) => {
+    const actionLabel = status === 'approved' ? 'approve' : status === 'rejected' ? 'reject' : 'move back to pending';
+    const shouldProceed = window.confirm(`Are you sure you want to ${actionLabel} this donation?`);
+    if (!shouldProceed) return;
 
-  const handleReject = async (donationId) => {
     try {
       const token = localStorage.getItem('uhf_admin_token');
       await axios.post(`${API}/donations/approve`, {
-        donation_id: donationId,
-        status: 'rejected'
+        donation_id: donation.id,
+        status
       }, { headers: { Authorization: `Bearer ${token}` } });
-      toast.success('Donation rejected');
+
+      if (status === 'approved') {
+        toast.success(donation.status === 'approved' ? 'Donation already approved' : 'Donation approved and receipt sent!');
+      } else if (status === 'rejected') {
+        toast.success('Donation marked as rejected');
+      } else {
+        toast.success('Donation moved back to pending');
+      }
+
       fetchDonations();
     } catch (error) {
-      console.error('Rejection failed:', error);
-      toast.error('Failed to reject donation');
+      console.error('Status update failed:', error);
+      toast.error('Failed to update donation status');
     }
   };
 
@@ -335,26 +332,40 @@ const AdminDashboard = () => {
                             </span>
                           </td>
                           <td className="py-4 px-4">
-                            {donation.status === 'pending' && (
-                              <div className="flex gap-2">
+                            <div className="flex gap-2">
+                              {donation.status !== 'approved' && (
                                 <button
-                                  onClick={() => handleApprove(donation.id)}
+                                  onClick={() => handleStatusChange(donation, 'approved')}
                                   className="p-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 rounded transition-colors"
                                   data-testid={`approve-${donation.id}`}
+                                  title="Mark as approved"
                                 >
                                   <CheckCircle size={18} />
                                 </button>
+                              )}
+                              {donation.status !== 'rejected' && (
                                 <button
-                                  onClick={() => handleReject(donation.id)}
+                                  onClick={() => handleStatusChange(donation, 'rejected')}
                                   className="p-2 bg-red-100 hover:bg-red-200 text-red-700 rounded transition-colors"
                                   data-testid={`reject-${donation.id}`}
+                                  title="Mark as rejected"
                                 >
                                   <XCircle size={18} />
                                 </button>
-                              </div>
-                            )}
+                              )}
+                              {donation.status !== 'pending' && (
+                                <button
+                                  onClick={() => handleStatusChange(donation, 'pending')}
+                                  className="px-3 py-2 text-xs font-semibold bg-slate-200 hover:bg-slate-300 text-slate-700 rounded transition-colors"
+                                  data-testid={`pending-${donation.id}`}
+                                  title="Move back to pending"
+                                >
+                                  Pending
+                                </button>
+                              )}
+                            </div>
                             {donation.status === 'approved' && donation.receipt_number && (
-                              <span className="text-xs" style={{color: 'var(--text-muted)'}}>{donation.receipt_number}</span>
+                              <span className="block mt-2 text-xs" style={{color: 'var(--text-muted)'}}>{donation.receipt_number}</span>
                             )}
                           </td>
                         </tr>
