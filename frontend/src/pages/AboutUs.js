@@ -10,10 +10,19 @@ const API = `${BACKEND_URL}/api`;
 const AboutUs = () => {
   const [siteAssets, setSiteAssets] = useState({});
   const [pillars, setPillars] = useState([]);
+  const [locations, setLocations] = useState([]);
   const normalizeCategory = (category) => (category || '').toString().trim().toLowerCase();
   const isPartner = (category) => normalizeCategory(category).startsWith('partner');
   const teamPillars = pillars.filter((pillar) => !isPartner(pillar.category));
   const partners = pillars.filter((pillar) => isPartner(pillar.category));
+  const fallbackLocations = [
+    { name: 'Dharashiv', description: 'Medical camps & elderly care' },
+    { name: 'Solapur', description: 'Education & health awareness' },
+    { name: 'Latur', description: 'Headquarters & community hub' },
+    { name: 'Palghar', description: 'Tribal healthcare outreach' },
+    { name: 'Panchgani', description: 'Rural health programs' }
+  ];
+  const visibleLocations = locations.length > 0 ? locations : fallbackLocations;
 
   useEffect(() => {
     const fetchAssets = async () => {
@@ -30,8 +39,15 @@ const AboutUs = () => {
         setPillars(response.data);
       } catch (error) { console.error('Failed to fetch pillars:', error); }
     };
+    const fetchLocations = async () => {
+      try {
+        const response = await axios.get(`${API}/locations`);
+        setLocations(Array.isArray(response.data) ? response.data : []);
+      } catch (error) { console.error('Failed to fetch locations:', error); }
+    };
     fetchAssets();
     fetchPillars();
+    fetchLocations();
   }, []);
 
   return (
@@ -92,14 +108,14 @@ const AboutUs = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-4xl mx-auto">
             {siteAssets.founder_1 && (
-              <div className="card-elevated rounded-lg overflow-hidden hover-lift" data-testid="about-founder-1">
+              <div className="card-elevated rounded-lg overflow-hidden hover-lift founder-card group" data-testid="about-founder-1">
                 <div className="h-80 overflow-hidden">
                   <img src={siteAssets.founder_1} alt="Dr. Rahul Sarwade" className="w-full h-full object-cover identity-lock" />
                 </div>
                 <div className="p-6">
                   <h3 className="text-2xl font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>Dr. Rahul Sarwade</h3>
                   <p className="text-xs tracking-[0.15em] uppercase font-bold mb-3" style={{ color: 'var(--accent-gold)' }}>Co-Founder & President</p>
-                  <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                  <p className="founder-description text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
                     Former Government of India medical officer with decades of healthcare expertise.
                     Dedicated to extending medical access to rural Maharashtra's most underserved populations.
                   </p>
@@ -108,14 +124,14 @@ const AboutUs = () => {
             )}
 
             {siteAssets.founder_2 && (
-              <div className="card-elevated rounded-lg overflow-hidden hover-lift" data-testid="about-founder-2">
+              <div className="card-elevated rounded-lg overflow-hidden hover-lift founder-card group" data-testid="about-founder-2">
                 <div className="h-80 overflow-hidden">
                   <img src={siteAssets.founder_2} alt="Dr. Jagruti Hankare" className="w-full h-full object-cover identity-lock" />
                 </div>
                 <div className="p-6">
                   <h3 className="text-2xl font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>Dr. Jagruti Hankare</h3>
                   <p className="text-xs tracking-[0.15em] uppercase font-bold mb-3" style={{ color: 'var(--accent-gold)' }}>Co-Founder & Secretary</p>
-                  <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                  <p className="founder-description text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
                     Healthcare professional committed to improving quality of life for underserved communities
                     through medical camps, health awareness drives, and community outreach programs.
                   </p>
@@ -181,7 +197,7 @@ const AboutUs = () => {
               {partners.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                   {partners.map((partner) => (
-                    <div key={partner.id} className="card-elevated p-8 rounded-lg hover-lift text-center" data-testid={`about-partner-${partner.id}`}>
+                    <div key={partner.id} className="card-elevated p-8 rounded-lg hover-lift text-center partner-card group" data-testid={`about-partner-${partner.id}`}>
                       {partner.image_url && (
                         <div className="w-24 h-24 mx-auto mb-4 overflow-hidden rounded-full border blue-border">
                           <img
@@ -193,8 +209,8 @@ const AboutUs = () => {
                       )}
                       <h4 className="text-xl font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{partner.name}</h4>
                       <p className="text-xs tracking-[0.15em] uppercase font-bold mb-3" style={{ color: 'var(--accent-teal)' }}>{partner.role}</p>
-                      {partner.specialty && <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{partner.specialty}</p>}
-                      {partner.bio_detailed && <p className="text-sm mt-2 leading-relaxed" style={{ color: 'var(--text-muted)' }}>{partner.bio_detailed}</p>}
+                      {partner.specialty && <p className="partner-description text-sm" style={{ color: 'var(--text-muted)' }}>{partner.specialty}</p>}
+                      {partner.bio_detailed && <p className="partner-description text-sm mt-2 leading-relaxed" style={{ color: 'var(--text-muted)' }}>{partner.bio_detailed}</p>}
                     </div>
                   ))}
                 </div>
@@ -217,17 +233,11 @@ const AboutUs = () => {
             Where We <span className="text-gradient-blue">Work</span>
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-            {[
-              { name: 'Dharashiv', desc: 'Medical camps & elderly care' },
-              { name: 'Solapur', desc: 'Education & health awareness' },
-              { name: 'Latur', desc: 'Headquarters & community hub' },
-              { name: 'Palghar', desc: 'Tribal healthcare outreach' },
-              { name: 'Panchgani', desc: 'Rural health programs' }
-            ].map(loc => (
-              <div key={loc.name} className="card-elevated p-6 rounded-lg text-center hover-lift">
+            {visibleLocations.map(loc => (
+              <div key={loc.id || loc.name} className="card-elevated p-6 rounded-lg text-center hover-lift">
                 <MapPin className="mx-auto mb-3" style={{ color: 'var(--accent-gold)' }} size={28} />
                 <h3 className="font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>{loc.name}</h3>
-                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{loc.desc}</p>
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{loc.description}</p>
               </div>
             ))}
           </div>

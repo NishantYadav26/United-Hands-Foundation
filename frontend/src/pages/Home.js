@@ -566,7 +566,7 @@ const Home = () => {
           {/* Team Pillars */}
           {teamPillars.length > 0 && (
             <div className="mt-16">
-              <h3 className="text-2xl font-medium text-center mb-10" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+              <h3 className="text-2xl font-bold text-center mb-10" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                 Our <span className="text-gradient-orange">Pillars</span>
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 pillars-animated-grid">
@@ -586,7 +586,7 @@ const Home = () => {
           )}
 
           <div className="mt-16" data-testid="home-partners-section">
-            <h3 className="text-2xl font-medium text-center mb-10" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+            <h3 className="text-2xl font-bold text-center mb-10" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               Our <span className="text-gradient-blue">Partners</span>
             </h3>
             {partners.length > 0 ? (
