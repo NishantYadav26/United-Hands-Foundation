@@ -593,6 +593,15 @@ const Home = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 partners-animated-grid">
                 {partners.map((partner) => (
                   <div key={partner.id} className="card-elevated p-6 rounded-lg hover-lift text-center partner-card" data-testid={`partner-${partner.id}`}>
+                    {partner.image_url && (
+                      <div className="w-24 h-24 mx-auto mb-4 overflow-hidden rounded-full border blue-border">
+                        <img
+                          src={partner.image_url}
+                          alt={partner.name}
+                          className="w-full h-full object-cover identity-lock"
+                        />
+                      </div>
+                    )}
                     <h4 className="text-lg font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{partner.name}</h4>
                     <p className="text-xs tracking-[0.15em] uppercase font-bold mb-2" style={{ color: 'var(--accent-teal)' }}>{partner.role}</p>
                     {partner.specialty && <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{partner.specialty}</p>}
