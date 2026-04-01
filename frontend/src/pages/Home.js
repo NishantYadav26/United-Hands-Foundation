@@ -260,7 +260,8 @@ const Home = () => {
           scrollTrigger: {
             trigger: '.gallery-animated-grid',
             start: 'top 85%',
-            once: true
+            toggleActions: 'restart none none reset',
+            invalidateOnRefresh: true
           }
         }
       );
@@ -280,7 +281,8 @@ const Home = () => {
           scrollTrigger: {
             trigger: '#impact',
             start: 'top 82%',
-            once: true
+            toggleActions: 'restart none none reset',
+            invalidateOnRefresh: true
           }
         }
       );
@@ -300,7 +302,8 @@ const Home = () => {
           scrollTrigger: {
             trigger: '[data-testid=\"founders-section\"]',
             start: 'top 80%',
-            once: true
+            toggleActions: 'restart none none reset',
+            invalidateOnRefresh: true
           }
         }
       );
@@ -322,7 +325,8 @@ const Home = () => {
           scrollTrigger: {
             trigger: '[data-testid=\"trust-bar\"]',
             start: 'top 92%',
-            once: true
+            toggleActions: 'restart none none reset',
+            invalidateOnRefresh: true
           }
         }
       );
@@ -342,7 +346,8 @@ const Home = () => {
           scrollTrigger: {
             trigger: '[data-testid=\"success-stories-section\"]',
             start: 'top 88%',
-            once: true
+            toggleActions: 'restart none none reset',
+            invalidateOnRefresh: true
           }
         }
       );
@@ -361,7 +366,8 @@ const Home = () => {
           scrollTrigger: {
             trigger: '[data-testid=\"cta-section\"]',
             start: 'top 86%',
-            once: true
+            toggleActions: 'restart none none reset',
+            invalidateOnRefresh: true
           }
         }
       );
