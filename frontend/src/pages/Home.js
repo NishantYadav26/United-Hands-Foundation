@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { Users, MapPin, Heart, TrendingUp } from 'lucide-react';
@@ -28,16 +28,6 @@ const normalizeStats = (data) => ({
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
 const API = `${BACKEND_URL}/api`;
-const OptimizedImage = ({ src, alt, className, priority = false }) => (
-  <img
-    src={src}
-    alt={alt}
-    className={className}
-    loading={priority ? 'eager' : 'lazy'}
-    decoding="async"
-    fetchPriority={priority ? 'high' : 'auto'}
-  />
-);
 
 const Home = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -55,13 +45,10 @@ const Home = () => {
   const [isMobileGalleryModalOpen, setIsMobileGalleryModalOpen] = useState(false);
   const normalizeCategory = (category) => (category || '').toString().trim().toLowerCase();
   const isPartner = (category) => normalizeCategory(category).startsWith('partner');
-  const teamPillars = useMemo(() => pillars.filter((pillar) => !isPartner(pillar.category)), [pillars]);
-  const partners = useMemo(() => pillars.filter((pillar) => isPartner(pillar.category)), [pillars]);
+  const teamPillars = pillars.filter((pillar) => !isPartner(pillar.category));
+  const partners = pillars.filter((pillar) => isPartner(pillar.category));
   const fallbackLocations = ['Dharashiv', 'Solapur', 'Latur', 'Palghar', 'Panchgani'];
-  const visibleLocations = useMemo(
-    () => (locations.length > 0 ? locations : fallbackLocations.map((name) => ({ name }))),
-    [locations]
-  );
+  const visibleLocations = locations.length > 0 ? locations : fallbackLocations.map((name) => ({ name }));
 
   const statsRef = useRef(null);
   const heroRef = useRef(null);
@@ -518,11 +505,12 @@ const Home = () => {
                   data-testid={`gallery-image-${image.id}`}
                 >
                   <div className="h-64 overflow-hidden">
-                    <OptimizedImage
+                    <img
                       src={image.image_url}
                       alt={image.title}
                       className="w-full h-full object-cover identity-lock transition-transform duration-500 hover:scale-105"
-                      priority={index < 3}
+                      loading={index < 3 ? 'eager' : 'lazy'}
+                      decoding="async"
                     />
                   </div>
                   <div className="p-5">
@@ -554,7 +542,7 @@ const Home = () => {
           <div className="gallery-mobile-modal-content">
             {galleryImages.map((image, index) => (
               <div key={`mobile-modal-image-${image.id || index}`} className="gallery-mobile-modal-item">
-                <OptimizedImage src={image.image_url} alt={image.title} className="w-full h-auto object-cover identity-lock" />
+                <img src={image.image_url} alt={image.title} className="w-full h-auto object-cover identity-lock" loading="lazy" decoding="async" />
               </div>
             ))}
           </div>
@@ -654,11 +642,12 @@ const Home = () => {
             {siteAssets.founder_1 && (
               <div className="text-center founder-card" data-testid="founder-rahul">
                 <div className="mb-6 overflow-hidden rounded-lg card-elevated">
-                  <OptimizedImage
+                  <img
                     src={siteAssets.founder_1}
                     alt="Dr. Rahul Sarwade"
                     className="w-full h-96 object-cover identity-lock"
-                    priority
+                    loading="eager"
+                    decoding="async"
                   />
                 </div>
                 <h3 className="text-2xl font-medium mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>Dr. Rahul Sarwade</h3>
@@ -670,11 +659,12 @@ const Home = () => {
             {siteAssets.founder_2 && (
               <div className="text-center founder-card" data-testid="founder-jagruti">
                 <div className="mb-6 overflow-hidden rounded-lg card-elevated">
-                  <OptimizedImage
+                  <img
                     src={siteAssets.founder_2}
                     alt="Dr. Jagruti Hankare"
                     className="w-full h-96 object-cover identity-lock"
-                    priority
+                    loading="eager"
+                    decoding="async"
                   />
                 </div>
                 <h3 className="text-2xl font-medium mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>Dr. Jagruti Hankare</h3>
@@ -695,7 +685,7 @@ const Home = () => {
 
                   <div key={pillar.id} className="card-elevated p-6 rounded-lg hover-lift text-center pillar-card" data-testid={`pillar-${pillar.id}`}>
                     {pillar.image_url && (
-                      <OptimizedImage src={pillar.image_url} alt={pillar.name} className="w-24 h-24 rounded-full mx-auto mb-4 object-cover identity-lock" />
+                      <img src={pillar.image_url} alt={pillar.name} className="w-24 h-24 rounded-full mx-auto mb-4 object-cover identity-lock" loading="lazy" decoding="async" />
                     )}
                     <h4 className="text-lg font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{pillar.name}</h4>
                     <p className="text-xs tracking-[0.15em] uppercase font-bold mb-2" style={{ color: 'var(--accent-teal)' }}>{pillar.role}</p>
@@ -716,10 +706,12 @@ const Home = () => {
                   <div key={partner.id} className="card-elevated p-6 rounded-lg hover-lift text-center partner-card" data-testid={`partner-${partner.id}`}>
                     {partner.image_url && (
                       <div className="w-24 h-24 mx-auto mb-4 overflow-hidden rounded-full border blue-border">
-                        <OptimizedImage
+                        <img
                           src={partner.image_url}
                           alt={partner.name}
                           className="w-full h-full object-cover identity-lock"
+                          loading="lazy"
+                          decoding="async"
                         />
                       </div>
                     )}
