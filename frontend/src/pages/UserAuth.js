@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { LogIn, UserPlus, Eye, EyeOff } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import usePageRevealAnimation from '@/hooks/usePageRevealAnimation';
 import axios from 'axios';
 import { toast } from 'sonner';
 
@@ -15,6 +16,8 @@ const UserAuth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', password: '', phone: '', pan: '' });
+
+  usePageRevealAnimation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -66,8 +69,8 @@ const UserAuth = () => {
 
       <div className="pt-28 pb-24 px-4 sm:px-6">
         <div className="max-w-md mx-auto">
-          <div className="card-elevated p-8 sm:p-10 rounded-lg" data-testid="auth-form-container">
-            <div className="text-center mb-8">
+          <div className="card-elevated p-8 sm:p-10 rounded-lg reveal-section" data-testid="auth-form-container">
+            <div className="text-center mb-8 reveal-section">
               <h1 className="text-3xl sm:text-4xl font-medium mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                 {isLogin ? 'Welcome Back' : 'Join Our Mission'}
               </h1>
