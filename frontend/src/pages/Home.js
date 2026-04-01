@@ -547,23 +547,9 @@ const Home = () => {
               >
                 ×
               </button>
-              <button
-                type="button"
-                className="gallery-mobile-modal-back"
-                onClick={closeMobileGalleryModal}
-              >
-                Back to home
-              </button>
-              <div
-                className="gallery-mobile-modal-content"
-                onClick={(event) => {
-                  if (event.target === event.currentTarget) {
-                    closeMobileGalleryModal();
-                  }
-                }}
-              >
-                {galleryImages.map((image, index) => (
-                  <div key={`modal-${image.id || index}`} className="gallery-mobile-modal-item">
+              <div className="gallery-mobile-modal-content">
+                {galleryImages.map((image) => (
+                  <div key={`modal-${image.id}`} className="gallery-mobile-modal-item">
                     <img src={image.image_url} alt={image.title} className="w-full h-auto object-cover identity-lock" />
                   </div>
                 ))}
