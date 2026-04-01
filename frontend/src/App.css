@@ -216,7 +216,7 @@ input,
 select,
 textarea,
 img {
-  transition: all 0.3s ease;
+  transition: color 0.25s ease, background-color 0.25s ease, border-color 0.25s ease, transform 0.25s ease, opacity 0.25s ease;
 }
 
 /* Input focus on light theme */
@@ -256,6 +256,34 @@ input:focus, select:focus, textarea:focus {
 
 .impact-stat-card {
   will-change: transform, opacity;
+}
+
+@media (max-width: 768px) {
+  .btn-primary,
+  .btn-orange,
+  .btn-gold {
+    width: 100%;
+    max-width: 320px;
+    padding: 12px 20px;
+    font-size: 14px;
+    letter-spacing: 0.08em;
+  }
+
+  .glass-morph {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 .founder-card {
