@@ -28,11 +28,8 @@ const normalizeStats = (data) => ({
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
 const API = `${BACKEND_URL}/api`;
-const HOME_CACHE_KEY = 'uhf_home_cache_v1';
-const REQUEST_TIMEOUT_MS = 4500;
 
 const Home = () => {
-  const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({
     patients_served: 0,
     districts_covered: 0,
@@ -83,29 +80,11 @@ const Home = () => {
     let isMounted = true;
 
     const fetchHomeData = async () => {
-      try {
-        const cached = sessionStorage.getItem(HOME_CACHE_KEY);
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          if (isMounted) {
-            if (parsed.stats) setStats(normalizeStats(parsed.stats));
-            if (parsed.siteAssets) setSiteAssets(parsed.siteAssets);
-            if (Array.isArray(parsed.locations)) setLocations(parsed.locations);
-            if (Array.isArray(parsed.pillars)) setPillars(parsed.pillars);
-            if (Array.isArray(parsed.successStories)) setSuccessStories(parsed.successStories);
-            if (Array.isArray(parsed.galleryImages)) setGalleryImages(parsed.galleryImages);
-            setIsLoading(false);
-          }
-        }
-      } catch (error) {
-        console.error('Failed to read home cache:', error);
-      }
-
       const criticalRequests = await Promise.allSettled([
-        axios.get(`${API}/stats`, { timeout: REQUEST_TIMEOUT_MS }),
-        axios.get(`${API}/site-assets`, { timeout: REQUEST_TIMEOUT_MS }),
-        axios.get(`${API}/locations`, { timeout: REQUEST_TIMEOUT_MS }),
-        axios.get(`${API}/pillars`, { timeout: REQUEST_TIMEOUT_MS })
+        axios.get(`${API}/stats`),
+        axios.get(`${API}/site-assets`),
+        axios.get(`${API}/locations`),
+        axios.get(`${API}/pillars`)
       ]);
 
       if (!isMounted) return;
@@ -138,32 +117,9 @@ const Home = () => {
         console.error('Failed to fetch pillars:', pillarsRes.reason);
       }
 
-      if (isMounted) {
-        setIsLoading(false);
-      }
-
-      try {
-        if (statsRes.status === 'fulfilled' || assetsRes.status === 'fulfilled' || locationsRes.status === 'fulfilled' || pillarsRes.status === 'fulfilled') {
-          const previousCache = sessionStorage.getItem(HOME_CACHE_KEY);
-          const parsedCache = previousCache ? JSON.parse(previousCache) : {};
-          const nextCache = {
-            ...parsedCache,
-            stats: statsRes.status === 'fulfilled' ? statsRes.value.data : parsedCache.stats,
-            siteAssets: assetsRes.status === 'fulfilled'
-              ? (assetsRes.value.data.assets || []).reduce((acc, a) => ({ ...acc, [a.asset_key]: a.asset_url }), {})
-              : (parsedCache.siteAssets || {}),
-            locations: locationsRes.status === 'fulfilled' ? ensureArray(locationsRes.value.data) : (parsedCache.locations || []),
-            pillars: pillarsRes.status === 'fulfilled' ? ensureArray(pillarsRes.value.data) : (parsedCache.pillars || [])
-          };
-          sessionStorage.setItem(HOME_CACHE_KEY, JSON.stringify(nextCache));
-        }
-      } catch (error) {
-        console.error('Failed to write home cache:', error);
-      }
-
       Promise.allSettled([
-        axios.get(`${API}/success-stories?limit=3`, { timeout: REQUEST_TIMEOUT_MS }),
-        axios.get(`${API}/gallery`, { timeout: REQUEST_TIMEOUT_MS })
+        axios.get(`${API}/success-stories?limit=3`),
+        axios.get(`${API}/gallery`)
       ]).then((deferredRequests) => {
         if (!isMounted) return;
         const [storiesRes, galleryRes] = deferredRequests;
@@ -178,18 +134,6 @@ const Home = () => {
           setGalleryImages(ensureArray(galleryRes.value.data));
         } else {
           console.error('Failed to fetch gallery:', galleryRes.reason);
-        }
-
-        try {
-          const cached = sessionStorage.getItem(HOME_CACHE_KEY);
-          const parsed = cached ? JSON.parse(cached) : {};
-          sessionStorage.setItem(HOME_CACHE_KEY, JSON.stringify({
-            ...parsed,
-            successStories: storiesRes.status === 'fulfilled' ? ensureArray(storiesRes.value.data) : (parsed.successStories || []),
-            galleryImages: galleryRes.status === 'fulfilled' ? ensureArray(galleryRes.value.data) : (parsed.galleryImages || [])
-          }));
-        } catch (error) {
-          console.error('Failed to update deferred home cache:', error);
         }
       });
     };
@@ -430,13 +374,6 @@ const Home = () => {
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-deep)' }}>
-      {isLoading && (
-        <div
-          className="fixed top-0 left-0 right-0 z-[70] h-1 transition-opacity duration-300"
-          style={{ background: 'linear-gradient(90deg, var(--accent-teal), var(--accent-gold))' }}
-          data-testid="home-loading-overlay"
-        />
-      )}
       <Navbar />
 
       {/* Hero Section - keeps dark overlay for image visibility */}
