@@ -170,7 +170,7 @@ const Home = () => {
 
         ScrollTrigger.create({
           trigger: statsRef.current,
-          start: 'top 80%',
+          start: 'top 70%',
           onEnter: () => {
             gsap.to(element, {
               innerText: finalValue,
@@ -198,8 +198,9 @@ const Home = () => {
           ease: 'power2.out',
           scrollTrigger: {
             trigger: section,
-            start: 'top 88%',
-            toggleActions: 'restart none none reset',
+            start: 'top 75%',
+            toggleActions: 'play none none none',
+            once: true,
             invalidateOnRefresh: true
           }
         }
@@ -219,8 +220,9 @@ const Home = () => {
           ease: 'power3.out',
           scrollTrigger: {
             trigger: '.pillars-animated-grid',
-            start: 'top 86%',
-            toggleActions: 'play none none reverse'
+            start: 'top 74%',
+            toggleActions: 'play none none none',
+            once: true
           }
         }
       );
@@ -239,8 +241,9 @@ const Home = () => {
           ease: 'power2.out',
           scrollTrigger: {
             trigger: '.partners-animated-grid',
-            start: 'top 88%',
-            toggleActions: 'play none none reverse'
+            start: 'top 75%',
+            toggleActions: 'play none none none',
+            once: true
           }
         }
       );
@@ -265,8 +268,9 @@ const Home = () => {
             ease: 'power3.out',
             scrollTrigger: {
               trigger: card,
-              start: isSmallScreen ? 'top 94%' : 'top 90%',
-              toggleActions: 'restart none none reset',
+              start: isSmallScreen ? 'top 82%' : 'top 76%',
+              toggleActions: 'play none none none',
+              once: true,
               invalidateOnRefresh: true
             }
           }
@@ -287,8 +291,9 @@ const Home = () => {
           ease: 'power2.out',
           scrollTrigger: {
             trigger: '.gallery-animated-grid',
-            start: 'top 85%',
-            toggleActions: 'restart none none reset',
+            start: 'top 74%',
+            toggleActions: 'play none none none',
+            once: true,
             invalidateOnRefresh: true
           }
         }
@@ -308,8 +313,9 @@ const Home = () => {
           ease: 'back.out(1.4)',
           scrollTrigger: {
             trigger: '#impact',
-            start: 'top 82%',
-            toggleActions: 'restart none none reset',
+            start: 'top 72%',
+            toggleActions: 'play none none none',
+            once: true,
             invalidateOnRefresh: true
           }
         }
@@ -329,8 +335,9 @@ const Home = () => {
           ease: 'power3.out',
           scrollTrigger: {
             trigger: '[data-testid=\"founders-section\"]',
-            start: 'top 80%',
-            toggleActions: 'restart none none reset',
+            start: 'top 70%',
+            toggleActions: 'play none none none',
+            once: true,
             invalidateOnRefresh: true
           }
         }
@@ -352,8 +359,9 @@ const Home = () => {
           ease: 'back.out(1.5)',
           scrollTrigger: {
             trigger: '[data-testid=\"trust-bar\"]',
-            start: 'top 92%',
-            toggleActions: 'restart none none reset',
+            start: 'top 78%',
+            toggleActions: 'play none none none',
+            once: true,
             invalidateOnRefresh: true
           }
         }
@@ -373,8 +381,9 @@ const Home = () => {
           ease: 'power3.out',
           scrollTrigger: {
             trigger: '[data-testid=\"success-stories-section\"]',
-            start: 'top 88%',
-            toggleActions: 'restart none none reset',
+            start: 'top 75%',
+            toggleActions: 'play none none none',
+            once: true,
             invalidateOnRefresh: true
           }
         }
@@ -393,8 +402,9 @@ const Home = () => {
           ease: 'power3.out',
           scrollTrigger: {
             trigger: '[data-testid=\"cta-section\"]',
-            start: 'top 86%',
-            toggleActions: 'restart none none reset',
+            start: 'top 74%',
+            toggleActions: 'play none none none',
+            once: true,
             invalidateOnRefresh: true
           }
         }
