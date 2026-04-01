@@ -108,33 +108,6 @@ const Home = () => {
       if (isMounted) {
         setIsLoading(false);
       }
-
-      Promise.allSettled([
-        axios.get(`${API}/success-stories?limit=3`),
-        axios.get(`${API}/gallery`),
-        axios.get(`${API}/pillars`)
-      ]).then((deferredRequests) => {
-        if (!isMounted) return;
-        const [storiesRes, galleryRes, pillarsRes] = deferredRequests;
-
-        if (storiesRes.status === 'fulfilled') {
-          setSuccessStories(ensureArray(storiesRes.value.data));
-        } else {
-          console.error('Failed to fetch success stories:', storiesRes.reason);
-        }
-
-        if (galleryRes.status === 'fulfilled') {
-          setGalleryImages(ensureArray(galleryRes.value.data));
-        } else {
-          console.error('Failed to fetch gallery:', galleryRes.reason);
-        }
-
-        if (pillarsRes.status === 'fulfilled') {
-          setPillars(ensureArray(pillarsRes.value.data));
-        } else {
-          console.error('Failed to fetch pillars:', pillarsRes.reason);
-        }
-      });
     };
 
     fetchHomeData();
