@@ -1,15 +1,18 @@
 import { Shield } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import usePageRevealAnimation from '@/hooks/usePageRevealAnimation';
 
 const Transparency = () => {
+  usePageRevealAnimation();
+
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-deep)' }}>
       <Navbar />
 
       <div className="pt-28 pb-24 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-16 reveal-section">
             <h1
               className="text-5xl sm:text-6xl font-medium tracking-tight mb-6"
               style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}
@@ -23,7 +26,7 @@ const Transparency = () => {
           </div>
 
           {/* Legal Status Banner */}
-          <div className="card-elevated p-8 rounded-lg mb-12 text-center" data-testid="legal-status">
+          <div className="card-elevated p-8 rounded-lg mb-12 text-center reveal-section" data-testid="legal-status">
             <Shield style={{ color: 'var(--accent-teal)' }} className="mx-auto mb-4" size={48} />
             <h2 className="text-2xl font-medium mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               Legally Registered NGO
@@ -53,7 +56,7 @@ const Transparency = () => {
           </div>
 
           {/* FCRA Notice */}
-          <div className="card-elevated p-8 rounded-lg mb-12" style={{ borderLeft: '4px solid var(--accent-gold)' }} data-testid="fcra-notice">
+          <div className="card-elevated p-8 rounded-lg mb-12 reveal-section" style={{ borderLeft: '4px solid var(--accent-gold)' }} data-testid="fcra-notice">
             <h3 className="text-2xl font-medium mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--accent-teal)' }}>
               FCRA Compliance Notice
             </h3>
@@ -67,7 +70,7 @@ const Transparency = () => {
           </div>
 
           {/* Contact for Queries */}
-          <div className="text-center card-elevated p-8 rounded-lg">
+          <div className="text-center card-elevated p-8 rounded-lg reveal-section">
             <h3 className="text-2xl font-medium mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               Questions or Queries?
             </h3>

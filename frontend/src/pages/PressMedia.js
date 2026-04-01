@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Filter, Loader2, Video } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import usePageRevealAnimation from '@/hooks/usePageRevealAnimation';
 import axios from 'axios';
 import Masonry from 'react-masonry-css';
 import Lightbox from 'yet-another-react-lightbox';
@@ -20,6 +21,8 @@ const PressMedia = () => {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [activeSection, setActiveSection] = useState('press');
+
+  usePageRevealAnimation([activeSection, loading, pressItems.length, videos.length]);
 
   const districts = ['All', 'Dharashiv', 'Solapur', 'Latur', 'Palghar', 'Panchgani'];
   const years = ['All', '2026', '2025', '2024', '2023', '2022', '2021', '2020'];
@@ -107,7 +110,7 @@ const PressMedia = () => {
 
       <div className="pt-28 pb-24 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-14">
+          <div className="text-center mb-14 reveal-section">
             <h1
               className="text-5xl sm:text-6xl font-medium tracking-tight mb-6"
               style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}
@@ -121,7 +124,7 @@ const PressMedia = () => {
           </div>
 
           {/* Section Toggle */}
-          <div className="flex gap-4 mb-8 justify-center">
+          <div className="flex gap-4 mb-8 justify-center reveal-section">
             <button
               onClick={() => setActiveSection('press')}
               className="px-6 py-3 text-sm font-semibold tracking-[0.1em] uppercase transition-colors rounded"
@@ -152,7 +155,7 @@ const PressMedia = () => {
           {activeSection === 'press' && (
             <>
               {/* Filters */}
-              <div className="card-elevated p-6 rounded-lg mb-12 flex flex-col md:flex-row gap-4 items-center" data-testid="filters">
+              <div className="card-elevated p-6 rounded-lg mb-12 flex flex-col md:flex-row gap-4 items-center reveal-section" data-testid="filters">
                 <Filter style={{ color: 'var(--accent-gold)' }} size={24} />
                 <div className="flex-1">
                   <label className="text-xs tracking-[0.2em] uppercase font-bold mb-2 block" style={{ color: 'var(--accent-teal)' }}>District</label>
