@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Loader2, Shield } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
+import usePageRevealAnimation from '@/hooks/usePageRevealAnimation';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
 const API = `${BACKEND_URL}/api`;
@@ -14,6 +15,8 @@ const AdminLogin = () => {
     password: ''
   });
   const [loading, setLoading] = useState(false);
+
+  usePageRevealAnimation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,7 +43,7 @@ const AdminLogin = () => {
       }}
     >
       <div className="max-w-md w-full">
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 reveal-section">
           <Shield className="mx-auto mb-4" size={64} style={{color: 'var(--accent-teal)'}} />
           <h1 
             className="text-4xl font-medium mb-2"
@@ -53,7 +56,7 @@ const AdminLogin = () => {
           </p>
         </div>
 
-        <div className="glass-morph p-8 rounded">
+        <div className="glass-morph p-8 rounded reveal-section">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-xs tracking-[0.2em] uppercase font-bold mb-3" style={{color: 'var(--accent-teal)'}}>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Search, Download, Loader2, Heart } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import usePageRevealAnimation from '@/hooks/usePageRevealAnimation';
 import axios from 'axios';
 import { toast } from 'sonner';
 
@@ -13,6 +14,8 @@ const TrackMyImpact = () => {
   const [donations, setDonations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+
+  usePageRevealAnimation(`${donations.length}-${searched}`);
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -59,7 +62,7 @@ const TrackMyImpact = () => {
 
       <div className="pt-28 pb-24 px-6">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-14">
+          <div className="text-center mb-14 reveal-section">
             <Heart className="mx-auto mb-6" size={56} style={{ color: 'var(--accent-gold)' }} />
             <h1
               className="text-5xl sm:text-6xl font-medium tracking-tight mb-6"
@@ -74,7 +77,7 @@ const TrackMyImpact = () => {
           </div>
 
           {/* Search Form */}
-          <div className="card-elevated p-10 rounded-lg mb-12">
+          <div className="card-elevated p-10 rounded-lg mb-12 reveal-section">
             <form onSubmit={handleSearch} className="space-y-5">
               <div>
                 <label className="block text-xs tracking-[0.2em] uppercase font-bold mb-2" style={{ color: 'var(--accent-teal)' }}>
@@ -121,7 +124,7 @@ const TrackMyImpact = () => {
 
           {/* Results */}
           {searched && (
-            <div className="card-elevated p-8 rounded-lg">
+            <div className="card-elevated p-8 rounded-lg reveal-section">
               <h2 className="text-3xl font-medium mb-8" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                 Your Donation <span className="text-gradient-blue">History</span>
               </h2>
