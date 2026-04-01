@@ -177,7 +177,7 @@ const AboutUs = () => {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {teamPillars.map(pillar => (
-                <div key={pillar.id} className="card-elevated p-8 rounded-lg hover-lift text-center" data-testid={`about-pillar-${pillar.id}`}>
+                <div key={pillar.id} className="card-elevated p-8 rounded-lg hover-lift text-center pop-card-lr" data-testid={`about-pillar-${pillar.id}`}>
                   {pillar.image_url ? (
                     <img src={pillar.image_url} alt={pillar.name} className="w-20 h-20 rounded-full mx-auto mb-5 object-cover identity-lock" />
                   ) : (
@@ -200,7 +200,7 @@ const AboutUs = () => {
               {partners.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                   {partners.map((partner) => (
-                    <div key={partner.id} className="card-elevated p-8 rounded-lg hover-lift text-center partner-card group" data-testid={`about-partner-${partner.id}`}>
+                    <div key={partner.id} className="card-elevated p-8 rounded-lg hover-lift text-center partner-card group pop-card-lr" data-testid={`about-partner-${partner.id}`}>
                       {partner.image_url && (
                         <div className="w-24 h-24 mx-auto mb-4 overflow-hidden rounded-full border blue-border">
                           <img

@@ -378,3 +378,14 @@ input:focus, select:focus, textarea:focus {
   opacity: 1;
   transform: translateY(0);
 }
+
+.pop-card-lr {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+@media (max-width: 768px) {
+  .pop-card-lr:hover {
+    transform: translateY(-4px) scale(1.01);
+  }
+}
