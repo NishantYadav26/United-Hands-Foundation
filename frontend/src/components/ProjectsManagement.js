@@ -15,6 +15,7 @@ const ProjectsManagement = () => {
     category: '',
     description: '',
     hero_image: '',
+    images: [],
     target_amount: 0,
     is_active: true
   });
@@ -111,12 +112,47 @@ const ProjectsManagement = () => {
     });
   };
 
+  const uploadGalleryImages = () => {
+    if (!window.cloudinary) {
+      toast.error('Cloudinary widget not loaded');
+      return;
+    }
+
+    setUploading(true);
+    window.cloudinary.openUploadWidget({
+      cloudName: 'dvmb3mzcy',
+      uploadPreset: 'uhf_unsigned',
+      sources: ['local', 'url'],
+      multiple: true,
+      folder: 'projects/gallery',
+      resourceType: 'image',
+      clientAllowedFormats: ['png', 'jpg', 'jpeg', 'webp'],
+      maxFileSize: 10000000
+    }, (error, result) => {
+      if (error) {
+        setUploading(false);
+        toast.error('Upload failed: ' + (error?.message || JSON.stringify(error)));
+        return;
+      }
+
+      if (result.event === 'success') {
+        setFormData((prev) => ({ ...prev, images: [...prev.images, result.info.secure_url] }));
+      }
+
+      if (result.event === 'close') {
+        setUploading(false);
+        toast.success('Gallery images added');
+      }
+    });
+  };
+
   const resetForm = () => {
     setFormData({
       title: '',
       category: '',
       description: '',
       hero_image: '',
+      images: [],
       target_amount: 0,
       is_active: true
     });
@@ -234,6 +270,46 @@ const ProjectsManagement = () => {
             )}
           </div>
 
+          <div className="mt-4 p-6 bg-[var(--bg-surface)] border blue-border rounded">
+            <div className="flex items-center justify-between gap-4 mb-4">
+              <p className="text-sm" style={{color: 'var(--text-primary)'}}>
+                Gallery images ({formData.images.length})
+              </p>
+              <button
+                onClick={uploadGalleryImages}
+                disabled={uploading}
+                className="btn-primary flex items-center gap-2 px-4 py-2 text-sm"
+              >
+                {uploading ? <Loader2 className="animate-spin" size={16} /> : <Upload size={16} />}
+                Upload Gallery Images
+              </button>
+            </div>
+
+            {formData.images.length === 0 ? (
+              <p className="text-sm" style={{color: 'var(--text-muted)'}}>
+                No gallery images uploaded yet.
+              </p>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {formData.images.map((image, index) => (
+                  <div key={`${image}-${index}`} className="relative">
+                    <img src={image} alt={`Gallery ${index + 1}`} className="w-full h-24 object-cover rounded" />
+                    <button
+                      type="button"
+                      onClick={() => setFormData((prev) => ({
+                        ...prev,
+                        images: prev.images.filter((_, imageIndex) => imageIndex !== index)
+                      }))}
+                      className="absolute top-1 right-1 bg-black/70 text-white p-1 rounded"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* Action Buttons */}
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
             <button 
@@ -326,6 +402,7 @@ const ProjectsManagement = () => {
                         category: project.category,
                         description: project.description,
                         hero_image: project.hero_image,
+                        images: project.images || [],
                         target_amount: project.target_amount,
                         is_active: project.is_active
                       });
