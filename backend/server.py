@@ -132,7 +132,7 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
         return email
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expired")
-    except jwt.JWTError:
+    except jwt.InvalidTokenError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
 def verify_user_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
@@ -145,7 +145,7 @@ def verify_user_token(credentials: HTTPAuthorizationCredentials = Depends(securi
         return {"email": email, "role": role}
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expired")
-    except jwt.JWTError:
+    except jwt.InvalidTokenError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
 # ===== MODELS =====

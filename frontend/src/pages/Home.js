@@ -27,10 +27,13 @@ const Home = () => {
   const [galleryImages, setGalleryImages] = useState([]);
   const [siteAssets, setSiteAssets] = useState({});
   const [pillars, setPillars] = useState([]);
+  const [locations, setLocations] = useState([]);
   const normalizeCategory = (category) => (category || '').toString().trim().toLowerCase();
   const isPartner = (category) => normalizeCategory(category).startsWith('partner');
   const teamPillars = pillars.filter((pillar) => !isPartner(pillar.category));
   const partners = pillars.filter((pillar) => isPartner(pillar.category));
+  const fallbackLocations = ['Dharashiv', 'Solapur', 'Latur', 'Palghar', 'Panchgani'];
+  const visibleLocations = locations.length > 0 ? locations : fallbackLocations.map((name) => ({ name }));
 
   const statsRef = useRef(null);
   const heroRef = useRef(null);
@@ -86,12 +89,21 @@ const Home = () => {
 
       }
     };
+    const fetchLocations = async () => {
+      try {
+        const response = await axios.get(`${API}/locations`);
+        setLocations(ensureArray(response.data));
+      } catch (error) {
+        console.error('Failed to fetch locations:', error);
+      }
+    };
 
     fetchStats();
     fetchStories();
     fetchGallery();
     fetchSiteAssets();
     fetchPillars();
+    fetchLocations();
   }, []);
 
   useEffect(() => {
@@ -247,14 +259,16 @@ const Home = () => {
     if (gsap.utils.toArray('.district-pill').length && document.querySelector('[data-testid=\"trust-bar\"]')) {
       gsap.fromTo(
         '.district-pill',
-        { opacity: 0, y: 20, scale: 0.95 },
+        { opacity: 0, y: 28, scale: 0.88, rotateX: 12, filter: 'blur(4px)' },
         {
           opacity: 1,
           y: 0,
           scale: 1,
-          duration: 0.7,
+          rotateX: 0,
+          filter: 'blur(0px)',
+          duration: 0.85,
           stagger: 0.08,
-          ease: 'power2.out',
+          ease: 'back.out(1.5)',
           scrollTrigger: {
             trigger: '[data-testid=\"trust-bar\"]',
             start: 'top 92%',
@@ -374,18 +388,34 @@ const Home = () => {
       </section>
 
       {/* Trust Bar - Districts */}
-      <section className="py-10 bg-section-alt" data-testid="trust-bar">
+      <section className="py-12 bg-section-alt" data-testid="trust-bar">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-6">
             <p className="text-xs tracking-[0.2em] uppercase font-bold" style={{ color: 'var(--accent-teal)' }}>
               Serving Communities Across
             </p>
+            <p className="text-xs mt-2" style={{ color: 'var(--text-muted)' }}>
+              Updated live from the admin location dashboard
+            </p>
           </div>
-          <div className="flex flex-wrap justify-center items-center gap-10">
-            {['Dharashiv', 'Solapur', 'Latur', 'Palghar', 'Panchgani'].map((district) => (
-              <div key={district} className="text-center district-pill">
-                <MapPin className="mx-auto mb-2" style={{ color: 'var(--accent-teal)' }} size={22} />
-                <span className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{district}</span>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            {visibleLocations.map((district, idx) => (
+              <div
+                key={district.id || district.name}
+                className="text-center district-pill card-elevated hover-lift rounded-xl p-4"
+                style={{
+                  background: idx % 2 === 0
+                    ? 'linear-gradient(145deg, rgba(31,111,109,0.09), rgba(255,255,255,0.95))'
+                    : 'linear-gradient(145deg, rgba(198,161,91,0.14), rgba(255,255,255,0.95))'
+                }}
+              >
+                <MapPin className="mx-auto mb-2" style={{ color: 'var(--accent-teal)' }} size={20} />
+                <span className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{district.name}</span>
+                {district.description && (
+                  <p className="text-[11px] mt-1 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                    {district.description}
+                  </p>
+                )}
               </div>
             ))}
           </div>
