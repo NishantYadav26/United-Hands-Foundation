@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Plus, Edit, Trash2, Upload, X, Loader2, Heart } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
@@ -18,6 +18,7 @@ const GalleryManagement = () => {
     display_priority: 0
   });
   const [uploading, setUploading] = useState(false);
+  const formRef = useRef(null);
 
   useEffect(() => {
     fetchImages();
@@ -122,6 +123,22 @@ const GalleryManagement = () => {
     setShowForm(false);
   };
 
+  const openEditForm = (image) => {
+    setEditingImage(image);
+    setFormData({
+      title: image.title,
+      description: image.description,
+      image_url: image.image_url,
+      category: image.category,
+      display_priority: image.display_priority
+    });
+    setShowForm(true);
+
+    requestAnimationFrame(() => {
+      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -146,7 +163,7 @@ const GalleryManagement = () => {
 
       {/* Form */}
       {showForm && (
-        <div className="glass-morph p-6 sm:p-8 rounded">
+        <div ref={formRef} className="glass-morph p-6 sm:p-8 rounded">
           <h4 className="text-xl font-medium mb-6" style={{fontFamily: 'Cormorant Garamond, serif'}}>
             {editingImage ? 'Edit' : 'Add'} Heartiest Moment
           </h4>
@@ -271,17 +288,7 @@ const GalleryManagement = () => {
 
                 <div className="flex gap-2">
                   <button 
-                    onClick={() => {
-                      setEditingImage(image); 
-                      setFormData({
-                        title: image.title,
-                        description: image.description,
-                        image_url: image.image_url,
-                        category: image.category,
-                        display_priority: image.display_priority
-                      });
-                      setShowForm(true);
-                    }} 
+                    onClick={() => openEditForm(image)} 
                     className="btn-primary flex-1 py-2 flex items-center justify-center gap-1 text-sm"
                   >
                     <Edit size={16} />
