@@ -39,7 +39,7 @@ const Navbar = () => {
 
   return (
     <nav
-      className="sticky top-0 left-0 right-0 z-50 transition-all duration-300 snake-navbar"
+      className="sticky top-0 left-0 right-0 z-50 transition-all duration-300"
       style={{
         background: 'rgba(236,230,219,0.95)',
         backdropFilter: 'blur(16px)',
@@ -49,12 +49,6 @@ const Navbar = () => {
       }}
       data-testid="main-navbar"
     >
-      <div className="snake-navbar-track" aria-hidden="true">
-        <span className="snake-body" />
-        <span className="snake-head" />
-        <span className="snake-spark snake-spark-one" />
-        <span className="snake-spark snake-spark-two" />
-      </div>
       <div
         className="max-w-7xl mx-auto px-4 sm:px-6 transition-all duration-300"
         style={{ paddingTop: '12px', paddingBottom: '12px' }}
