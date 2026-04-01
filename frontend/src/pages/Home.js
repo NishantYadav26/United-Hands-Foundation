@@ -522,9 +522,40 @@ const Home = () => {
                 </div>
               ))}
             </div>
-            <button type="button" className="gallery-mobile-view-all-btn" onClick={openMobileGalleryModal}>
+
+            <button
+              type="button"
+              className="gallery-mobile-view-all-btn"
+              onClick={openMobileGalleryModal}
+              aria-haspopup="dialog"
+              aria-controls="mobile-gallery-modal"
+            >
               View all photos
             </button>
+
+            <div
+              id="mobile-gallery-modal"
+              className={`gallery-mobile-modal ${isMobileGalleryModalOpen ? 'is-open' : ''}`}
+              role="dialog"
+              aria-modal="true"
+              aria-label="All gallery photos"
+            >
+              <button
+                type="button"
+                className="gallery-mobile-modal-close"
+                onClick={closeMobileGalleryModal}
+                aria-label="Close gallery"
+              >
+                ×
+              </button>
+              <div className="gallery-mobile-modal-content">
+                {galleryImages.map((image) => (
+                  <div key={`modal-${image.id}`} className="gallery-mobile-modal-item">
+                    <img src={image.image_url} alt={image.title} className="w-full h-auto object-cover identity-lock" />
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
       )}
