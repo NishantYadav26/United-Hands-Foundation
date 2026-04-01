@@ -83,34 +83,15 @@ const Home = () => {
     let isMounted = true;
 
     const fetchHomeData = async () => {
-      try {
-        const cached = sessionStorage.getItem(HOME_CACHE_KEY);
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          if (isMounted) {
-            if (parsed.stats) setStats(normalizeStats(parsed.stats));
-            if (parsed.siteAssets) setSiteAssets(parsed.siteAssets);
-            if (Array.isArray(parsed.locations)) setLocations(parsed.locations);
-            if (Array.isArray(parsed.pillars)) setPillars(parsed.pillars);
-            if (Array.isArray(parsed.successStories)) setSuccessStories(parsed.successStories);
-            if (Array.isArray(parsed.galleryImages)) setGalleryImages(parsed.galleryImages);
-            setIsLoading(false);
-          }
-        }
-      } catch (error) {
-        console.error('Failed to read home cache:', error);
-      }
-
       const criticalRequests = await Promise.allSettled([
-        axios.get(`${API}/stats`, { timeout: REQUEST_TIMEOUT_MS }),
-        axios.get(`${API}/site-assets`, { timeout: REQUEST_TIMEOUT_MS }),
-        axios.get(`${API}/locations`, { timeout: REQUEST_TIMEOUT_MS }),
-        axios.get(`${API}/pillars`, { timeout: REQUEST_TIMEOUT_MS })
+        axios.get(`${API}/stats`),
+        axios.get(`${API}/site-assets`),
+        axios.get(`${API}/locations`)
       ]);
 
       if (!isMounted) return;
 
-      const [statsRes, assetsRes, locationsRes, pillarsRes] = criticalRequests;
+      const [statsRes, assetsRes, locationsRes] = criticalRequests;
 
       if (statsRes.status === 'fulfilled') {
         setStats(normalizeStats(statsRes.value.data));
@@ -132,66 +113,9 @@ const Home = () => {
         console.error('Failed to fetch locations:', locationsRes.reason);
       }
 
-      if (pillarsRes.status === 'fulfilled') {
-        setPillars(ensureArray(pillarsRes.value.data));
-      } else {
-        console.error('Failed to fetch pillars:', pillarsRes.reason);
-      }
-
       if (isMounted) {
         setIsLoading(false);
       }
-
-      try {
-        if (statsRes.status === 'fulfilled' || assetsRes.status === 'fulfilled' || locationsRes.status === 'fulfilled' || pillarsRes.status === 'fulfilled') {
-          const previousCache = sessionStorage.getItem(HOME_CACHE_KEY);
-          const parsedCache = previousCache ? JSON.parse(previousCache) : {};
-          const nextCache = {
-            ...parsedCache,
-            stats: statsRes.status === 'fulfilled' ? statsRes.value.data : parsedCache.stats,
-            siteAssets: assetsRes.status === 'fulfilled'
-              ? (assetsRes.value.data.assets || []).reduce((acc, a) => ({ ...acc, [a.asset_key]: a.asset_url }), {})
-              : (parsedCache.siteAssets || {}),
-            locations: locationsRes.status === 'fulfilled' ? ensureArray(locationsRes.value.data) : (parsedCache.locations || []),
-            pillars: pillarsRes.status === 'fulfilled' ? ensureArray(pillarsRes.value.data) : (parsedCache.pillars || [])
-          };
-          sessionStorage.setItem(HOME_CACHE_KEY, JSON.stringify(nextCache));
-        }
-      } catch (error) {
-        console.error('Failed to write home cache:', error);
-      }
-
-      Promise.allSettled([
-        axios.get(`${API}/success-stories?limit=3`, { timeout: REQUEST_TIMEOUT_MS }),
-        axios.get(`${API}/gallery`, { timeout: REQUEST_TIMEOUT_MS })
-      ]).then((deferredRequests) => {
-        if (!isMounted) return;
-        const [storiesRes, galleryRes] = deferredRequests;
-
-        if (storiesRes.status === 'fulfilled') {
-          setSuccessStories(ensureArray(storiesRes.value.data));
-        } else {
-          console.error('Failed to fetch success stories:', storiesRes.reason);
-        }
-
-        if (galleryRes.status === 'fulfilled') {
-          setGalleryImages(ensureArray(galleryRes.value.data));
-        } else {
-          console.error('Failed to fetch gallery:', galleryRes.reason);
-        }
-
-        try {
-          const cached = sessionStorage.getItem(HOME_CACHE_KEY);
-          const parsed = cached ? JSON.parse(cached) : {};
-          sessionStorage.setItem(HOME_CACHE_KEY, JSON.stringify({
-            ...parsed,
-            successStories: storiesRes.status === 'fulfilled' ? ensureArray(storiesRes.value.data) : (parsed.successStories || []),
-            galleryImages: galleryRes.status === 'fulfilled' ? ensureArray(galleryRes.value.data) : (parsed.galleryImages || [])
-          }));
-        } catch (error) {
-          console.error('Failed to update deferred home cache:', error);
-        }
-      });
     };
 
     fetchHomeData();
@@ -759,9 +683,9 @@ const Home = () => {
             <h3 className="text-2xl font-bold text-center mb-10" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               Our <span className="text-gradient-blue">Partners</span>
             </h3>
-            {displayPartners.length > 0 ? (
+            {visiblePartners.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 partners-animated-grid">
-                {displayPartners.map((partner) => (
+                {visiblePartners.map((partner) => (
                   <div key={partner.id} className="card-elevated p-6 rounded-lg hover-lift text-center partner-card" data-testid={`partner-${partner.id}`}>
                     {partner.image_url && (
                       <div className="w-24 h-24 mx-auto mb-4 overflow-hidden rounded-full border blue-border">
