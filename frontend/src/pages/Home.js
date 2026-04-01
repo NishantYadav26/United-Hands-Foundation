@@ -113,23 +113,16 @@ const Home = () => {
 
     const handleEscape = (event) => {
       if (event.key === 'Escape') {
-        closeMobileGalleryModal();
+        setIsMobileGalleryModalOpen(false);
       }
     };
 
-    const handlePopState = () => {
-      setIsMobileGalleryModalOpen(false);
-    };
-
     document.body.style.overflow = 'hidden';
-    window.history.pushState({ mobileGalleryModal: true }, '', window.location.href);
     window.addEventListener('keydown', handleEscape);
-    window.addEventListener('popstate', handlePopState);
 
     return () => {
       document.body.style.overflow = '';
       window.removeEventListener('keydown', handleEscape);
-      window.removeEventListener('popstate', handlePopState);
     };
   }, [isMobileGalleryModalOpen]);
 
@@ -140,10 +133,6 @@ const Home = () => {
   };
 
   const closeMobileGalleryModal = () => {
-    if (window.history.state?.mobileGalleryModal) {
-      window.history.back();
-      return;
-    }
     setIsMobileGalleryModalOpen(false);
   };
 
@@ -558,23 +547,9 @@ const Home = () => {
               >
                 ×
               </button>
-              <button
-                type="button"
-                className="gallery-mobile-modal-back"
-                onClick={closeMobileGalleryModal}
-              >
-                Back to home
-              </button>
-              <div
-                className="gallery-mobile-modal-content"
-                onClick={(event) => {
-                  if (event.target === event.currentTarget) {
-                    closeMobileGalleryModal();
-                  }
-                }}
-              >
-                {galleryImages.map((image, index) => (
-                  <div key={`modal-${image.id || index}`} className="gallery-mobile-modal-item">
+              <div className="gallery-mobile-modal-content">
+                {galleryImages.map((image) => (
+                  <div key={`modal-${image.id}`} className="gallery-mobile-modal-item">
                     <img src={image.image_url} alt={image.title} className="w-full h-auto object-cover identity-lock" />
                   </div>
                 ))}
