@@ -32,7 +32,6 @@ const HOME_CACHE_KEY = 'uhf_home_cache_v1';
 const REQUEST_TIMEOUT_MS = 4500;
 
 const Home = () => {
-  const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({
     patients_served: 0,
     districts_covered: 0,
@@ -83,15 +82,17 @@ const Home = () => {
     let isMounted = true;
 
     const fetchHomeData = async () => {
+      // Keep pillars in critical requests so Team/Partner sections render reliably on first paint.
       const criticalRequests = await Promise.allSettled([
         axios.get(`${API}/stats`),
         axios.get(`${API}/site-assets`),
-        axios.get(`${API}/locations`)
+        axios.get(`${API}/locations`),
+        axios.get(`${API}/pillars`)
       ]);
 
       if (!isMounted) return;
 
-      const [statsRes, assetsRes, locationsRes] = criticalRequests;
+      const [statsRes, assetsRes, locationsRes, pillarsRes] = criticalRequests;
 
       if (statsRes.status === 'fulfilled') {
         setStats(normalizeStats(statsRes.value.data));
@@ -113,9 +114,31 @@ const Home = () => {
         console.error('Failed to fetch locations:', locationsRes.reason);
       }
 
-      if (isMounted) {
-        setIsLoading(false);
+      if (pillarsRes.status === 'fulfilled') {
+        setPillars(ensureArray(pillarsRes.value.data));
+      } else {
+        console.error('Failed to fetch pillars:', pillarsRes.reason);
       }
+
+      Promise.allSettled([
+        axios.get(`${API}/success-stories?limit=3`),
+        axios.get(`${API}/gallery`)
+      ]).then((deferredRequests) => {
+        if (!isMounted) return;
+        const [storiesRes, galleryRes] = deferredRequests;
+
+        if (storiesRes.status === 'fulfilled') {
+          setSuccessStories(ensureArray(storiesRes.value.data));
+        } else {
+          console.error('Failed to fetch success stories:', storiesRes.reason);
+        }
+
+        if (galleryRes.status === 'fulfilled') {
+          setGalleryImages(ensureArray(galleryRes.value.data));
+        } else {
+          console.error('Failed to fetch gallery:', galleryRes.reason);
+        }
+      });
     };
 
     fetchHomeData();
@@ -348,19 +371,12 @@ const Home = () => {
     };
   }, [stats]);
 
-  const displayPartners = partners.length > 0
+  const partnerCards = partners.length > 0
     ? partners
     : pillars.filter((pillar) => pillar.image_url).slice(0, 3);
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-deep)' }}>
-      {isLoading && (
-        <div
-          className="fixed top-0 left-0 right-0 z-[70] h-1 transition-opacity duration-300"
-          style={{ background: 'linear-gradient(90deg, var(--accent-teal), var(--accent-gold))' }}
-          data-testid="home-loading-overlay"
-        />
-      )}
       <Navbar />
 
       {/* Hero Section - keeps dark overlay for image visibility */}
@@ -683,9 +699,9 @@ const Home = () => {
             <h3 className="text-2xl font-bold text-center mb-10" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               Our <span className="text-gradient-blue">Partners</span>
             </h3>
-            {visiblePartners.length > 0 ? (
+            {partnerCards.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 partners-animated-grid">
-                {visiblePartners.map((partner) => (
+                {partnerCards.map((partner) => (
                   <div key={partner.id} className="card-elevated p-6 rounded-lg hover-lift text-center partner-card" data-testid={`partner-${partner.id}`}>
                     {partner.image_url && (
                       <div className="w-24 h-24 mx-auto mb-4 overflow-hidden rounded-full border blue-border">
