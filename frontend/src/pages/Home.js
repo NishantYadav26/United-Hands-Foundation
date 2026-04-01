@@ -138,13 +138,16 @@ const Home = () => {
 
       try {
         if (statsRes.status === 'fulfilled' || assetsRes.status === 'fulfilled' || locationsRes.status === 'fulfilled' || pillarsRes.status === 'fulfilled') {
+          const previousCache = sessionStorage.getItem(HOME_CACHE_KEY);
+          const parsedCache = previousCache ? JSON.parse(previousCache) : {};
           const nextCache = {
-            stats: statsRes.status === 'fulfilled' ? statsRes.value.data : stats,
+            ...parsedCache,
+            stats: statsRes.status === 'fulfilled' ? statsRes.value.data : parsedCache.stats,
             siteAssets: assetsRes.status === 'fulfilled'
               ? (assetsRes.value.data.assets || []).reduce((acc, a) => ({ ...acc, [a.asset_key]: a.asset_url }), {})
-              : siteAssets,
-            locations: locationsRes.status === 'fulfilled' ? ensureArray(locationsRes.value.data) : locations,
-            pillars: pillarsRes.status === 'fulfilled' ? ensureArray(pillarsRes.value.data) : pillars
+              : (parsedCache.siteAssets || {}),
+            locations: locationsRes.status === 'fulfilled' ? ensureArray(locationsRes.value.data) : (parsedCache.locations || []),
+            pillars: pillarsRes.status === 'fulfilled' ? ensureArray(pillarsRes.value.data) : (parsedCache.pillars || [])
           };
           sessionStorage.setItem(HOME_CACHE_KEY, JSON.stringify(nextCache));
         }
