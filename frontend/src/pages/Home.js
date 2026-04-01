@@ -26,6 +26,7 @@ const Home = () => {
   });
   const [successStories, setSuccessStories] = useState([]);
   const [galleryImages, setGalleryImages] = useState([]);
+  const [isMobileGalleryModalOpen, setIsMobileGalleryModalOpen] = useState(false);
   const [siteAssets, setSiteAssets] = useState({});
   const [pillars, setPillars] = useState([]);
   const [locations, setLocations] = useState([]);
@@ -106,6 +107,34 @@ const Home = () => {
       isMounted = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (!isMobileGalleryModalOpen) return undefined;
+
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        setIsMobileGalleryModalOpen(false);
+      }
+    };
+
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleEscape);
+    };
+  }, [isMobileGalleryModalOpen]);
+
+  const openMobileGalleryModal = () => {
+    if (window.matchMedia('(max-width: 768px)').matches) {
+      setIsMobileGalleryModalOpen(true);
+    }
+  };
+
+  const closeMobileGalleryModal = () => {
+    setIsMobileGalleryModalOpen(false);
+  };
 
   useEffect(() => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -465,11 +494,11 @@ const Home = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 gallery-animated-grid">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 gallery-animated-grid gallery-mobile-scroll">
               {galleryImages.map((image, index) => (
                 <div
                   key={image.id}
-                  className="rounded-lg overflow-hidden hover-lift card-elevated gallery-card"
+                  className="rounded-lg overflow-hidden hover-lift card-elevated gallery-card gallery-mobile-item"
                   style={{ animationDelay: `${index * 0.1}s` }}
                   data-testid={`gallery-image-${image.id}`}
                 >
@@ -491,6 +520,40 @@ const Home = () => {
                   </div>
                 </div>
               ))}
+            </div>
+
+            <button
+              type="button"
+              className="gallery-mobile-view-all-btn"
+              onClick={openMobileGalleryModal}
+              aria-haspopup="dialog"
+              aria-controls="mobile-gallery-modal"
+            >
+              View all photos
+            </button>
+
+            <div
+              id="mobile-gallery-modal"
+              className={`gallery-mobile-modal ${isMobileGalleryModalOpen ? 'is-open' : ''}`}
+              role="dialog"
+              aria-modal="true"
+              aria-label="All gallery photos"
+            >
+              <button
+                type="button"
+                className="gallery-mobile-modal-close"
+                onClick={closeMobileGalleryModal}
+                aria-label="Close gallery"
+              >
+                ×
+              </button>
+              <div className="gallery-mobile-modal-content">
+                {galleryImages.map((image) => (
+                  <div key={`modal-${image.id}`} className="gallery-mobile-modal-item">
+                    <img src={image.image_url} alt={image.title} className="w-full h-auto object-cover identity-lock" />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
