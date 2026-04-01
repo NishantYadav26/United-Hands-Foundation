@@ -80,6 +80,7 @@ const Home = () => {
     let isMounted = true;
 
     const fetchHomeData = async () => {
+      // Keep pillars in critical requests so Team/Partner sections render reliably on first paint.
       const criticalRequests = await Promise.allSettled([
         axios.get(`${API}/stats`),
         axios.get(`${API}/site-assets`),
