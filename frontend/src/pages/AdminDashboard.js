@@ -17,6 +17,7 @@ import {
   XCircle
 } from 'lucide-react';
 import Footer from '@/components/Footer';
+import usePageRevealAnimation from '@/hooks/usePageRevealAnimation';
 import Navbar from '@/components/Navbar';
 import MediaLibrary from '@/components/MediaLibrary';
 import TeamPillars from '@/components/TeamPillars';
@@ -39,6 +40,8 @@ const AdminDashboard = () => {
   const [settings, setSettings] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('donations');
+
+  usePageRevealAnimation([activeTab, donations.length, loading]);
 
   useEffect(() => {
     fetchDonations();
@@ -141,7 +144,7 @@ const AdminDashboard = () => {
 
       <div className="pt-32 pb-24 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-12 gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-12 gap-4 reveal-section">
             <h1 
               className="text-4xl sm:text-5xl lg:text-6xl font-medium tracking-tight"
               style={{fontFamily: 'Cormorant Garamond, serif'}}
@@ -160,8 +163,8 @@ const AdminDashboard = () => {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <div className="glass-morph p-8 rounded" data-testid="stat-card-pending">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 reveal-section">
+            <div className="glass-morph p-8 rounded reveal-section" data-testid="stat-card-pending">
               <Users className="mb-4" style={{color: 'var(--accent-warm)'}} size={32} />
               <div className="text-4xl font-medium mb-2" style={{fontFamily: 'Cormorant Garamond, serif'}}>
                 {pendingDonations.length}
@@ -169,7 +172,7 @@ const AdminDashboard = () => {
               <p className="text-sm" style={{color: 'var(--text-muted)'}}>Pending Approvals</p>
             </div>
 
-            <div className="glass-morph p-8 rounded" data-testid="stat-card-approved">
+            <div className="glass-morph p-8 rounded reveal-section" data-testid="stat-card-approved">
               <CheckCircle className="mb-4" style={{color: 'var(--accent-teal)'}} size={32} />
               <div className="text-4xl font-medium mb-2" style={{fontFamily: 'Cormorant Garamond, serif'}}>
                 {approvedDonations.length}
@@ -177,7 +180,7 @@ const AdminDashboard = () => {
               <p className="text-sm" style={{color: 'var(--text-muted)'}}>Approved Donations</p>
             </div>
 
-            <div className="glass-morph p-8 rounded" data-testid="stat-card-total">
+            <div className="glass-morph p-8 rounded reveal-section" data-testid="stat-card-total">
               <DollarSign className="mb-4" style={{color: 'var(--accent-gold)'}} size={32} />
               <div className="text-4xl font-medium mb-2" style={{fontFamily: 'Cormorant Garamond, serif'}}>
                 ₹{approvedDonations.reduce((sum, d) => sum + d.amount, 0).toLocaleString()}
@@ -187,7 +190,7 @@ const AdminDashboard = () => {
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-2 sm:gap-4 mb-8 border-b blue-border overflow-x-auto pb-0">
+          <div className="flex gap-2 sm:gap-4 mb-8 border-b blue-border overflow-x-auto pb-0 reveal-section">
             <button
               onClick={() => setActiveTab('donations')}
               className={`pb-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold tracking-[0.1em] uppercase transition-colors whitespace-nowrap ${
@@ -291,7 +294,7 @@ const AdminDashboard = () => {
 
           {/* Content */}
           {activeTab === 'donations' && (
-            <div className="glass-morph p-8 rounded" data-testid="donations-list">
+            <div className="glass-morph p-8 rounded reveal-section" data-testid="donations-list">
               {loading ? (
                 <div className="text-center py-12">
                   <Loader2 className="animate-spin mx-auto mb-4" style={{color: 'var(--accent-warm)'}} size={48} />
@@ -368,7 +371,7 @@ const AdminDashboard = () => {
           {activeTab === 'gallery' && <GalleryManagement />}
 
           {activeTab === 'settings' && settings && (
-            <div className="glass-morph p-8 rounded" data-testid="settings-panel">
+            <div className="glass-morph p-8 rounded reveal-section" data-testid="settings-panel">
               <h2 
                 className="text-3xl font-medium mb-8"
                 style={{fontFamily: 'Cormorant Garamond, serif'}}
