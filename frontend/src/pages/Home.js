@@ -75,35 +75,20 @@ const Home = () => {
     let isMounted = true;
 
     const fetchHomeData = async () => {
-      const requests = await Promise.allSettled([
+      const criticalRequests = await Promise.allSettled([
         axios.get(`${API}/stats`),
-        axios.get(`${API}/success-stories?limit=3`),
-        axios.get(`${API}/gallery`),
         axios.get(`${API}/site-assets`),
-        axios.get(`${API}/pillars`),
         axios.get(`${API}/locations`)
       ]);
 
       if (!isMounted) return;
 
-      const [statsRes, storiesRes, galleryRes, assetsRes, pillarsRes, locationsRes] = requests;
+      const [statsRes, assetsRes, locationsRes] = criticalRequests;
 
       if (statsRes.status === 'fulfilled') {
         setStats(normalizeStats(statsRes.value.data));
       } else {
         console.error('Failed to fetch stats:', statsRes.reason);
-      }
-
-      if (storiesRes.status === 'fulfilled') {
-        setSuccessStories(ensureArray(storiesRes.value.data));
-      } else {
-        console.error('Failed to fetch success stories:', storiesRes.reason);
-      }
-
-      if (galleryRes.status === 'fulfilled') {
-        setGalleryImages(ensureArray(galleryRes.value.data));
-      } else {
-        console.error('Failed to fetch gallery:', galleryRes.reason);
       }
 
       if (assetsRes.status === 'fulfilled') {
@@ -114,21 +99,42 @@ const Home = () => {
         console.error('Failed to fetch site assets:', assetsRes.reason);
       }
 
-      if (pillarsRes.status === 'fulfilled') {
-        setPillars(ensureArray(pillarsRes.value.data));
-      } else {
-        console.error('Failed to fetch pillars:', pillarsRes.reason);
-      }
-
       if (locationsRes.status === 'fulfilled') {
         setLocations(ensureArray(locationsRes.value.data));
       } else {
         console.error('Failed to fetch locations:', locationsRes.reason);
       }
 
-      setTimeout(() => {
-        if (isMounted) setIsLoading(false);
-      }, 250);
+      if (isMounted) {
+        setIsLoading(false);
+      }
+
+      Promise.allSettled([
+        axios.get(`${API}/success-stories?limit=3`),
+        axios.get(`${API}/gallery`),
+        axios.get(`${API}/pillars`)
+      ]).then((deferredRequests) => {
+        if (!isMounted) return;
+        const [storiesRes, galleryRes, pillarsRes] = deferredRequests;
+
+        if (storiesRes.status === 'fulfilled') {
+          setSuccessStories(ensureArray(storiesRes.value.data));
+        } else {
+          console.error('Failed to fetch success stories:', storiesRes.reason);
+        }
+
+        if (galleryRes.status === 'fulfilled') {
+          setGalleryImages(ensureArray(galleryRes.value.data));
+        } else {
+          console.error('Failed to fetch gallery:', galleryRes.reason);
+        }
+
+        if (pillarsRes.status === 'fulfilled') {
+          setPillars(ensureArray(pillarsRes.value.data));
+        } else {
+          console.error('Failed to fetch pillars:', pillarsRes.reason);
+        }
+      });
     };
 
     fetchHomeData();
@@ -365,18 +371,10 @@ const Home = () => {
     <div className="min-h-screen" style={{ background: 'var(--bg-deep)' }}>
       {isLoading && (
         <div
-          className="fixed inset-0 z-[70] flex items-center justify-center transition-opacity duration-300"
-          style={{ background: 'rgba(246,243,237,0.94)', backdropFilter: 'blur(4px)' }}
+          className="fixed top-0 left-0 right-0 z-[70] h-1 transition-opacity duration-300"
+          style={{ background: 'linear-gradient(90deg, var(--accent-teal), var(--accent-gold))' }}
           data-testid="home-loading-overlay"
-        >
-          <div className="flex flex-col items-center gap-3">
-            <div
-              className="w-10 h-10 rounded-full border-4 border-t-transparent animate-spin"
-              style={{ borderColor: 'var(--accent-teal)', borderTopColor: 'transparent' }}
-            />
-            <p className="text-sm tracking-wide" style={{ color: 'var(--text-muted)' }}>Loading United Hands Foundation...</p>
-          </div>
-        </div>
+        />
       )}
       <Navbar />
 
@@ -509,6 +507,8 @@ const Home = () => {
                       src={image.image_url}
                       alt={image.title}
                       className="w-full h-full object-cover identity-lock transition-transform duration-500 hover:scale-105"
+                      loading={index < 3 ? 'eager' : 'lazy'}
+                      decoding="async"
                     />
                   </div>
                   <div className="p-5">
@@ -540,7 +540,7 @@ const Home = () => {
           <div className="gallery-mobile-modal-content">
             {galleryImages.map((image, index) => (
               <div key={`mobile-modal-image-${image.id || index}`} className="gallery-mobile-modal-item">
-                <img src={image.image_url} alt={image.title} className="w-full h-auto object-cover identity-lock" />
+                <img src={image.image_url} alt={image.title} className="w-full h-auto object-cover identity-lock" loading="lazy" decoding="async" />
               </div>
             ))}
           </div>
@@ -644,6 +644,8 @@ const Home = () => {
                     src={siteAssets.founder_1}
                     alt="Dr. Rahul Sarwade"
                     className="w-full h-96 object-cover identity-lock"
+                    loading="eager"
+                    decoding="async"
                   />
                 </div>
                 <h3 className="text-2xl font-medium mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>Dr. Rahul Sarwade</h3>
@@ -659,6 +661,8 @@ const Home = () => {
                     src={siteAssets.founder_2}
                     alt="Dr. Jagruti Hankare"
                     className="w-full h-96 object-cover identity-lock"
+                    loading="eager"
+                    decoding="async"
                   />
                 </div>
                 <h3 className="text-2xl font-medium mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>Dr. Jagruti Hankare</h3>
@@ -679,7 +683,7 @@ const Home = () => {
 
                   <div key={pillar.id} className="card-elevated p-6 rounded-lg hover-lift text-center pillar-card" data-testid={`pillar-${pillar.id}`}>
                     {pillar.image_url && (
-                      <img src={pillar.image_url} alt={pillar.name} className="w-24 h-24 rounded-full mx-auto mb-4 object-cover identity-lock" />
+                      <img src={pillar.image_url} alt={pillar.name} className="w-24 h-24 rounded-full mx-auto mb-4 object-cover identity-lock" loading="lazy" decoding="async" />
                     )}
                     <h4 className="text-lg font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{pillar.name}</h4>
                     <p className="text-xs tracking-[0.15em] uppercase font-bold mb-2" style={{ color: 'var(--accent-teal)' }}>{pillar.role}</p>
@@ -704,6 +708,8 @@ const Home = () => {
                           src={partner.image_url}
                           alt={partner.name}
                           className="w-full h-full object-cover identity-lock"
+                          loading="lazy"
+                          decoding="async"
                         />
                       </div>
                     )}
