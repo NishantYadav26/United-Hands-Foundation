@@ -348,6 +348,10 @@ const Home = () => {
     };
   }, [stats]);
 
+  const displayPartners = partners.length > 0
+    ? partners
+    : pillars.filter((pillar) => pillar.image_url).slice(0, 3);
+
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-deep)' }}>
       {isLoading && (
