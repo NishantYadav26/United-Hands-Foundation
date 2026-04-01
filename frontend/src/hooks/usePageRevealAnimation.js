@@ -23,7 +23,8 @@ const usePageRevealAnimation = (rerunKey = 0) => {
         scrollTrigger: {
           trigger: section,
           start: 'top 88%',
-          toggleActions: 'play none none reverse'
+          toggleActions: 'restart none none reset',
+          invalidateOnRefresh: true
         }
       }
     ));
