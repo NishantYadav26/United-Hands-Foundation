@@ -17,6 +17,7 @@ const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKE
 const API = `${BACKEND_URL}/api`;
 
 const Home = () => {
+  const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({
     patients_served: 0,
     districts_covered: 0,
@@ -40,77 +41,84 @@ const Home = () => {
 
 
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const response = await axios.get(`${API}/stats`);
-        setStats(response.data);
-      } catch (error) {
-        console.error('Failed to fetch stats:', error);
+    let isMounted = true;
+
+    const fetchHomeData = async () => {
+      const requests = await Promise.allSettled([
+        axios.get(`${API}/stats`),
+        axios.get(`${API}/success-stories?limit=3`),
+        axios.get(`${API}/gallery`),
+        axios.get(`${API}/site-assets`),
+        axios.get(`${API}/pillars`),
+        axios.get(`${API}/locations`)
+      ]);
+
+      if (!isMounted) return;
+
+      const [statsRes, storiesRes, galleryRes, assetsRes, pillarsRes, locationsRes] = requests;
+
+      if (statsRes.status === 'fulfilled') {
+        setStats(statsRes.value.data);
+      } else {
+        console.error('Failed to fetch stats:', statsRes.reason);
       }
-    };
 
-    const fetchStories = async () => {
-      try {
-        const response = await axios.get(`${API}/success-stories?limit=3`);
-        setSuccessStories(ensureArray(response.data));
-      } catch (error) {
-        console.error('Failed to fetch success stories:', error);
-
+      if (storiesRes.status === 'fulfilled') {
+        setSuccessStories(ensureArray(storiesRes.value.data));
+      } else {
+        console.error('Failed to fetch success stories:', storiesRes.reason);
       }
-    };
 
-    const fetchGallery = async () => {
-      try {
-        const response = await axios.get(`${API}/gallery`);
-        setGalleryImages(ensureArray(response.data));
-      } catch (error) {
-        console.error('Failed to fetch gallery:', error);
-
+      if (galleryRes.status === 'fulfilled') {
+        setGalleryImages(ensureArray(galleryRes.value.data));
+      } else {
+        console.error('Failed to fetch gallery:', galleryRes.reason);
       }
-    };
 
-    const fetchSiteAssets = async () => {
-      try {
-        const response = await axios.get(`${API}/site-assets`);
+      if (assetsRes.status === 'fulfilled') {
         const assetsMap = {};
-        (response.data.assets || []).forEach(a => { assetsMap[a.asset_key] = a.asset_url; });
+        (assetsRes.value.data.assets || []).forEach((a) => { assetsMap[a.asset_key] = a.asset_url; });
         setSiteAssets(assetsMap);
-      } catch (error) {
-        console.error('Failed to fetch site assets:', error);
+      } else {
+        console.error('Failed to fetch site assets:', assetsRes.reason);
       }
+
+      if (pillarsRes.status === 'fulfilled') {
+        setPillars(ensureArray(pillarsRes.value.data));
+      } else {
+        console.error('Failed to fetch pillars:', pillarsRes.reason);
+      }
+
+      if (locationsRes.status === 'fulfilled') {
+        setLocations(ensureArray(locationsRes.value.data));
+      } else {
+        console.error('Failed to fetch locations:', locationsRes.reason);
+      }
+
+      setTimeout(() => {
+        if (isMounted) setIsLoading(false);
+      }, 250);
     };
 
-    const fetchPillars = async () => {
-      try {
-        const response = await axios.get(`${API}/pillars`);
-        setPillars(ensureArray(response.data));
-      } catch (error) {
-        console.error('Failed to fetch pillars:', error);
+    fetchHomeData();
 
-      }
+    return () => {
+      isMounted = false;
     };
-    const fetchLocations = async () => {
-      try {
-        const response = await axios.get(`${API}/locations`);
-        setLocations(ensureArray(response.data));
-      } catch (error) {
-        console.error('Failed to fetch locations:', error);
-      }
-    };
-
-    fetchStats();
-    fetchStories();
-    fetchGallery();
-    fetchSiteAssets();
-    fetchPillars();
-    fetchLocations();
   }, []);
 
   useEffect(() => {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isSmallScreen = window.matchMedia('(max-width: 768px)').matches;
+    if (reducedMotion) return;
+
+    const yOffset = isSmallScreen ? 24 : 36;
+    const heroYOffset = isSmallScreen ? 28 : 50;
+
     gsap.fromTo(
       heroRef.current,
-      { opacity: 0, y: 50 },
-      { opacity: 1, y: 0, duration: 1.2, ease: 'power3.out' }
+      { opacity: 0, y: heroYOffset },
+      { opacity: 1, y: 0, duration: isSmallScreen ? 0.8 : 1.1, ease: 'power2.out' }
     );
 
     if (statsRef.current && stats.patients_served > 0) {
@@ -141,11 +149,11 @@ const Home = () => {
     gsap.utils.toArray('.reveal-section').forEach((section) => {
       gsap.fromTo(
         section,
-        { opacity: 0, y: 36 },
+        { opacity: 0, y: yOffset },
         {
           opacity: 1,
           y: 0,
-          duration: 1.05,
+          duration: isSmallScreen ? 0.7 : 0.95,
           ease: 'power2.out',
           scrollTrigger: {
             trigger: section,
@@ -159,12 +167,12 @@ const Home = () => {
     if (gsap.utils.toArray('.pillar-card').length && document.querySelector('.pillars-animated-grid')) {
       gsap.fromTo(
         '.pillar-card',
-        { opacity: 0, x: (i) => (i % 2 === 0 ? -90 : 90), rotateY: (i) => (i % 2 === 0 ? -12 : 12) },
+        { opacity: 0, x: (i) => (i % 2 === 0 ? -70 : 70), rotateY: (i) => (i % 2 === 0 ? -8 : 8) },
         {
           opacity: 1,
           x: 0,
           rotateY: 0,
-          duration: 0.95,
+          duration: 0.8,
           stagger: 0.12,
           ease: 'power3.out',
           scrollTrigger: {
@@ -179,12 +187,12 @@ const Home = () => {
     if (gsap.utils.toArray('.partner-card').length && document.querySelector('.partners-animated-grid')) {
       gsap.fromTo(
         '.partner-card',
-        { opacity: 0, x: (i) => (i % 2 === 0 ? 80 : -80), y: 20 },
+        { opacity: 0, x: (i) => (i % 2 === 0 ? 60 : -60), y: 16 },
         {
           opacity: 1,
           x: 0,
           y: 0,
-          duration: 0.9,
+          duration: 0.75,
           stagger: 0.1,
           ease: 'power2.out',
           scrollTrigger: {
@@ -324,6 +332,21 @@ const Home = () => {
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-deep)' }}>
+      {isLoading && (
+        <div
+          className="fixed inset-0 z-[70] flex items-center justify-center transition-opacity duration-300"
+          style={{ background: 'rgba(246,243,237,0.94)', backdropFilter: 'blur(4px)' }}
+          data-testid="home-loading-overlay"
+        >
+          <div className="flex flex-col items-center gap-3">
+            <div
+              className="w-10 h-10 rounded-full border-4 border-t-transparent animate-spin"
+              style={{ borderColor: 'var(--accent-teal)', borderTopColor: 'transparent' }}
+            />
+            <p className="text-sm tracking-wide" style={{ color: 'var(--text-muted)' }}>Loading United Hands Foundation...</p>
+          </div>
+        </div>
+      )}
       <Navbar />
 
       {/* Hero Section - keeps dark overlay for image visibility */}
