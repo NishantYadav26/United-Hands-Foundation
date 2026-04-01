@@ -1143,7 +1143,7 @@ async def get_locations():
     return locations
 
 @api_router.post("/locations", response_model=WorkLocation)
-async def create_location(location: WorkLocationCreate):
+async def create_location(location: WorkLocationCreate, admin_email: str = Depends(verify_token)):
     """Create a new work location"""
     location_obj = WorkLocation(**location.model_dump())
     doc = location_obj.model_dump()
@@ -1153,7 +1153,7 @@ async def create_location(location: WorkLocationCreate):
     return location_obj
 
 @api_router.put("/locations/{location_id}")
-async def update_location(location_id: str, location: WorkLocationCreate):
+async def update_location(location_id: str, location: WorkLocationCreate, admin_email: str = Depends(verify_token)):
     """Update a work location"""
     result = await db.locations.update_one(
         {"id": location_id},
@@ -1164,7 +1164,7 @@ async def update_location(location_id: str, location: WorkLocationCreate):
     return {"status": "success", "message": "Location updated"}
 
 @api_router.delete("/locations/{location_id}")
-async def delete_location(location_id: str):
+async def delete_location(location_id: str, admin_email: str = Depends(verify_token)):
     """Delete a work location"""
     result = await db.locations.delete_one({"id": location_id})
     if result.deleted_count == 0:

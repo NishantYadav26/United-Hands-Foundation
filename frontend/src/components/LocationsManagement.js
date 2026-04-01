@@ -24,15 +24,6 @@ const LocationsManagement = () => {
     }
   };
 
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem('uhf_admin_token') || localStorage.getItem('uhf_user_token');
-    if (!token) {
-      toast.error('Session expired. Please login again as admin.');
-      return null;
-    }
-    return { Authorization: `Bearer ${token}` };
-  };
-
   useEffect(() => {
     fetchLocations();
   }, []);
@@ -50,21 +41,15 @@ const LocationsManagement = () => {
     }
 
     try {
-      const headers = getAuthHeaders();
-      if (!headers) return;
-      const payload = {
-        name: formData.name.trim(),
-        description: formData.description.trim(),
-        display_priority: Number(formData.display_priority) || 0
-      };
+      const token = localStorage.getItem('uhf_admin_token');
       if (editingLocation) {
-        await axios.put(`${API}/locations/${editingLocation.id}`, payload, {
-          headers
+        await axios.put(`${API}/locations/${editingLocation.id}`, formData, {
+          headers: { Authorization: `Bearer ${token}` }
         });
         toast.success('Location updated');
       } else {
-        await axios.post(`${API}/locations`, payload, {
-          headers
+        await axios.post(`${API}/locations`, formData, {
+          headers: { Authorization: `Bearer ${token}` }
         });
         toast.success('Location created');
       }
@@ -73,7 +58,7 @@ const LocationsManagement = () => {
       fetchLocations();
     } catch (error) {
       console.error('Failed to save location:', error);
-      const msg = error.response?.data?.detail || error.message || 'Failed to save location';
+      const msg = error.response?.data?.detail || 'Failed to save location';
       toast.error(msg);
     }
   };
@@ -82,10 +67,9 @@ const LocationsManagement = () => {
     if (!window.confirm(`Delete ${location.name}? This cannot be undone.`)) return;
 
     try {
-      const headers = getAuthHeaders();
-      if (!headers) return;
+      const token = localStorage.getItem('uhf_admin_token');
       await axios.delete(`${API}/locations/${location.id}`, {
-        headers
+        headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Location deleted');
       fetchLocations();
