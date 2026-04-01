@@ -1,17 +1,16 @@
-import { Suspense, lazy, useEffect } from "react";
+import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Home from "@/pages/Home";
+import Donate from "@/pages/Donate";
+import AdminDashboard from "@/pages/AdminDashboard";
+import PressMedia from "@/pages/PressMedia";
+import Transparency from "@/pages/Transparency";
+import AboutUs from "@/pages/AboutUs";
+import TrackMyImpact from "@/pages/TrackMyImpact";
+import UserAuth from "@/pages/UserAuth";
 import "@/App.css";
-
-const Home = lazy(() => import("@/pages/Home"));
-const Donate = lazy(() => import("@/pages/Donate"));
-const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
-const PressMedia = lazy(() => import("@/pages/PressMedia"));
-const Transparency = lazy(() => import("@/pages/Transparency"));
-const AboutUs = lazy(() => import("@/pages/AboutUs"));
-const TrackMyImpact = lazy(() => import("@/pages/TrackMyImpact"));
-const UserAuth = lazy(() => import("@/pages/UserAuth"));
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('uhf_admin_token');
@@ -76,15 +75,7 @@ function App() {
   return (
     <div className="App">
       <BrowserRouter>
-        <Suspense
-          fallback={(
-            <div className="min-h-screen flex items-center justify-center text-sm" style={{ color: "var(--text-muted)" }}>
-              Loading page...
-            </div>
-          )}
-        >
-          <AppRoutes />
-        </Suspense>
+        <AppRoutes />
       </BrowserRouter>
     </div>
   );
