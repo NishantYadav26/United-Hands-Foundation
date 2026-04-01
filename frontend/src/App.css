@@ -258,6 +258,11 @@ input:focus, select:focus, textarea:focus {
   will-change: transform, opacity;
 }
 
+.gallery-mobile-view-all-btn,
+.gallery-mobile-modal {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .btn-primary,
   .btn-orange,
