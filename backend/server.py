@@ -753,20 +753,35 @@ async def get_donations(status: Optional[str] = None):
 
 @api_router.post("/donations/approve")
 async def approve_donation(approval: DonationApproval, admin_email: str = Depends(verify_token)):
+    if approval.status not in {"pending", "approved", "rejected"}:
+        raise HTTPException(status_code=400, detail="Invalid status")
+
     donation = await db.donations.find_one({"id": approval.donation_id}, {"_id": 0})
     
     if not donation:
         raise HTTPException(status_code=404, detail="Donation not found")
+
+    current_status = donation.get("status", "pending")
+    target_status = approval.status
+
+    if current_status == target_status:
+        return {"status": "success", "message": f"Donation already {target_status}"}
+
+    if donation.get('project_id') and current_status == "approved" and target_status != "approved":
+        await db.projects.update_one(
+            {"id": donation['project_id']},
+            {"$inc": {"raised_amount": -donation['amount']}}
+        )
     
-    if approval.status == "approved":
-        receipt_number = await generate_receipt_number()
+    if target_status == "approved":
+        receipt_number = donation.get("receipt_number") or await generate_receipt_number()
         
         await db.donations.update_one(
             {"id": approval.donation_id},
             {"$set": {"status": "approved", "receipt_number": receipt_number}}
         )
         
-        if donation.get('project_id'):
+        if donation.get('project_id') and current_status != "approved":
             await db.projects.update_one(
                 {"id": donation['project_id']},
                 {"$inc": {"raised_amount": donation['amount']}}
@@ -794,11 +809,15 @@ async def approve_donation(approval: DonationApproval, admin_email: str = Depend
                 "receipt_number": receipt_number
             }
     else:
+        update_fields = {"status": target_status}
+        if target_status == "pending":
+            update_fields["receipt_number"] = None
+
         await db.donations.update_one(
             {"id": approval.donation_id},
-            {"$set": {"status": "rejected"}}
+            {"$set": update_fields}
         )
-        return {"status": "success", "message": "Donation rejected"}
+        return {"status": "success", "message": f"Donation marked as {target_status}"}
 
 @api_router.get("/donations/{donation_id}/receipt")
 async def download_receipt(donation_id: str):
