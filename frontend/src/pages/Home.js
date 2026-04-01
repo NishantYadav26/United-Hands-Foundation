@@ -14,6 +14,18 @@ gsap.registerPlugin(ScrollTrigger);
 // Add this helper to prevent .map crashes
 const ensureArray = (data) => (Array.isArray(data) ? data : []);
 
+const toNumber = (value) => {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : 0;
+};
+
+const normalizeStats = (data) => ({
+  patients_served: toNumber(data?.patients_served),
+  districts_covered: toNumber(data?.districts_covered),
+  total_donations: toNumber(data?.total_donations),
+  total_amount: toNumber(data?.total_amount)
+});
+
 const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
 const API = `${BACKEND_URL}/api`;
 
@@ -30,6 +42,7 @@ const Home = () => {
   const [siteAssets, setSiteAssets] = useState({});
   const [pillars, setPillars] = useState([]);
   const [locations, setLocations] = useState([]);
+  const [isMobileGalleryModalOpen, setIsMobileGalleryModalOpen] = useState(false);
   const normalizeCategory = (category) => (category || '').toString().trim().toLowerCase();
   const isPartner = (category) => normalizeCategory(category).startsWith('partner');
   const teamPillars = pillars.filter((pillar) => !isPartner(pillar.category));
@@ -40,6 +53,9 @@ const Home = () => {
   const statsRef = useRef(null);
   const heroRef = useRef(null);
 
+  const closeMobileGalleryModal = () => {
+    setIsMobileGalleryModalOpen(false);
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -59,7 +75,7 @@ const Home = () => {
       const [statsRes, storiesRes, galleryRes, assetsRes, pillarsRes, locationsRes] = requests;
 
       if (statsRes.status === 'fulfilled') {
-        setStats(statsRes.value.data);
+        setStats(normalizeStats(statsRes.value.data));
       } else {
         console.error('Failed to fetch stats:', statsRes.reason);
       }

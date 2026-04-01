@@ -43,8 +43,19 @@ const PillarsOfImpact = () => {
     }
   };
 
+  const toNumber = (value) => {
+    const num = Number(value);
+    return Number.isFinite(num) ? num : 0;
+  };
+
+  const formatNumber = (value) => toNumber(value).toLocaleString();
+
   const getProgress = (raised, target) => {
-    return Math.min((raised / target) * 100, 100);
+    const safeRaised = toNumber(raised);
+    const safeTarget = toNumber(target);
+
+    if (safeTarget <= 0) return 0;
+    return Math.min((safeRaised / safeTarget) * 100, 100);
   };
 
   const normalizeImages = (payload) => {
@@ -111,7 +122,9 @@ const PillarsOfImpact = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {projects.map((project) => {
               const Icon = categoryIcons[project.category] || HandHeart;
-              const progress = getProgress(project.raised_amount, project.target_amount);
+              const raisedAmount = toNumber(project.raised_amount);
+              const targetAmount = toNumber(project.target_amount);
+              const progress = getProgress(raisedAmount, targetAmount);
 
               return (
                 <div
@@ -121,7 +134,7 @@ const PillarsOfImpact = () => {
                 >
                   <div
                     className="h-56 bg-cover bg-center relative"
-                    style={{ backgroundImage: `url('${project.hero_image}')` }}
+                    style={{ backgroundImage: project.hero_image ? `url('${project.hero_image}')` : 'none' }}
                   >
                     <div className="absolute inset-0 bg-gradient-to-t from-[#1F2933] to-transparent opacity-70"></div>
                     <div className="absolute bottom-5 left-5">
@@ -146,7 +159,7 @@ const PillarsOfImpact = () => {
                     <div className="mb-5">
                       <div className="flex justify-between text-sm mb-2">
                         <span style={{ color: 'var(--text-muted)' }}>
-                          ₹{project.raised_amount.toLocaleString()} raised
+                          ₹{formatNumber(raisedAmount)} raised
                         </span>
                         <span className="font-semibold" style={{ color: 'var(--accent-teal)' }}>
                           {progress.toFixed(0)}%
@@ -159,7 +172,7 @@ const PillarsOfImpact = () => {
                         ></div>
                       </div>
                       <p className="text-xs mt-2" style={{ color: 'var(--text-muted)' }}>
-                        Goal: ₹{project.target_amount.toLocaleString()}
+                        Goal: ₹{formatNumber(targetAmount)}
                       </p>
                     </div>
 
