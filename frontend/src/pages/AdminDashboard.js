@@ -9,6 +9,7 @@ import {
   Image,
   Loader2,
   LogOut,
+  MapPin,
   Newspaper,
   Users,
   UsersRound,
@@ -24,6 +25,7 @@ import GalleryManagement from '@/components/GalleryManagement';
 import PressManagement from '@/components/PressManagement';
 import VideosManagement from '@/components/VideosManagement';
 import SuccessStoriesManagement from '@/components/SuccessStoriesManagement';
+import LocationsManagement from '@/components/LocationsManagement';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { Switch } from '@/components/ui/switch';
@@ -265,6 +267,16 @@ const AdminDashboard = () => {
             >
               <BookOpen size={16} />
               Stories
+            </button>
+            <button
+              onClick={() => setActiveTab('locations')}
+              className={`pb-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold tracking-[0.1em] uppercase transition-colors whitespace-nowrap flex items-center gap-2 ${
+                activeTab === 'locations' ? 'text-[var(--accent-teal)] border-b-2 border-[var(--accent-teal)]' : 'text-[var(--text-muted)]'
+              }`}
+              data-testid="tab-locations"
+            >
+              <MapPin size={16} />
+              Locations
             </button>
             <button
               onClick={() => setActiveTab('settings')}
@@ -542,6 +554,9 @@ const AdminDashboard = () => {
 
           {/* Success Stories Tab */}
           {activeTab === 'stories' && <SuccessStoriesManagement />}
+
+          {/* Locations Tab */}
+          {activeTab === 'locations' && <LocationsManagement />}
         </div>
       </div>
 

@@ -132,7 +132,7 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
         return email
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expired")
-    except jwt.JWTError:
+    except jwt.InvalidTokenError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
 def verify_user_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
@@ -145,7 +145,7 @@ def verify_user_token(credentials: HTTPAuthorizationCredentials = Depends(securi
         return {"email": email, "role": role}
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expired")
-    except jwt.JWTError:
+    except jwt.InvalidTokenError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
 # ===== MODELS =====
@@ -313,6 +313,20 @@ class PillarCreate(BaseModel):
     specialty: str
     image_url: str
     category: str
+    display_priority: int = 0
+
+class WorkLocation(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    description: str
+    display_priority: int = 0
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class WorkLocationCreate(BaseModel):
+    name: str
+    description: str
     display_priority: int = 0
 
 class GalleryImage(BaseModel):
@@ -1115,6 +1129,68 @@ async def seed_pillars():
         await db.pillars.insert_one(doc)
     
     return {"status": "success", "message": f"Seeded {len(default_pillars)} default pillars"}
+
+# Work Locations Management
+@api_router.get("/locations", response_model=List[WorkLocation])
+async def get_locations():
+    """Get all work locations"""
+    locations = await db.locations.find({}, {"_id": 0}).sort("display_priority", 1).to_list(1000)
+
+    for location in locations:
+        if isinstance(location.get('created_at'), str):
+            location['created_at'] = datetime.fromisoformat(location['created_at'])
+
+    return locations
+
+@api_router.post("/locations", response_model=WorkLocation)
+async def create_location(location: WorkLocationCreate):
+    """Create a new work location"""
+    location_obj = WorkLocation(**location.model_dump())
+    doc = location_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+
+    await db.locations.insert_one(doc)
+    return location_obj
+
+@api_router.put("/locations/{location_id}")
+async def update_location(location_id: str, location: WorkLocationCreate):
+    """Update a work location"""
+    result = await db.locations.update_one(
+        {"id": location_id},
+        {"$set": location.model_dump()}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Location not found")
+    return {"status": "success", "message": "Location updated"}
+
+@api_router.delete("/locations/{location_id}")
+async def delete_location(location_id: str):
+    """Delete a work location"""
+    result = await db.locations.delete_one({"id": location_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Location not found")
+    return {"status": "success", "message": "Location deleted"}
+
+@api_router.post("/seed/locations")
+async def seed_locations():
+    """Seed default work locations"""
+    default_locations = [
+        {"name": "Dharashiv", "description": "Medical camps & elderly care", "display_priority": 1},
+        {"name": "Solapur", "description": "Education & health awareness", "display_priority": 2},
+        {"name": "Latur", "description": "Headquarters & community hub", "display_priority": 3},
+        {"name": "Palghar", "description": "Tribal healthcare outreach", "display_priority": 4},
+        {"name": "Panchgani", "description": "Rural health programs", "display_priority": 5}
+    ]
+
+    await db.locations.delete_many({})
+
+    for location_data in default_locations:
+        location_obj = WorkLocation(**location_data)
+        doc = location_obj.model_dump()
+        doc['created_at'] = doc['created_at'].isoformat()
+        await db.locations.insert_one(doc)
+
+    return {"status": "success", "message": f"Seeded {len(default_locations)} default locations"}
 
 # Gallery Management (Heartiest Moments)
 @api_router.get("/gallery", response_model=List[GalleryImage])
