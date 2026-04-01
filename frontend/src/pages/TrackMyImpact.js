@@ -13,9 +13,9 @@ const TrackMyImpact = () => {
   const [formData, setFormData] = useState({ email: '', pan: '' });
   const [donations, setDonations] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  usePageRevealAnimation([donations.length, searched]);
   const [searched, setSearched] = useState(false);
+
+  usePageRevealAnimation(`${donations.length}-${searched}`);
 
   const handleSearch = async (e) => {
     e.preventDefault();

@@ -25,7 +25,7 @@ const AboutUs = () => {
   ];
   const visibleLocations = locations.length > 0 ? locations : fallbackLocations;
 
-  usePageRevealAnimation([pillars.length, partners.length, visibleLocations.length]);
+  usePageRevealAnimation(`${pillars.length}-${partners.length}-${visibleLocations.length}`);
 
   useEffect(() => {
     const fetchAssets = async () => {

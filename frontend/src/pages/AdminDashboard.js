@@ -41,7 +41,7 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('donations');
 
-  usePageRevealAnimation([activeTab, donations.length, loading]);
+  usePageRevealAnimation(`${activeTab}-${donations.length}-${loading}`);
 
   useEffect(() => {
     fetchDonations();

@@ -4,7 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const usePageRevealAnimation = (dependencies = []) => {
+const usePageRevealAnimation = (rerunKey = 0) => {
   useEffect(() => {
     const sections = gsap.utils.toArray('.reveal-section');
 
@@ -34,7 +34,7 @@ const usePageRevealAnimation = (dependencies = []) => {
         animation.kill();
       });
     };
-  }, dependencies);
+  }, [rerunKey]);
 };
 
 export default usePageRevealAnimation;

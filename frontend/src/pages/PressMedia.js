@@ -22,7 +22,7 @@ const PressMedia = () => {
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [activeSection, setActiveSection] = useState('press');
 
-  usePageRevealAnimation([activeSection, loading, pressItems.length, videos.length]);
+  usePageRevealAnimation(`${activeSection}-${loading}-${pressItems.length}-${videos.length}`);
 
   const districts = ['All', 'Dharashiv', 'Solapur', 'Latur', 'Palghar', 'Panchgani'];
   const years = ['All', '2026', '2025', '2024', '2023', '2022', '2021', '2020'];

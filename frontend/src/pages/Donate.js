@@ -31,7 +31,7 @@ const Donate = () => {
   const [qrCodeUrl, setQrCodeUrl] = useState('');
   const [paymentMode, setPaymentMode] = useState('manual_qr');
 
-  usePageRevealAnimation([projects.length, paymentMode, submitted]);
+  usePageRevealAnimation(`${projects.length}-${paymentMode}-${submitted}`);
 
   const loadRazorpayScript = () => new Promise((resolve) => {
     if (window.Razorpay) {
