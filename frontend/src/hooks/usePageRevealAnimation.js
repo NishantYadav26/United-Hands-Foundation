@@ -27,8 +27,9 @@ const usePageRevealAnimation = (rerunKey = 0) => {
         ease: 'power2.out',
         scrollTrigger: {
           trigger: section,
-          start: 'top 88%',
-          toggleActions: 'restart none none reset',
+          start: 'top 75%',
+          toggleActions: 'play none none none',
+          once: true,
           invalidateOnRefresh: true
         }
       }
@@ -57,8 +58,9 @@ const usePageRevealAnimation = (rerunKey = 0) => {
           ease: 'power3.out',
           scrollTrigger: {
             trigger: card,
-            start: isSmallScreen ? 'top 94%' : 'top 90%',
-            toggleActions: 'restart none none reset',
+            start: isSmallScreen ? 'top 82%' : 'top 76%',
+            toggleActions: 'play none none none',
+            once: true,
             invalidateOnRefresh: true
           }
         }
