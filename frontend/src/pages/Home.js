@@ -28,6 +28,8 @@ const normalizeStats = (data) => ({
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
 const API = `${BACKEND_URL}/api`;
+const HOME_CACHE_KEY = 'uhf_home_cache_v1';
+const REQUEST_TIMEOUT_MS = 4500;
 
 const Home = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -75,35 +77,39 @@ const Home = () => {
     let isMounted = true;
 
     const fetchHomeData = async () => {
-      const requests = await Promise.allSettled([
-        axios.get(`${API}/stats`),
-        axios.get(`${API}/success-stories?limit=3`),
-        axios.get(`${API}/gallery`),
-        axios.get(`${API}/site-assets`),
-        axios.get(`${API}/pillars`),
-        axios.get(`${API}/locations`)
+      try {
+        const cached = sessionStorage.getItem(HOME_CACHE_KEY);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (isMounted) {
+            if (parsed.stats) setStats(normalizeStats(parsed.stats));
+            if (parsed.siteAssets) setSiteAssets(parsed.siteAssets);
+            if (Array.isArray(parsed.locations)) setLocations(parsed.locations);
+            if (Array.isArray(parsed.pillars)) setPillars(parsed.pillars);
+            if (Array.isArray(parsed.successStories)) setSuccessStories(parsed.successStories);
+            if (Array.isArray(parsed.galleryImages)) setGalleryImages(parsed.galleryImages);
+            setIsLoading(false);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to read home cache:', error);
+      }
+
+      const criticalRequests = await Promise.allSettled([
+        axios.get(`${API}/stats`, { timeout: REQUEST_TIMEOUT_MS }),
+        axios.get(`${API}/site-assets`, { timeout: REQUEST_TIMEOUT_MS }),
+        axios.get(`${API}/locations`, { timeout: REQUEST_TIMEOUT_MS }),
+        axios.get(`${API}/pillars`, { timeout: REQUEST_TIMEOUT_MS })
       ]);
 
       if (!isMounted) return;
 
-      const [statsRes, storiesRes, galleryRes, assetsRes, pillarsRes, locationsRes] = requests;
+      const [statsRes, assetsRes, locationsRes, pillarsRes] = criticalRequests;
 
       if (statsRes.status === 'fulfilled') {
         setStats(normalizeStats(statsRes.value.data));
       } else {
         console.error('Failed to fetch stats:', statsRes.reason);
-      }
-
-      if (storiesRes.status === 'fulfilled') {
-        setSuccessStories(ensureArray(storiesRes.value.data));
-      } else {
-        console.error('Failed to fetch success stories:', storiesRes.reason);
-      }
-
-      if (galleryRes.status === 'fulfilled') {
-        setGalleryImages(ensureArray(galleryRes.value.data));
-      } else {
-        console.error('Failed to fetch gallery:', galleryRes.reason);
       }
 
       if (assetsRes.status === 'fulfilled') {
@@ -114,21 +120,69 @@ const Home = () => {
         console.error('Failed to fetch site assets:', assetsRes.reason);
       }
 
-      if (pillarsRes.status === 'fulfilled') {
-        setPillars(ensureArray(pillarsRes.value.data));
-      } else {
-        console.error('Failed to fetch pillars:', pillarsRes.reason);
-      }
-
       if (locationsRes.status === 'fulfilled') {
         setLocations(ensureArray(locationsRes.value.data));
       } else {
         console.error('Failed to fetch locations:', locationsRes.reason);
       }
 
-      setTimeout(() => {
-        if (isMounted) setIsLoading(false);
-      }, 250);
+      if (pillarsRes.status === 'fulfilled') {
+        setPillars(ensureArray(pillarsRes.value.data));
+      } else {
+        console.error('Failed to fetch pillars:', pillarsRes.reason);
+      }
+
+      if (isMounted) {
+        setIsLoading(false);
+      }
+
+      try {
+        if (statsRes.status === 'fulfilled' || assetsRes.status === 'fulfilled' || locationsRes.status === 'fulfilled' || pillarsRes.status === 'fulfilled') {
+          const nextCache = {
+            stats: statsRes.status === 'fulfilled' ? statsRes.value.data : stats,
+            siteAssets: assetsRes.status === 'fulfilled'
+              ? (assetsRes.value.data.assets || []).reduce((acc, a) => ({ ...acc, [a.asset_key]: a.asset_url }), {})
+              : siteAssets,
+            locations: locationsRes.status === 'fulfilled' ? ensureArray(locationsRes.value.data) : locations,
+            pillars: pillarsRes.status === 'fulfilled' ? ensureArray(pillarsRes.value.data) : pillars
+          };
+          sessionStorage.setItem(HOME_CACHE_KEY, JSON.stringify(nextCache));
+        }
+      } catch (error) {
+        console.error('Failed to write home cache:', error);
+      }
+
+      Promise.allSettled([
+        axios.get(`${API}/success-stories?limit=3`, { timeout: REQUEST_TIMEOUT_MS }),
+        axios.get(`${API}/gallery`, { timeout: REQUEST_TIMEOUT_MS })
+      ]).then((deferredRequests) => {
+        if (!isMounted) return;
+        const [storiesRes, galleryRes] = deferredRequests;
+
+        if (storiesRes.status === 'fulfilled') {
+          setSuccessStories(ensureArray(storiesRes.value.data));
+        } else {
+          console.error('Failed to fetch success stories:', storiesRes.reason);
+        }
+
+        if (galleryRes.status === 'fulfilled') {
+          setGalleryImages(ensureArray(galleryRes.value.data));
+        } else {
+          console.error('Failed to fetch gallery:', galleryRes.reason);
+        }
+
+        try {
+          const cached = sessionStorage.getItem(HOME_CACHE_KEY);
+          const parsed = cached ? JSON.parse(cached) : {};
+          sessionStorage.setItem(HOME_CACHE_KEY, JSON.stringify({
+            ...parsed,
+            successStories: storiesRes.status === 'fulfilled' ? ensureArray(storiesRes.value.data) : (parsed.successStories || []),
+            galleryImages: galleryRes.status === 'fulfilled' ? ensureArray(galleryRes.value.data) : (parsed.galleryImages || [])
+          }));
+        } catch (error) {
+          console.error('Failed to update deferred home cache:', error);
+        }
+      });
     };
 
     fetchHomeData();
@@ -365,18 +419,10 @@ const Home = () => {
     <div className="min-h-screen" style={{ background: 'var(--bg-deep)' }}>
       {isLoading && (
         <div
-          className="fixed inset-0 z-[70] flex items-center justify-center transition-opacity duration-300"
-          style={{ background: 'rgba(246,243,237,0.94)', backdropFilter: 'blur(4px)' }}
+          className="fixed top-0 left-0 right-0 z-[70] h-1 transition-opacity duration-300"
+          style={{ background: 'linear-gradient(90deg, var(--accent-teal), var(--accent-gold))' }}
           data-testid="home-loading-overlay"
-        >
-          <div className="flex flex-col items-center gap-3">
-            <div
-              className="w-10 h-10 rounded-full border-4 border-t-transparent animate-spin"
-              style={{ borderColor: 'var(--accent-teal)', borderTopColor: 'transparent' }}
-            />
-            <p className="text-sm tracking-wide" style={{ color: 'var(--text-muted)' }}>Loading United Hands Foundation...</p>
-          </div>
-        </div>
+        />
       )}
       <Navbar />
 
@@ -509,6 +555,8 @@ const Home = () => {
                       src={image.image_url}
                       alt={image.title}
                       className="w-full h-full object-cover identity-lock transition-transform duration-500 hover:scale-105"
+                      loading={index < 3 ? 'eager' : 'lazy'}
+                      decoding="async"
                     />
                   </div>
                   <div className="p-5">
@@ -540,7 +588,7 @@ const Home = () => {
           <div className="gallery-mobile-modal-content">
             {galleryImages.map((image, index) => (
               <div key={`mobile-modal-image-${image.id || index}`} className="gallery-mobile-modal-item">
-                <img src={image.image_url} alt={image.title} className="w-full h-auto object-cover identity-lock" />
+                <img src={image.image_url} alt={image.title} className="w-full h-auto object-cover identity-lock" loading="lazy" decoding="async" />
               </div>
             ))}
           </div>
@@ -644,6 +692,8 @@ const Home = () => {
                     src={siteAssets.founder_1}
                     alt="Dr. Rahul Sarwade"
                     className="w-full h-96 object-cover identity-lock"
+                    loading="eager"
+                    decoding="async"
                   />
                 </div>
                 <h3 className="text-2xl font-medium mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>Dr. Rahul Sarwade</h3>
@@ -659,6 +709,8 @@ const Home = () => {
                     src={siteAssets.founder_2}
                     alt="Dr. Jagruti Hankare"
                     className="w-full h-96 object-cover identity-lock"
+                    loading="eager"
+                    decoding="async"
                   />
                 </div>
                 <h3 className="text-2xl font-medium mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>Dr. Jagruti Hankare</h3>
@@ -679,7 +731,7 @@ const Home = () => {
 
                   <div key={pillar.id} className="card-elevated p-6 rounded-lg hover-lift text-center pillar-card" data-testid={`pillar-${pillar.id}`}>
                     {pillar.image_url && (
-                      <img src={pillar.image_url} alt={pillar.name} className="w-24 h-24 rounded-full mx-auto mb-4 object-cover identity-lock" />
+                      <img src={pillar.image_url} alt={pillar.name} className="w-24 h-24 rounded-full mx-auto mb-4 object-cover identity-lock" loading="lazy" decoding="async" />
                     )}
                     <h4 className="text-lg font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{pillar.name}</h4>
                     <p className="text-xs tracking-[0.15em] uppercase font-bold mb-2" style={{ color: 'var(--accent-teal)' }}>{pillar.role}</p>
@@ -704,6 +756,8 @@ const Home = () => {
                           src={partner.image_url}
                           alt={partner.name}
                           className="w-full h-full object-cover identity-lock"
+                          loading="lazy"
+                          decoding="async"
                         />
                       </div>
                     )}
