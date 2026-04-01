@@ -244,6 +244,7 @@ class Project(BaseModel):
     category: str
     description: str
     hero_image: str
+    images: List[str] = []
     target_amount: int
     raised_amount: int = 0
     is_active: bool = True
@@ -254,6 +255,7 @@ class ProjectCreate(BaseModel):
     category: str
     description: str
     hero_image: str
+    images: List[str] = []
     target_amount: int
     is_active: bool = True
 
@@ -891,6 +893,17 @@ async def get_project(project_id: str):
         project['created_at'] = datetime.fromisoformat(project['created_at'])
     
     return Project(**project)
+
+@api_router.get("/projects/{project_id}/images", response_model=List[str])
+async def get_project_images(project_id: str):
+    project = await db.projects.find_one({"id": project_id}, {"_id": 0, "images": 1, "hero_image": 1})
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    images = project.get("images") or []
+    if not images and project.get("hero_image"):
+        images = [project["hero_image"]]
+    return images
 
 @api_router.put("/projects/{project_id}")
 async def update_project(project_id: str, project: ProjectCreate, admin_email: str = Depends(verify_token)):
