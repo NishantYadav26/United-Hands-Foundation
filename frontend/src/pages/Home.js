@@ -679,9 +679,9 @@ const Home = () => {
             <h3 className="text-2xl font-bold text-center mb-10" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               Our <span className="text-gradient-blue">Partners</span>
             </h3>
-            {partners.length > 0 ? (
+            {visiblePartners.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 partners-animated-grid">
-                {partners.map((partner) => (
+                {visiblePartners.map((partner) => (
                   <div key={partner.id} className="card-elevated p-6 rounded-lg hover-lift text-center partner-card" data-testid={`partner-${partner.id}`}>
                     {partner.image_url && (
                       <div className="w-24 h-24 mx-auto mb-4 overflow-hidden rounded-full border blue-border">
@@ -703,7 +703,7 @@ const Home = () => {
             ) : (
               <div className="card-elevated p-8 rounded-lg text-center">
                 <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                  Partner profiles will appear here as soon as they are added from the dashboard.
+                  Add partners from dashboard → Team & Partners tab to show official partner profiles here.
                 </p>
               </div>
             )}
