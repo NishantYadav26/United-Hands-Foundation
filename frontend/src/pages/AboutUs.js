@@ -1,9 +1,8 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { MapPin, Heart, Award, Target } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import usePageRevealAnimation from '@/hooks/usePageRevealAnimation';
-import usePillarScrollAnimation from '@/hooks/usePillarScrollAnimation';
 import axios from 'axios';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
@@ -12,26 +11,6 @@ const API = `${BACKEND_URL}/api`;
 const AboutUs = () => {
   const [siteAssets, setSiteAssets] = useState({});
   const [locations, setLocations] = useState([]);
-  const founders = useMemo(() => ([
-    siteAssets.founder_1 ? {
-      key: 'founder-1',
-      image: siteAssets.founder_1,
-      alt: 'Dr. Rahul Sarwade',
-      name: 'Dr. Rahul Sarwade',
-      title: 'Co-Founder & President',
-      description: `Former Government of India medical officer with decades of healthcare expertise.
-Dedicated to extending medical access to rural Maharashtra's most underserved populations.`
-    } : null,
-    siteAssets.founder_2 ? {
-      key: 'founder-2',
-      image: siteAssets.founder_2,
-      alt: 'Dr. Jagruti Hankare',
-      name: 'Dr. Jagruti Hankare',
-      title: 'Co-Founder & Secretary',
-      description: `Healthcare professional committed to improving quality of life for underserved communities
-through medical camps, health awareness drives, and community outreach programs.`
-    } : null
-  ].filter(Boolean)), [siteAssets.founder_1, siteAssets.founder_2]);
   const fallbackLocations = [
     { name: 'Dharashiv', description: 'Medical camps & elderly care' },
     { name: 'Solapur', description: 'Education & health awareness' },
@@ -61,39 +40,6 @@ through medical camps, health awareness drives, and community outreach programs.
     fetchAssets();
     fetchLocations();
   }, []);
-
-
-  useEffect(() => {
-    const foundersSection = document.querySelector('[data-testid="about-founders"]');
-    if (!foundersSection) return undefined;
-
-    const founderElements = foundersSection.querySelectorAll('[data-testid^="about-founder-"]');
-    if (!founderElements.length) return undefined;
-
-    founderElements.forEach((element, index) => {
-      element.classList.add('pillar-hidden');
-      element.classList.add(index % 2 === 0 ? 'from-left' : 'from-right');
-    });
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          entry.target.classList.add('pillar-show');
-          observer.unobserve(entry.target);
-        });
-      },
-      {
-        threshold: 0.2,
-        rootMargin: '0px 0px -10% 0px'
-      }
-    );
-
-    founderElements.forEach((element) => observer.observe(element));
-
-    return () => observer.disconnect();
-  }, [founders.length]);
-
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-deep)' }}>
@@ -148,40 +94,6 @@ leading to sustainable and inclusive development`}
               {`build a compassionate, healthy, and self-reliant society where every individual — from
 children to the elderly — has access to dignity, care, opportunities, and hope.`}
             </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Founder Photos - Dynamic from CMS */}
-      <section className="py-16 px-6 reveal-section" data-testid="about-founders">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-medium text-center mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
-            Our <span className="text-gradient-blue">Founders</span>
-          </h2>
-          <p className="text-center text-base mb-12" style={{ color: 'var(--text-muted)' }}>
-            Ex-Government of India doctors serving communities with dedication
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-4xl mx-auto items-stretch" data-testid="about-founders-grid">
-            {founders.map((founder) => (
-              <div
-                key={founder.key}
-                className="card-elevated rounded-lg overflow-hidden hover-lift founder-card group h-full flex flex-col"
-                data-testid={`about-${founder.key}`}
-              >
-                <div className="h-80 overflow-hidden">
-                  <img src={founder.image} alt={founder.alt} className="w-full h-full object-cover identity-lock" />
-                </div>
-                <div className="p-6 flex flex-col flex-1">
-                  <h3 className="text-2xl font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{founder.name}</h3>
-                  <p className="text-xs tracking-[0.15em] uppercase font-bold mb-3" style={{ color: 'var(--accent-gold)' }}>{founder.title}</p>
-                  <p className="founder-description text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                    {founder.description}
-                  </p>
-                  <div className="mt-auto pt-4 founder-card-spacer" />
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>
