@@ -8,6 +8,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import PillarsOfImpact from '@/components/PillarsOfImpact';
 import axios from 'axios';
+import usePillarScrollAnimation from '@/hooks/usePillarScrollAnimation';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -56,6 +57,8 @@ const Home = () => {
   const visibleTeamPillars = teamPillars.length > 0 ? teamPillars : pillars;
   const fallbackLocations = ['Dharashiv', 'Solapur', 'Latur', 'Palghar', 'Panchgani'];
   const visibleLocations = locations.length > 0 ? locations : fallbackLocations.map((name) => ({ name }));
+
+  usePillarScrollAnimation(`home-${visibleTeamPillars.length}`);
 
   const statsRef = useRef(null);
   const heroRef = useRef(null);

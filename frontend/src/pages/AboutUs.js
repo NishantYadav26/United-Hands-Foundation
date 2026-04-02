@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { MapPin, Heart, Users, Award, Target } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import usePageRevealAnimation from '@/hooks/usePageRevealAnimation';
+import usePillarScrollAnimation from '@/hooks/usePillarScrollAnimation';
 import axios from 'axios';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
@@ -16,6 +17,26 @@ const AboutUs = () => {
   const isPartner = (category) => normalizeCategory(category).startsWith('partner');
   const teamPillars = pillars.filter((pillar) => !isPartner(pillar.category));
   const partners = pillars.filter((pillar) => isPartner(pillar.category));
+  const founders = useMemo(() => ([
+    siteAssets.founder_1 ? {
+      key: 'founder-1',
+      image: siteAssets.founder_1,
+      alt: 'Dr. Rahul Sarwade',
+      name: 'Dr. Rahul Sarwade',
+      title: 'Co-Founder & President',
+      description: `Former Government of India medical officer with decades of healthcare expertise.
+Dedicated to extending medical access to rural Maharashtra's most underserved populations.`
+    } : null,
+    siteAssets.founder_2 ? {
+      key: 'founder-2',
+      image: siteAssets.founder_2,
+      alt: 'Dr. Jagruti Hankare',
+      name: 'Dr. Jagruti Hankare',
+      title: 'Co-Founder & Secretary',
+      description: `Healthcare professional committed to improving quality of life for underserved communities
+through medical camps, health awareness drives, and community outreach programs.`
+    } : null
+  ].filter(Boolean)), [siteAssets.founder_1, siteAssets.founder_2]);
   const fallbackLocations = [
     { name: 'Dharashiv', description: 'Medical camps & elderly care' },
     { name: 'Solapur', description: 'Education & health awareness' },
@@ -26,6 +47,7 @@ const AboutUs = () => {
   const visibleLocations = locations.length > 0 ? locations : fallbackLocations;
 
   usePageRevealAnimation(`${pillars.length}-${partners.length}-${visibleLocations.length}`);
+  usePillarScrollAnimation(`about-${teamPillars.length}`);
 
   useEffect(() => {
     const fetchAssets = async () => {
@@ -53,14 +75,15 @@ const AboutUs = () => {
     fetchLocations();
   }, []);
 
+
   useEffect(() => {
-    const pillarsSection = document.querySelector('[data-testid="about-pillars"]');
-    if (!pillarsSection) return undefined;
+    const foundersSection = document.querySelector('[data-testid="about-founders"]');
+    if (!foundersSection) return undefined;
 
-    const pillarElements = pillarsSection.querySelectorAll('[data-testid^="about-pillar-"]');
-    if (!pillarElements.length) return undefined;
+    const founderElements = foundersSection.querySelectorAll('[data-testid^="about-founder-"]');
+    if (!founderElements.length) return undefined;
 
-    pillarElements.forEach((element, index) => {
+    founderElements.forEach((element, index) => {
       element.classList.add('pillar-hidden');
       element.classList.add(index % 2 === 0 ? 'from-left' : 'from-right');
     });
@@ -79,10 +102,11 @@ const AboutUs = () => {
       }
     );
 
-    pillarElements.forEach((element) => observer.observe(element));
+    founderElements.forEach((element) => observer.observe(element));
 
     return () => observer.disconnect();
-  }, [teamPillars.length]);
+  }, [founders.length]);
+
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-deep)' }}>
@@ -109,11 +133,17 @@ const AboutUs = () => {
             <h2 className="text-3xl font-medium mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               Our <span className="text-gradient-blue">Mission</span>
             </h2>
-            <p className="leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              To provide compassionate healthcare, quality education, and emergency relief to
-              underserved communities. We believe in hands-on service, operating medical camps,
-              distributing essential supplies, and building sustainable support systems that
-              restore dignity and hope.
+            <p className="leading-relaxed whitespace-pre-line" style={{ color: 'var(--text-muted)' }}>
+              {`To unite hands and hearts in serving underserved communities through integrated
+programs in healthcare, elderly care, palliative support, education, and livelihood.
+To ensure accessible, affordable, and holistic health services in both rural and tribal
+areas.
+To empower women, youth, and marginalized groups through skill development,
+education, and livelihood opportunities.
+To provide comfort, dignity, and companionship to the elderly and those in palliative
+care.
+To create a platform where communities actively participate in their own growth,
+leading to sustainable and inclusive development`}
             </p>
           </div>
           <div className="card-elevated p-10 rounded-lg">
@@ -121,10 +151,9 @@ const AboutUs = () => {
             <h2 className="text-3xl font-medium mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               Our <span className="text-gradient-orange">Vision</span>
             </h2>
-            <p className="leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              A Maharashtra where every individual has access to healthcare, education, and
-              a life of dignity. We envision a network of community-driven programs spanning
-              every district, powered by local volunteers and transparent governance.
+            <p className="leading-relaxed whitespace-pre-line" style={{ color: 'var(--text-muted)' }}>
+              {`build a compassionate, healthy, and self-reliant society where every individual — from
+children to the elderly — has access to dignity, care, opportunities, and hope.`}
             </p>
           </div>
         </div>
@@ -140,38 +169,26 @@ const AboutUs = () => {
             Ex-Government of India doctors serving communities with dedication
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-4xl mx-auto">
-            {siteAssets.founder_1 && (
-              <div className="card-elevated rounded-lg overflow-hidden hover-lift founder-card group" data-testid="about-founder-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-4xl mx-auto items-stretch" data-testid="about-founders-grid">
+            {founders.map((founder) => (
+              <div
+                key={founder.key}
+                className="card-elevated rounded-lg overflow-hidden hover-lift founder-card group h-full flex flex-col"
+                data-testid={`about-${founder.key}`}
+              >
                 <div className="h-80 overflow-hidden">
-                  <img src={siteAssets.founder_1} alt="Dr. Rahul Sarwade" className="w-full h-full object-cover identity-lock" />
+                  <img src={founder.image} alt={founder.alt} className="w-full h-full object-cover identity-lock" />
                 </div>
-                <div className="p-6">
-                  <h3 className="text-2xl font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>Dr. Rahul Sarwade</h3>
-                  <p className="text-xs tracking-[0.15em] uppercase font-bold mb-3" style={{ color: 'var(--accent-gold)' }}>Co-Founder & President</p>
+                <div className="p-6 flex flex-col flex-1">
+                  <h3 className="text-2xl font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{founder.name}</h3>
+                  <p className="text-xs tracking-[0.15em] uppercase font-bold mb-3" style={{ color: 'var(--accent-gold)' }}>{founder.title}</p>
                   <p className="founder-description text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                    Former Government of India medical officer with decades of healthcare expertise.
-                    Dedicated to extending medical access to rural Maharashtra's most underserved populations.
+                    {founder.description}
                   </p>
+                  <div className="mt-auto pt-4 founder-card-spacer" />
                 </div>
               </div>
-            )}
-
-            {siteAssets.founder_2 && (
-              <div className="card-elevated rounded-lg overflow-hidden hover-lift founder-card group" data-testid="about-founder-2">
-                <div className="h-80 overflow-hidden">
-                  <img src={siteAssets.founder_2} alt="Dr. Jagruti Hankare" className="w-full h-full object-cover identity-lock" />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-2xl font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>Dr. Jagruti Hankare</h3>
-                  <p className="text-xs tracking-[0.15em] uppercase font-bold mb-3" style={{ color: 'var(--accent-gold)' }}>Co-Founder & Secretary</p>
-                  <p className="founder-description text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                    Healthcare professional committed to improving quality of life for underserved communities
-                    through medical camps, health awareness drives, and community outreach programs.
-                  </p>
-                </div>
-              </div>
-            )}
+            ))}
           </div>
         </div>
       </section>
