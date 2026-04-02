@@ -50,7 +50,7 @@ const Transparency = () => {
               </div>
               <div className="p-4 rounded" style={{ background: 'var(--bg-surface)' }}>
                 <span className="text-xs tracking-[0.15em] uppercase font-bold block mb-1" style={{ color: 'var(--accent-teal)' }}>Society Reg</span>
-                <span className="text-sm" style={{ color: 'var(--text-primary)' }}>Latur/0000171/2020</span>
+                <span className="text-sm" style={{ color: 'var(--text-primary)' }}>Latur/171/2020</span>
               </div>
             </div>
           </div>

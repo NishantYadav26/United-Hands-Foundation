@@ -150,7 +150,7 @@ children to the elderly — has access to dignity, care, opportunities, and hope
               { label: 'PAN', value: 'AABTU0797K' },
               { label: '80G Certificate', value: 'AABTU0797KF20231' },
               { label: '12A Registration', value: 'AABTU0797KE20231' },
-              { label: 'Society Registration', value: 'Latur/0000171/2020' },
+              { label: 'Society Registration', value: 'Latur/171/2020' },
               { label: 'Registered Date', value: '04 August 2020' },
               { label: 'Address', value: 'Ratnai Niwas, Kaikadi Chal, Bhoi Galli, Latur, MH - 413512' }
             ].map(item => (
