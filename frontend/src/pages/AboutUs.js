@@ -223,7 +223,7 @@ children to the elderly — has access to dignity, care, opportunities, and hope
             <h2 className="text-4xl font-medium text-center mb-12" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               Our <span className="text-gradient-orange">Pillars</span>
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 items-stretch">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
               {teamPillars.map(pillar => (
                 <div key={pillar.id} className="card-elevated p-8 rounded-lg hover-lift text-center pop-card-lr pillar-card h-full flex flex-col" data-testid={`about-pillar-${pillar.id}`}>
                   {pillar.image_url ? (
@@ -246,7 +246,7 @@ children to the elderly — has access to dignity, care, opportunities, and hope
                 Our <span className="text-gradient-blue">Partners</span>
               </h3>
               {partners.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 items-stretch">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
                   {partners.map((partner) => (
                     <div key={partner.id} className="card-elevated p-8 rounded-lg hover-lift text-center partner-card group pop-card-lr" data-testid={`about-partner-${partner.id}`}>
                       {partner.image_url && (
