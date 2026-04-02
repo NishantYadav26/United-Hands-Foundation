@@ -18,8 +18,8 @@ const usePillarScrollAnimation = (rerunKey) => {
         });
       },
       {
-        threshold: 0.35,
-        rootMargin: '0px 0px -8% 0px'
+        threshold: 0.6,
+        rootMargin: '0px 0px -100px 0px'
       }
     );
 
