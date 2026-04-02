@@ -244,6 +244,8 @@ input:focus, select:focus, textarea:focus {
 .pillar-card {
   transform-style: preserve-3d;
   will-change: transform, opacity;
+  width: 100%;
+  max-width: 340px;
 }
 
 .pillar-card:hover {
@@ -377,6 +379,29 @@ input:focus, select:focus, textarea:focus {
 
 .partner-card {
   will-change: transform, opacity;
+  width: 100%;
+  max-width: 340px;
+  height: 100%;
+}
+
+/* About page pillar/partner card alignment */
+[data-testid="about-pillars"] .grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 340px));
+  justify-content: center;
+  gap: 2rem;
+}
+
+@media (max-width: 1023px) {
+  [data-testid="about-pillars"] .grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-3 {
+    grid-template-columns: repeat(2, minmax(0, 340px));
+  }
+}
+
+@media (max-width: 639px) {
+  [data-testid="about-pillars"] .grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-3 {
+    grid-template-columns: minmax(0, 340px);
+  }
 }
 
 .founder-description,
