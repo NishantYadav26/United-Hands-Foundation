@@ -3,6 +3,7 @@ import { MapPin, Heart, Award, Target } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import usePageRevealAnimation from '@/hooks/usePageRevealAnimation';
+import usePillarScrollAnimation from '@/hooks/usePillarScrollAnimation';
 import axios from 'axios';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
@@ -46,6 +47,7 @@ through medical camps, health awareness drives, and community outreach programs.
   const visibleLocations = locations.length > 0 ? locations : fallbackLocations;
 
   usePageRevealAnimation(`${pillars.length}-${partners.length}-${visibleLocations.length}`);
+  usePillarScrollAnimation(`${teamPillars.length}-${partners.length}`);
 
   useEffect(() => {
     const fetchAssets = async () => {
@@ -255,7 +257,7 @@ children to the elderly — has access to dignity, care, opportunities, and hope
             {partners.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
                 {partners.map((partner) => (
-                  <div key={partner.id} className="card-elevated p-8 rounded-lg hover-lift text-center partner-card group pop-card-lr" data-testid={`about-partner-${partner.id}`}>
+                  <div key={partner.id} className="card-elevated p-8 rounded-lg hover-lift text-center partner-card group pop-card-lr pillar-card" data-testid={`about-partner-${partner.id}`}>
                     {partner.image_url && (
                       <div className="w-24 h-24 mx-auto mb-4 overflow-hidden rounded-full border blue-border">
                         <img

@@ -207,9 +207,9 @@ const Home = () => {
       );
     });
 
-    if (gsap.utils.toArray('.partner-card').length && document.querySelector('.partners-animated-grid')) {
+    if (gsap.utils.toArray('.home-people-card').length && document.querySelector('[data-testid="founders-section"]')) {
       gsap.fromTo(
-        '.partner-card',
+        '.home-people-card',
         { opacity: 0, x: (i) => (i % 2 === 0 ? 60 : -60), y: 16 },
         {
           opacity: 1,
@@ -219,7 +219,7 @@ const Home = () => {
           stagger: 0.1,
           ease: 'power2.out',
           scrollTrigger: {
-            trigger: '.partners-animated-grid',
+            trigger: '[data-testid="founders-section"]',
             start: 'top 75%',
             toggleActions: 'play none none none',
             once: true
@@ -741,7 +741,7 @@ const Home = () => {
             {partnerCards.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 partners-animated-grid">
                 {partnerCards.map((partner) => (
-                  <div key={partner.id} className="card-elevated p-6 rounded-lg hover-lift text-center partner-card" data-testid={`partner-${partner.id}`}>
+                  <div key={partner.id} className="card-elevated p-6 rounded-lg hover-lift text-center partner-card home-people-card" data-testid={`partner-${partner.id}`}>
                     {partner.image_url && (
                       <div className="w-24 h-24 mx-auto mb-4 overflow-hidden rounded-full border blue-border">
                         <img
