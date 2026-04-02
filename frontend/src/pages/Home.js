@@ -207,27 +207,6 @@ const Home = () => {
       );
     });
 
-    if (gsap.utils.toArray('.pillar-card').length && document.querySelector('.pillars-animated-grid')) {
-      gsap.fromTo(
-        '.pillar-card',
-        { opacity: 0, x: (i) => (i % 2 === 0 ? -70 : 70), rotateY: (i) => (i % 2 === 0 ? -8 : 8) },
-        {
-          opacity: 1,
-          x: 0,
-          rotateY: 0,
-          duration: 0.8,
-          stagger: 0.12,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: '.pillars-animated-grid',
-            start: 'top 74%',
-            toggleActions: 'play none none none',
-            once: true
-          }
-        }
-      );
-    }
-
     if (gsap.utils.toArray('.partner-card').length && document.querySelector('.partners-animated-grid')) {
       gsap.fromTo(
         '.partner-card',

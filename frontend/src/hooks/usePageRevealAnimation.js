@@ -37,7 +37,7 @@ const usePageRevealAnimation = (rerunKey = 0) => {
 
 
     const cardAnimations = sections.flatMap((section) => {
-      const cards = section.querySelectorAll('.pop-card-lr');
+      const cards = section.querySelectorAll('.pop-card-lr:not(.pillar-card)');
 
       if (!cards.length) return [];
 
