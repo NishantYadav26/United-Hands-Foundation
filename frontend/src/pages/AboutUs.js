@@ -226,7 +226,7 @@ children to the elderly — has access to dignity, care, opportunities, and hope
             {teamPillars.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch mb-14">
                 {teamPillars.map((pillar) => (
-                  <div key={pillar.id} className="card-elevated p-8 rounded-lg hover-lift text-center group pop-card-lr" data-testid={`about-pillar-${pillar.id}`}>
+                  <div key={pillar.id} className="card-elevated p-8 rounded-lg hover-lift text-center group pop-card-lr pillar-card" data-testid={`about-pillar-${pillar.id}`}>
                     {pillar.image_url && (
                       <div className="w-24 h-24 mx-auto mb-4 overflow-hidden rounded-full border blue-border">
                         <img
