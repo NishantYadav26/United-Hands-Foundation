@@ -707,7 +707,7 @@ const Home = () => {
             {teamPillarCards.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {teamPillarCards.map((pillar) => (
-                  <div key={pillar.id} className="card-elevated p-6 rounded-lg hover-lift text-center pop-card-lr home-people-card" data-testid={`home-pillar-${pillar.id}`}>
+                  <div key={pillar.id} className="card-elevated p-6 rounded-lg hover-lift text-center pop-card-lr" data-testid={`home-pillar-${pillar.id}`}>
                     {pillar.image_url && (
                       <div className="w-24 h-24 mx-auto mb-4 overflow-hidden rounded-full border blue-border">
                         <img
