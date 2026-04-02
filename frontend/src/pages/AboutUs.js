@@ -107,37 +107,6 @@ through medical camps, health awareness drives, and community outreach programs.
     return () => observer.disconnect();
   }, [founders.length]);
 
-  useEffect(() => {
-    const foundersSection = document.querySelector('[data-testid="about-founders"]');
-    if (!foundersSection) return undefined;
-
-    const founderElements = foundersSection.querySelectorAll('[data-testid^="about-founder-"]');
-    if (!founderElements.length) return undefined;
-
-    founderElements.forEach((element, index) => {
-      element.classList.add('pillar-hidden');
-      element.classList.add(index % 2 === 0 ? 'from-left' : 'from-right');
-    });
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          entry.target.classList.add('pillar-show');
-          observer.unobserve(entry.target);
-        });
-      },
-      {
-        threshold: 0.2,
-        rootMargin: '0px 0px -10% 0px'
-      }
-    );
-
-    founderElements.forEach((element) => observer.observe(element));
-
-    return () => observer.disconnect();
-  }, [founders.length]);
-
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-deep)' }}>
@@ -254,9 +223,9 @@ children to the elderly — has access to dignity, care, opportunities, and hope
             <h2 className="text-4xl font-medium text-center mb-12" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               Our <span className="text-gradient-orange">Pillars</span>
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
               {teamPillars.map(pillar => (
-                <div key={pillar.id} className="card-elevated p-8 rounded-lg hover-lift text-center pop-card-lr pillar-card" data-testid={`about-pillar-${pillar.id}`}>
+                <div key={pillar.id} className="card-elevated p-8 rounded-lg hover-lift text-center pop-card-lr pillar-card h-full flex flex-col" data-testid={`about-pillar-${pillar.id}`}>
                   {pillar.image_url ? (
                     <img src={pillar.image_url} alt={pillar.name} className="w-20 h-20 rounded-full mx-auto mb-5 object-cover identity-lock" />
                   ) : (
@@ -277,7 +246,7 @@ children to the elderly — has access to dignity, care, opportunities, and hope
                 Our <span className="text-gradient-blue">Partners</span>
               </h3>
               {partners.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
                   {partners.map((partner) => (
                     <div key={partner.id} className="card-elevated p-8 rounded-lg hover-lift text-center partner-card group pop-card-lr" data-testid={`about-partner-${partner.id}`}>
                       {partner.image_url && (
