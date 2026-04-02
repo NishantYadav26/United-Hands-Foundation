@@ -244,27 +244,6 @@ const Home = () => {
       );
     });
 
-    if (gsap.utils.toArray('.home-people-card').length && document.querySelector('[data-testid="founders-section"]')) {
-      gsap.fromTo(
-        '.home-people-card',
-        { opacity: 0, x: (i) => (i % 2 === 0 ? 60 : -60), y: 16 },
-        {
-          opacity: 1,
-          x: 0,
-          y: 0,
-          duration: 0.75,
-          stagger: 0.1,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: '[data-testid="founders-section"]',
-            start: 'top 75%',
-            toggleActions: 'play none none none',
-            once: true
-          }
-        }
-      );
-    }
-
     if (gsap.utils.toArray('.pop-card-lr').length) {
       gsap.utils.toArray('.pop-card-lr').forEach((card, index) => {
         gsap.fromTo(
@@ -330,28 +309,6 @@ const Home = () => {
           scrollTrigger: {
             trigger: '#impact',
             start: 'top 72%',
-            toggleActions: 'play none none none',
-            once: true,
-            invalidateOnRefresh: true
-          }
-        }
-      );
-    }
-
-    if (gsap.utils.toArray('.founder-card').length && document.querySelector('[data-testid=\"founders-section\"]')) {
-      gsap.fromTo(
-        '.founder-card',
-        { opacity: 0, y: 40, rotateX: 8 },
-        {
-          opacity: 1,
-          y: 0,
-          rotateX: 0,
-          duration: 1,
-          stagger: 0.16,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: '[data-testid=\"founders-section\"]',
-            start: 'top 70%',
             toggleActions: 'play none none none',
             once: true,
             invalidateOnRefresh: true
@@ -701,52 +658,15 @@ const Home = () => {
         </section>
       )}
 
-      {/* Founders Section */}
-      <section className="py-20 px-6 reveal-section" data-testid="founders-section">
+      {/* Team Section */}
+      <section className="py-20 px-6 reveal-section" data-testid="home-team-section">
         <div className="max-w-7xl mx-auto">
           <h2
-            className="text-4xl sm:text-5xl font-medium tracking-tight text-center mb-4"
+            className="text-4xl sm:text-5xl font-medium tracking-tight text-center mb-14"
             style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}
           >
-            Meet Our <span className="text-gradient-blue">Founders</span>
+            Our <span className="text-gradient-blue">Team</span>
           </h2>
-          <p className="text-center text-base mb-14" style={{ color: 'var(--text-muted)' }}>Ex-Government of India doctors dedicated to community service</p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
-            {siteAssets.founder_1 && (
-              <div className="text-center founder-card" data-testid="founder-rahul">
-                <div className="mb-6 overflow-hidden rounded-lg card-elevated">
-                  <img
-                    src={siteAssets.founder_1}
-                    alt="Dr. Rahul Sarwade"
-                    className="w-full h-96 object-cover identity-lock"
-                    loading="eager"
-                    decoding="async"
-                  />
-                </div>
-                <h3 className="text-2xl font-medium mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>Dr. Rahul Sarwade</h3>
-                <p className="text-xs tracking-[0.2em] uppercase font-bold mb-3" style={{ color: 'var(--accent-gold)' }}>Co-Founder</p>
-                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>Former Government of India medical officer bringing decades of healthcare expertise to community service.</p>
-              </div>
-            )}
-
-            {siteAssets.founder_2 && (
-              <div className="text-center founder-card" data-testid="founder-jagruti">
-                <div className="mb-6 overflow-hidden rounded-lg card-elevated">
-                  <img
-                    src={siteAssets.founder_2}
-                    alt="Dr. Jagruti Hankare"
-                    className="w-full h-96 object-cover identity-lock"
-                    loading="eager"
-                    decoding="async"
-                  />
-                </div>
-                <h3 className="text-2xl font-medium mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>Dr. Jagruti Hankare</h3>
-                <p className="text-xs tracking-[0.2em] uppercase font-bold mb-3" style={{ color: 'var(--accent-gold)' }}>Co-Founder</p>
-                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>Dedicated healthcare professional committed to improving quality of life for underserved communities.</p>
-              </div>
-            )}
-          </div>
 
           <div className="mt-16" data-testid="home-team-pillars-section">
             <h3 className="text-2xl font-bold text-center mb-10" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
