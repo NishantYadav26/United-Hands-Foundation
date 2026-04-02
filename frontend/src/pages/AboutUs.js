@@ -115,7 +115,7 @@ through medical camps, health awareness drives, and community outreach programs.
       {/* Mission & Vision */}
       <section className="py-16 px-6 reveal-section" style={{ background: 'var(--bg-surface)' }} data-testid="about-mission">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <div className="card-elevated p-10 rounded-lg group transition-all duration-300 hover:-translate-y-1 hover:bg-[#e8f5e9]">
+          <div className="card-elevated p-10 rounded-lg group transition-all duration-300 hover:-translate-y-1">
             <Target className="mb-6" style={{ color: 'var(--accent-teal)' }} size={40} />
             <h2 className="text-3xl font-medium mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               Our <span className="text-gradient-blue">Mission</span>
@@ -136,7 +136,7 @@ To create a platform where communities actively participate in their own growth,
 leading to sustainable and inclusive development`}
             </p>
           </div>
-          <div className="card-elevated p-10 rounded-lg group transition-all duration-300 hover:-translate-y-1 hover:bg-[#e8f5e9]">
+          <div className="card-elevated p-10 rounded-lg group transition-all duration-300 hover:-translate-y-1">
             <Award className="mb-6" style={{ color: 'var(--accent-gold)' }} size={40} />
             <h2 className="text-3xl font-medium mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               Our <span className="text-gradient-orange">Vision</span>
