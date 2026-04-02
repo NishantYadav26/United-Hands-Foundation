@@ -31,6 +31,22 @@ const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKE
 const API = `${BACKEND_URL}/api`;
 const HOME_CACHE_KEY = 'uhf_home_cache_v1';
 const REQUEST_TIMEOUT_MS = 4500;
+const HOME_CACHE_TTL_MS = 30 * 60 * 1000;
+
+const readCachedSiteAssets = () => {
+  try {
+    const cached = localStorage.getItem(HOME_CACHE_KEY);
+    if (!cached) return {};
+
+    const parsed = JSON.parse(cached);
+    const isFresh = parsed?.timestamp && (Date.now() - parsed.timestamp) < HOME_CACHE_TTL_MS;
+    if (!isFresh || !parsed?.siteAssets || typeof parsed.siteAssets !== 'object') return {};
+
+    return parsed.siteAssets;
+  } catch (error) {
+    return {};
+  }
+};
 
 const Home = () => {
   const [stats, setStats] = useState({
@@ -41,7 +57,7 @@ const Home = () => {
   });
   const [successStories, setSuccessStories] = useState([]);
   const [galleryImages, setGalleryImages] = useState([]);
-  const [siteAssets, setSiteAssets] = useState({});
+  const [siteAssets, setSiteAssets] = useState(() => readCachedSiteAssets());
   const [pillars, setPillars] = useState([]);
   const [locations, setLocations] = useState([]);
   const [isMobileGalleryModalOpen, setIsMobileGalleryModalOpen] = useState(false);
@@ -81,32 +97,45 @@ const Home = () => {
 
   useEffect(() => {
     let isMounted = true;
+    const cacheSiteAssets = (assetsMap) => {
+      try {
+        localStorage.setItem(HOME_CACHE_KEY, JSON.stringify({
+          timestamp: Date.now(),
+          siteAssets: assetsMap
+        }));
+      } catch (error) {
+        // no-op if storage is unavailable
+      }
+    };
 
     const fetchHomeData = async () => {
+      axios.get(`${API}/site-assets`, { timeout: REQUEST_TIMEOUT_MS })
+        .then((assetsRes) => {
+          if (!isMounted) return;
+          const assetsMap = {};
+          (assetsRes.data.assets || []).forEach((a) => { assetsMap[a.asset_key] = a.asset_url; });
+          setSiteAssets(assetsMap);
+          cacheSiteAssets(assetsMap);
+        })
+        .catch((error) => {
+          console.error('Failed to fetch site assets:', error);
+        });
+
       // Keep pillars in critical requests so Team/Partner sections render reliably on first paint.
       const criticalRequests = await Promise.allSettled([
-        axios.get(`${API}/stats`),
-        axios.get(`${API}/site-assets`),
-        axios.get(`${API}/locations`),
-        axios.get(`${API}/pillars`)
+        axios.get(`${API}/stats`, { timeout: REQUEST_TIMEOUT_MS }),
+        axios.get(`${API}/locations`, { timeout: REQUEST_TIMEOUT_MS }),
+        axios.get(`${API}/pillars`, { timeout: REQUEST_TIMEOUT_MS })
       ]);
 
       if (!isMounted) return;
 
-      const [statsRes, assetsRes, locationsRes, pillarsRes] = criticalRequests;
+      const [statsRes, locationsRes, pillarsRes] = criticalRequests;
 
       if (statsRes.status === 'fulfilled') {
         setStats(normalizeStats(statsRes.value.data));
       } else {
         console.error('Failed to fetch stats:', statsRes.reason);
-      }
-
-      if (assetsRes.status === 'fulfilled') {
-        const assetsMap = {};
-        (assetsRes.value.data.assets || []).forEach((a) => { assetsMap[a.asset_key] = a.asset_url; });
-        setSiteAssets(assetsMap);
-      } else {
-        console.error('Failed to fetch site assets:', assetsRes.reason);
       }
 
       if (locationsRes.status === 'fulfilled') {
@@ -122,8 +151,8 @@ const Home = () => {
       }
 
       Promise.allSettled([
-        axios.get(`${API}/success-stories?limit=3`),
-        axios.get(`${API}/gallery`)
+        axios.get(`${API}/success-stories?limit=3`, { timeout: REQUEST_TIMEOUT_MS }),
+        axios.get(`${API}/gallery`, { timeout: REQUEST_TIMEOUT_MS })
       ]).then((deferredRequests) => {
         if (!isMounted) return;
         const [storiesRes, galleryRes] = deferredRequests;
@@ -148,6 +177,13 @@ const Home = () => {
       isMounted = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (!siteAssets?.hero_background) return;
+
+    const preloadImage = new Image();
+    preloadImage.src = siteAssets.hero_background;
+  }, [siteAssets]);
 
   useEffect(() => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -413,12 +449,22 @@ const Home = () => {
         ref={heroRef}
         className="relative min-h-screen flex items-center justify-center pt-16 px-6"
         style={{
-          background: siteAssets.hero_background
-            ? `url(${siteAssets.hero_background}) center/cover no-repeat`
-            : 'linear-gradient(135deg, #0B1F3A 0%, #163455 100%)'
+          background: 'linear-gradient(135deg, #0B1F3A 0%, #163455 100%)'
         }}
         data-testid="hero-section"
       >
+        {siteAssets.hero_background && (
+          <img
+            src={siteAssets.hero_background}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full object-cover"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+          />
+        )}
+
         {/* Gradient overlay - lighter to show people */}
         <div
           className="absolute inset-0"
