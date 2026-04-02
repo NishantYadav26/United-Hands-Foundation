@@ -224,11 +224,11 @@ children to the elderly — has access to dignity, care, opportunities, and hope
               Our <span className="text-gradient-gold">Pillars</span>
             </h3>
             {teamPillars.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch mb-14">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10 items-stretch mb-14">
                 {teamPillars.map((pillar) => (
-                  <div key={pillar.id} className="card-elevated p-8 rounded-lg hover-lift text-center group pop-card-lr pillar-card" data-testid={`about-pillar-${pillar.id}`}>
+                  <div key={pillar.id} className="card-elevated p-8 rounded-lg hover-lift text-center group pop-card-lr pillar-card h-full flex flex-col" data-testid={`about-pillar-${pillar.id}`}>
                     {pillar.image_url && (
-                      <div className="w-24 h-24 mx-auto mb-4 overflow-hidden rounded-full border blue-border">
+                      <div className="w-24 h-24 mx-auto mb-5 overflow-hidden rounded-full border blue-border">
                         <img
                           src={pillar.image_url}
                           alt={pillar.name}
@@ -236,10 +236,11 @@ children to the elderly — has access to dignity, care, opportunities, and hope
                         />
                       </div>
                     )}
-                    <h4 className="text-xl font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{pillar.name}</h4>
-                    <p className="text-xs tracking-[0.15em] uppercase font-bold mb-3" style={{ color: 'var(--accent-gold)' }}>{pillar.role}</p>
-                    {pillar.specialty && <p className="partner-description text-sm" style={{ color: 'var(--text-muted)' }}>{pillar.specialty}</p>}
+                    <h4 className="text-xl font-medium mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{pillar.name}</h4>
+                    <p className="text-xs tracking-[0.15em] uppercase font-bold mb-4" style={{ color: 'var(--accent-gold)' }}>{pillar.role}</p>
+                    {pillar.specialty && <p className="partner-description text-sm mb-2" style={{ color: 'var(--text-muted)' }}>{pillar.specialty}</p>}
                     {pillar.bio_detailed && <p className="partner-description text-sm mt-2 leading-relaxed" style={{ color: 'var(--text-muted)' }}>{pillar.bio_detailed}</p>}
+                    <div className="mt-auto pt-2" />
                   </div>
                 ))}
               </div>
