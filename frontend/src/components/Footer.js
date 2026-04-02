@@ -103,10 +103,10 @@ const Footer = () => {
               PAN: AABTU0797K | 80G: AABTU0797KF20231 | 12A: AABTU0797KE20231
             </p>
             <p className="text-xs" style={{ color: '#A7B1BC' }}>
-              Societies Reg: Latur/0000171/2020 | Registered: 04/08/2020
+              Societies Reg: Latur/171/2020 | Registered: 04/08/2020
             </p>
             <p className="text-xs mt-3 leading-relaxed" style={{ color: '#A7B1BC' }}>
-              Account Name: United Hands Foundation | Account Number: 09900100048917 | IFSC: BARB0(zero)LATURX
+              Account Name: United Hands Foundation | Account Number: 09900100048917 | IFSC: BARB0LATURX (fifth character is zero)
             </p>
           </div>
           <p className="text-sm text-center" style={{ color: '#A7B1BC' }}>

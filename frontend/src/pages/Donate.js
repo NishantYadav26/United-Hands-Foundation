@@ -290,7 +290,7 @@ const Donate = () => {
                       <br />
                       Account Number: 09900100048917
                       <br />
-                      IFSC: BARB0(zero)LATURX
+                      IFSC: BARB0LATURX (fifth character is zero)
                     </p>
                   </div>
                   <div className="p-6 rounded-lg" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-warm)' }}>

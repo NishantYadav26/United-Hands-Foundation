@@ -446,11 +446,11 @@ def create_80g_receipt_pdf(donation: dict, receipt_number: str) -> BytesIO:
     c.drawString(100, height - 80, "United Hands Foundation")
     c.setFont("Helvetica", 10)
     c.drawString(100, height - 100, "TA JI LATUR | Est. 2020 | Healthcare, Education & Community Service")
-    c.drawString(100, height - 115, "New Bhagya Nagar, Ring Road, Latur, Maharashtra - 413512")
+    c.drawString(100, height - 115, "Ratnai Niwas, Kaikadi Chal, Bhoi Galli, Latur, Maharashtra - 413512")
     
     c.setFont("Helvetica-Bold", 9)
     c.drawString(100, height - 135, "PAN: AABTU0797K | 12A: AABTU0797KE20231 | 80G: AABTU0797KF20231")
-    c.drawString(100, height - 150, "Societies Reg: Latur/0000171/2020 | Registered: 04/08/2020")
+    c.drawString(100, height - 150, "Societies Reg: Latur/171/2020 | Registered: 04/08/2020")
     
     c.setFont("Helvetica-Bold", 12)
     c.drawString(100, height - 180, f"Receipt No: {receipt_number}")
@@ -512,7 +512,7 @@ async def send_receipt_email(donor_email: str, donor_name: str, receipt_number: 
                     <p>Thank you for your generous contribution to United Hands Foundation. Your support helps us continue our healthcare, education, disaster relief, and community service programs.</p>
                     <p>Please find your 80G tax exemption receipt attached to this email.</p>
                     <p><strong>Receipt Number:</strong> {receipt_number}</p>
-                    <p>With gratitude,<br>United Hands Foundation<br>New Bhagya Nagar, Ring Road, Latur, Maharashtra - 413512</p>
+                    <p>With gratitude,<br>United Hands Foundation<br>Ratnai Niwas, Kaikadi Chal, Bhoi Galli, Latur, Maharashtra - 413512</p>
                 </body>
             </html>
             """,
