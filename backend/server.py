@@ -67,6 +67,7 @@ SENDER_EMAIL = os.getenv("SENDER_EMAIL", "onboarding@resend.dev")
 
 # Security
 security = HTTPBearer()
+optional_security = HTTPBearer(auto_error=False)
 
 def delete_cloudinary_image(image_url: str):
     """Delete an image from Cloudinary given its URL."""
@@ -152,6 +153,20 @@ def verify_user_token(credentials: HTTPAuthorizationCredentials = Depends(securi
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expired")
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
+def get_optional_admin_email(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(optional_security)
+):
+    if not credentials:
+        return None
+    try:
+        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get("sub")
+        if email == ADMIN_EMAIL:
+            return email
+    except jwt.InvalidTokenError:
+        return None
+    return None
 
 # ===== MODELS =====
 
@@ -859,17 +874,17 @@ async def download_receipt(donation_id: str):
         headers={"Content-Disposition": f"attachment; filename=Receipt_{donation['receipt_number']}.pdf"}
     )
 
-@api_router.get("/admin/settings", response_model=AdminSettingsPublic)
-async def get_admin_settings():
+@api_router.get("/admin/settings")
+async def get_admin_settings(admin_email: Optional[str] = Depends(get_optional_admin_email)):
     settings = await db.admin_settings.find_one({"id": "settings"}, {"_id": 0})
     
     if not settings:
         default_settings = AdminSettings()
         doc = default_settings.model_dump()
         await db.admin_settings.insert_one(doc)
-        return AdminSettingsPublic(**default_settings.model_dump())
-    
-    return AdminSettingsPublic(**settings)
+        return default_settings if admin_email else AdminSettingsPublic(**default_settings.model_dump())
+
+    return AdminSettings(**settings) if admin_email else AdminSettingsPublic(**settings)
 
 @api_router.get("/admin/settings/private", response_model=AdminSettings)
 async def get_admin_settings_private(admin_email: str = Depends(verify_token)):
