@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Body, Depends, status, UploadFile, File, Form, Request
+from fastapi import FastAPI, APIRouter, HTTPException, Body, Depends, status, UploadFile, File, Form
 from fastapi.responses import FileResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
@@ -25,16 +25,12 @@ import razorpay
 import jwt
 import bcrypt
 import hashlib
-import secrets
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 # JWT Configuration
-SECRET_KEY = os.getenv("JWT_SECRET_KEY")
-if not SECRET_KEY:
-    SECRET_KEY = secrets.token_urlsafe(48)
-    logging.getLogger(__name__).warning("JWT_SECRET_KEY is not set; generated an ephemeral key for this process.")
+SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'uhf-secret-key-2026-change-in-production')
 ALGORITHM = 'HS256'
 ACCESS_TOKEN_EXPIRE_MINUTES = 480  # 8 hours
 
@@ -67,7 +63,6 @@ SENDER_EMAIL = os.getenv("SENDER_EMAIL", "onboarding@resend.dev")
 
 # Security
 security = HTTPBearer()
-optional_security = HTTPBearer(auto_error=False)
 
 def delete_cloudinary_image(image_url: str):
     """Delete an image from Cloudinary given its URL."""
@@ -154,20 +149,6 @@ def verify_user_token(credentials: HTTPAuthorizationCredentials = Depends(securi
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
-def get_optional_admin_email(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(optional_security)
-):
-    if not credentials:
-        return None
-    try:
-        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
-        email: str = payload.get("sub")
-        if email == ADMIN_EMAIL:
-            return email
-    except jwt.InvalidTokenError:
-        return None
-    return None
-
 # ===== MODELS =====
 
 class DonationCreate(BaseModel):
@@ -208,19 +189,6 @@ class AdminSettings(BaseModel):
     upi_id: str = "unitedhands@upi"
     razorpay_key_id: str = ""
     razorpay_key_secret: str = ""
-    razorpay_enabled: bool = False
-    facebook_url: str = "https://www.facebook.com/share/g/17PHfXpM2Q/"
-    instagram_url: str = ""
-    youtube_url: str = ""
-
-class AdminSettingsPublic(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-    
-    id: str = "settings"
-    payment_mode: str = "manual_qr"
-    qr_code_url: str = ""
-    upi_id: str = "unitedhands@upi"
-    razorpay_key_id: str = ""
     razorpay_enabled: bool = False
     facebook_url: str = "https://www.facebook.com/share/g/17PHfXpM2Q/"
     instagram_url: str = ""
@@ -693,11 +661,7 @@ async def root():
     return {"message": "United Hands Foundation API"}
 
 @api_router.get("/cloudinary/signature")
-async def generate_cloudinary_signature(
-    resource_type: str = "image",
-    folder: str = "uploads",
-    admin_email: str = Depends(verify_token)
-):
+async def generate_cloudinary_signature(resource_type: str = "image", folder: str = "uploads"):
     ALLOWED_FOLDERS = ("donations", "press", "uploads", "success_stories", "qr_codes", "videos", "projects", "gallery", "site_assets", "team_pillars")
     folder_base = folder.rstrip("/")
     if folder_base not in ALLOWED_FOLDERS:
@@ -774,7 +738,7 @@ async def create_donation(donation: DonationCreate):
     return donation_obj
 
 @api_router.get("/donations", response_model=List[Donation])
-async def get_donations(status: Optional[str] = None, admin_email: str = Depends(verify_token)):
+async def get_donations(status: Optional[str] = None):
     query = {}
     if status:
         query["status"] = status
@@ -874,28 +838,16 @@ async def download_receipt(donation_id: str):
         headers={"Content-Disposition": f"attachment; filename=Receipt_{donation['receipt_number']}.pdf"}
     )
 
-@api_router.get("/admin/settings")
-async def get_admin_settings(admin_email: Optional[str] = Depends(get_optional_admin_email)):
+@api_router.get("/admin/settings", response_model=AdminSettings)
+async def get_admin_settings():
     settings = await db.admin_settings.find_one({"id": "settings"}, {"_id": 0})
     
     if not settings:
         default_settings = AdminSettings()
         doc = default_settings.model_dump()
         await db.admin_settings.insert_one(doc)
-        return default_settings if admin_email else AdminSettingsPublic(**default_settings.model_dump())
-
-    return AdminSettings(**settings) if admin_email else AdminSettingsPublic(**settings)
-
-@api_router.get("/admin/settings/private", response_model=AdminSettings)
-async def get_admin_settings_private(admin_email: str = Depends(verify_token)):
-    settings = await db.admin_settings.find_one({"id": "settings"}, {"_id": 0})
-
-    if not settings:
-        default_settings = AdminSettings()
-        doc = default_settings.model_dump()
-        await db.admin_settings.insert_one(doc)
         return default_settings
-
+    
     return AdminSettings(**settings)
 
 @api_router.put("/admin/settings")
@@ -1017,7 +969,7 @@ async def verify_razorpay_payment(data: dict = Body(...)):
     return {"status": "success", "message": "Payment verified and donation recorded", "donation_id": donation_doc["id"]}
 
 @api_router.post("/press-media", response_model=PressMedia)
-async def create_press_media(media: PressMediaCreate, admin_email: str = Depends(verify_token)):
+async def create_press_media(media: PressMediaCreate):
     media_obj = PressMedia(**media.model_dump())
     doc = media_obj.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
@@ -1069,7 +1021,7 @@ async def delete_press_media(media_id: str, admin_email: str = Depends(verify_to
     return {"status": "success", "message": "Press clipping deleted"}
 
 @api_router.post("/projects", response_model=Project)
-async def create_project(project: ProjectCreate, admin_email: str = Depends(verify_token)):
+async def create_project(project: ProjectCreate):
     project_obj = Project(**project.model_dump())
     doc = project_obj.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
@@ -1576,26 +1528,10 @@ async def seed_projects():
 
 app.include_router(api_router)
 
-@app.middleware("http")
-async def add_security_headers(request: Request, call_next):
-    response = await call_next(request)
-    response.headers["X-Content-Type-Options"] = "nosniff"
-    response.headers["X-Frame-Options"] = "DENY"
-    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-    response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
-    response.headers["X-XSS-Protection"] = "0"
-    return response
-
-cors_origins = [origin.strip() for origin in os.environ.get("CORS_ORIGINS", "*").split(",") if origin.strip()]
-allow_credentials = True
-if "*" in cors_origins:
-    # Never combine wildcard origin with credentialed requests.
-    allow_credentials = False
-
 app.add_middleware(
     CORSMiddleware,
-    allow_credentials=allow_credentials,
-    allow_origins=cors_origins,
+    allow_credentials=True,
+    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
     allow_methods=["*"],
     allow_headers=["*"],
 )
