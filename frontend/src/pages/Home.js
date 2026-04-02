@@ -51,7 +51,9 @@ const Home = () => {
     const name = normalizeText(pillar?.name);
     return category.startsWith('partner') || role.includes('partner') || name.includes('partner');
   };
+  const isTeamPillar = (pillar) => !isPartner(pillar);
   const partners = pillars.filter((pillar) => isPartner(pillar));
+  const teamPillars = pillars.filter((pillar) => isTeamPillar(pillar));
   const fallbackLocations = ['Dharashiv', 'Solapur', 'Latur', 'Palghar', 'Panchgani'];
   const visibleLocations = locations.length > 0 ? locations : fallbackLocations.map((name) => ({ name }));
 
@@ -396,6 +398,9 @@ const Home = () => {
   const partnerCards = partners.length > 0
     ? partners
     : pillars.filter((pillar) => pillar.image_url).slice(0, 3);
+  const teamPillarCards = teamPillars.length > 0
+    ? teamPillars
+    : pillars.filter((pillar) => !isPartner(pillar) && pillar.image_url).slice(0, 3);
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-deep)' }}>
@@ -691,6 +696,40 @@ const Home = () => {
                 <h3 className="text-2xl font-medium mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>Dr. Jagruti Hankare</h3>
                 <p className="text-xs tracking-[0.2em] uppercase font-bold mb-3" style={{ color: 'var(--accent-gold)' }}>Co-Founder</p>
                 <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>Dedicated healthcare professional committed to improving quality of life for underserved communities.</p>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-16" data-testid="home-team-pillars-section">
+            <h3 className="text-2xl font-bold text-center mb-10" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+              Our <span className="text-gradient-gold">Pillars</span>
+            </h3>
+            {teamPillarCards.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                {teamPillarCards.map((pillar) => (
+                  <div key={pillar.id} className="card-elevated p-6 rounded-lg hover-lift text-center pop-card-lr" data-testid={`home-pillar-${pillar.id}`}>
+                    {pillar.image_url && (
+                      <div className="w-24 h-24 mx-auto mb-4 overflow-hidden rounded-full border blue-border">
+                        <img
+                          src={pillar.image_url}
+                          alt={pillar.name}
+                          className="w-full h-full object-cover identity-lock"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </div>
+                    )}
+                    <h4 className="text-lg font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{pillar.name}</h4>
+                    <p className="text-xs tracking-[0.15em] uppercase font-bold mb-2" style={{ color: 'var(--accent-gold)' }}>{pillar.role}</p>
+                    {pillar.specialty && <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{pillar.specialty}</p>}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="card-elevated p-8 rounded-lg text-center">
+                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                  Add team pillars from dashboard → Team & Partners tab to highlight your core members here.
+                </p>
               </div>
             )}
           </div>
