@@ -107,6 +107,37 @@ through medical camps, health awareness drives, and community outreach programs.
     return () => observer.disconnect();
   }, [founders.length]);
 
+  useEffect(() => {
+    const foundersSection = document.querySelector('[data-testid="about-founders"]');
+    if (!foundersSection) return undefined;
+
+    const founderElements = foundersSection.querySelectorAll('[data-testid^="about-founder-"]');
+    if (!founderElements.length) return undefined;
+
+    founderElements.forEach((element, index) => {
+      element.classList.add('pillar-hidden');
+      element.classList.add(index % 2 === 0 ? 'from-left' : 'from-right');
+    });
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('pillar-show');
+          observer.unobserve(entry.target);
+        });
+      },
+      {
+        threshold: 0.2,
+        rootMargin: '0px 0px -10% 0px'
+      }
+    );
+
+    founderElements.forEach((element) => observer.observe(element));
+
+    return () => observer.disconnect();
+  }, [founders.length]);
+
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-deep)' }}>
