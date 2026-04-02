@@ -281,6 +281,18 @@ const Donate = () => {
                       )}
                     </div>
                   </div>
+                  <div className="p-4 rounded-lg mb-6" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)' }}>
+                    <p className="text-xs tracking-[0.12em] uppercase font-bold mb-2" style={{ color: 'var(--accent-teal)' }}>
+                      Bank Transfer Details
+                    </p>
+                    <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                      Account Name: United Hands Foundation
+                      <br />
+                      Account Number: 09900100048917
+                      <br />
+                      IFSC: BARB0LATURX
+                    </p>
+                  </div>
                   <div className="p-6 rounded-lg" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-warm)' }}>
                     <div className="flex items-start gap-3">
                       <AlertCircle style={{ color: 'var(--accent-gold)' }} className="flex-shrink-0 mt-1" size={20} />

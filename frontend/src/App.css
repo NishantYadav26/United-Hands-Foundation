@@ -421,6 +421,15 @@ input:focus, select:focus, textarea:focus {
   transform: translateY(0);
 }
 
+@media (max-width: 768px) {
+  .founder-description {
+    max-height: none;
+    opacity: 1;
+    overflow: visible;
+    transform: none;
+  }
+}
+
 .pop-card-lr {
   will-change: transform, opacity;
   backface-visibility: hidden;
