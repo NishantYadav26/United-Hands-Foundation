@@ -18,9 +18,11 @@ const initialForm = {
 const PressManagement = () => {
   const [pressItems, setPressItems] = useState([]);
   const [formData, setFormData] = useState(initialForm);
+  const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
     fetchPressItems();
@@ -76,18 +78,64 @@ const PressManagement = () => {
     setSaving(true);
     try {
       const token = localStorage.getItem('uhf_admin_token');
-      await axios.post(`${API}/press-media`, formData, {
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined
-      });
-      toast.success('Press clipping added');
+      const request = editingId
+        ? axios.put(`${API}/press-media/${editingId}`, formData, {
+            headers: token ? { Authorization: `Bearer ${token}` } : undefined
+          })
+        : axios.post(`${API}/press-media`, formData, {
+            headers: token ? { Authorization: `Bearer ${token}` } : undefined
+          });
+
+      await request;
+      toast.success(editingId ? 'Press clipping updated' : 'Press clipping added');
+      setEditingId(null);
       setFormData(initialForm);
       fetchPressItems();
     } catch (error) {
-      console.error('Failed to add press clipping:', error);
+      console.error('Failed to save press clipping:', error);
       const msg = error.response?.data?.detail || error.message || 'Unknown error';
       toast.error(`Failed to save: ${msg}`);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const startEdit = (item) => {
+    setEditingId(item.id);
+    setFormData({
+      title: item.title || '',
+      publication: item.publication || '',
+      district: item.district || 'Dharashiv',
+      year: item.year || String(new Date().getFullYear()),
+      category: item.category || 'newspaper',
+      image_url: item.image_url || ''
+    });
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setFormData(initialForm);
+  };
+
+  const handleDelete = async (item) => {
+    if (!window.confirm(`Delete "${item.title}" from press clippings?`)) return;
+
+    setDeletingId(item.id);
+    try {
+      const token = localStorage.getItem('uhf_admin_token');
+      await axios.delete(`${API}/press-media/${item.id}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined
+      });
+      toast.success('Press clipping deleted');
+      if (editingId === item.id) {
+        cancelEdit();
+      }
+      fetchPressItems();
+    } catch (error) {
+      console.error('Failed to delete press clipping:', error);
+      toast.error(error.response?.data?.detail || 'Failed to delete press clipping');
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -155,9 +203,16 @@ const PressManagement = () => {
           )}
         </div>
 
-        <button onClick={handleSave} className="btn-primary mt-6 w-full sm:w-auto px-8 py-3" disabled={saving}>
-          {saving ? 'Saving...' : 'Add to Press'}
-        </button>
+        <div className="flex flex-wrap gap-3 mt-6">
+          <button onClick={handleSave} className="btn-primary w-full sm:w-auto px-8 py-3" disabled={saving}>
+            {saving ? 'Saving...' : editingId ? 'Update Press Item' : 'Add to Press'}
+          </button>
+          {editingId && (
+            <button onClick={cancelEdit} className="btn-gold w-full sm:w-auto px-8 py-3" disabled={saving}>
+              Cancel Edit
+            </button>
+          )}
+        </div>
       </div>
 
       {loading ? (
@@ -172,6 +227,21 @@ const PressManagement = () => {
               <div className="p-4">
                 <h4 className="font-semibold text-sm mb-1" style={{ color: 'var(--text-primary)' }}>{item.title}</h4>
                 <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{item.publication} • {item.district} • {item.year}</p>
+                <div className="mt-3 flex gap-2">
+                  <button
+                    onClick={() => startEdit(item)}
+                    className="btn-primary px-3 py-1 text-xs"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(item)}
+                    className="btn-gold px-3 py-1 text-xs"
+                    disabled={deletingId === item.id}
+                  >
+                    {deletingId === item.id ? 'Deleting...' : 'Delete'}
+                  </button>
+                </div>
               </div>
             </div>
           ))}

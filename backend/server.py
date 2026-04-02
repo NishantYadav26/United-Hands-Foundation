@@ -993,6 +993,33 @@ async def get_press_media(district: Optional[str] = None, year: Optional[str] = 
     
     return media
 
+@api_router.put("/press-media/{media_id}")
+async def update_press_media(media_id: str, media: PressMediaCreate, admin_email: str = Depends(verify_token)):
+    old = await db.press_media.find_one({"id": media_id}, {"_id": 0})
+    if not old:
+        raise HTTPException(status_code=404, detail="Press clipping not found")
+
+    if old.get("image_url") and old["image_url"] != media.image_url:
+        delete_cloudinary_image(old["image_url"])
+
+    await db.press_media.update_one(
+        {"id": media_id},
+        {"$set": media.model_dump()}
+    )
+    return {"status": "success", "message": "Press clipping updated"}
+
+@api_router.delete("/press-media/{media_id}")
+async def delete_press_media(media_id: str, admin_email: str = Depends(verify_token)):
+    old = await db.press_media.find_one({"id": media_id}, {"_id": 0})
+    if not old:
+        raise HTTPException(status_code=404, detail="Press clipping not found")
+
+    if old.get("image_url"):
+        delete_cloudinary_image(old["image_url"])
+
+    await db.press_media.delete_one({"id": media_id})
+    return {"status": "success", "message": "Press clipping deleted"}
+
 @api_router.post("/projects", response_model=Project)
 async def create_project(project: ProjectCreate):
     project_obj = Project(**project.model_dump())
