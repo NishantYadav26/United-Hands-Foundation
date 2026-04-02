@@ -276,11 +276,6 @@ input:focus, select:focus, textarea:focus {
   transform: translateX(0);
 }
 
-.pillar-show.from-left,
-.pillar-show.from-right {
-  transform: translateX(0);
-}
-
 .gallery-mobile-view-all-btn,
 .gallery-mobile-modal {
   display: none;

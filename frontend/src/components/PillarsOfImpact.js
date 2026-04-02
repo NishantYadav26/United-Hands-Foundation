@@ -32,6 +32,39 @@ const PillarsOfImpact = () => {
     fetchProjects();
   }, []);
 
+  useEffect(() => {
+    if (!projects.length) return undefined;
+
+    const section = document.querySelector('[data-testid="pillars-section"]');
+    if (!section) return undefined;
+
+    const pillarElements = section.querySelectorAll('[data-testid^="project-"]');
+    if (!pillarElements.length) return undefined;
+
+    pillarElements.forEach((element, index) => {
+      element.classList.add('pillar-hidden');
+      element.classList.add(index % 2 === 0 ? 'from-left' : 'from-right');
+    });
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('pillar-show');
+          observer.unobserve(entry.target);
+        });
+      },
+      {
+        threshold: 0.2,
+        rootMargin: '0px 0px -10% 0px'
+      }
+    );
+
+    pillarElements.forEach((element) => observer.observe(element));
+
+    return () => observer.disconnect();
+  }, [projects]);
+
   const fetchProjects = async () => {
     try {
       const response = await axios.get(`${API}/projects?active_only=true`);

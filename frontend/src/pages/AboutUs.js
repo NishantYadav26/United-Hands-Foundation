@@ -53,6 +53,37 @@ const AboutUs = () => {
     fetchLocations();
   }, []);
 
+  useEffect(() => {
+    const pillarsSection = document.querySelector('[data-testid="about-pillars"]');
+    if (!pillarsSection) return undefined;
+
+    const pillarElements = pillarsSection.querySelectorAll('[data-testid^="about-pillar-"]');
+    if (!pillarElements.length) return undefined;
+
+    pillarElements.forEach((element, index) => {
+      element.classList.add('pillar-hidden');
+      element.classList.add(index % 2 === 0 ? 'from-left' : 'from-right');
+    });
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('pillar-show');
+          observer.unobserve(entry.target);
+        });
+      },
+      {
+        threshold: 0.2,
+        rootMargin: '0px 0px -10% 0px'
+      }
+    );
+
+    pillarElements.forEach((element) => observer.observe(element));
+
+    return () => observer.disconnect();
+  }, [teamPillars.length]);
+
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-deep)' }}>
       <Navbar />

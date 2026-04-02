@@ -27,12 +27,11 @@ const usePillarScrollAnimation = (rerunKey) => {
       const pillarElements = Array.from(document.querySelectorAll(PILLAR_SELECTOR));
 
       pillarElements.forEach((element, index) => {
-        if (observedElements.has(element)) return;
-
         element.classList.add('pillar-hidden');
-        element.classList.remove('pillar-show');
         element.classList.remove('from-left', 'from-right');
         element.classList.add(index % 2 === 0 ? 'from-left' : 'from-right');
+
+        if (observedElements.has(element)) return;
         intersectionObserver.observe(element);
         observedElements.add(element);
       });
