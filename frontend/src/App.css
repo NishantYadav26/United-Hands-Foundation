@@ -258,6 +258,29 @@ input:focus, select:focus, textarea:focus {
   will-change: transform, opacity;
 }
 
+.pillar-hidden {
+  opacity: 0;
+  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+}
+
+.pillar-hidden.from-left {
+  transform: translateX(-50px);
+}
+
+.pillar-hidden.from-right {
+  transform: translateX(50px);
+}
+
+.pillar-show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.pillar-show.from-left,
+.pillar-show.from-right {
+  transform: translateX(0);
+}
+
 .gallery-mobile-view-all-btn,
 .gallery-mobile-modal {
   display: none;
