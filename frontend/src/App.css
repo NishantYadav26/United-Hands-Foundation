@@ -241,16 +241,6 @@ input:focus, select:focus, textarea:focus {
   margin-bottom: 16px;
 }
 
-.pillar-card {
-  transform-style: preserve-3d;
-  will-change: transform, opacity;
-  width: 100%;
-  max-width: 340px;
-}
-
-.pillar-card:hover {
-  transform: translateY(-8px) scale(1.02);
-}
 
 .gallery-card {
   will-change: transform, opacity;

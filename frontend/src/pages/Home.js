@@ -8,7 +8,6 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import PillarsOfImpact from '@/components/PillarsOfImpact';
 import axios from 'axios';
-import usePillarScrollAnimation from '@/hooks/usePillarScrollAnimation';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -53,12 +52,8 @@ const Home = () => {
     return category.startsWith('partner') || role.includes('partner') || name.includes('partner');
   };
   const partners = pillars.filter((pillar) => isPartner(pillar));
-  const teamPillars = pillars.filter((pillar) => !isPartner(pillar));
-  const visibleTeamPillars = teamPillars.length > 0 ? teamPillars : pillars;
   const fallbackLocations = ['Dharashiv', 'Solapur', 'Latur', 'Palghar', 'Panchgani'];
   const visibleLocations = locations.length > 0 ? locations : fallbackLocations.map((name) => ({ name }));
-
-  usePillarScrollAnimation(`home-${visibleTeamPillars.length}`);
 
   const statsRef = useRef(null);
   const heroRef = useRef(null);
@@ -699,28 +694,6 @@ const Home = () => {
               </div>
             )}
           </div>
-
-          {/* Team Pillars */}
-          {visibleTeamPillars.length > 0 && (
-            <div className="mt-16">
-              <h3 className="text-2xl font-bold text-center mb-10" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
-                Our <span className="text-gradient-orange">Pillars</span>
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 pillars-animated-grid items-stretch">
-                {visibleTeamPillars.map(pillar => (
-
-                  <div key={pillar.id} className="card-elevated p-6 rounded-lg hover-lift text-center pillar-card h-full flex flex-col" data-testid={`pillar-${pillar.id}`}>
-                    {pillar.image_url && (
-                      <img src={pillar.image_url} alt={pillar.name} className="w-24 h-24 rounded-full mx-auto mb-4 object-cover identity-lock" loading="lazy" decoding="async" />
-                    )}
-                    <h4 className="text-lg font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{pillar.name}</h4>
-                    <p className="text-xs tracking-[0.15em] uppercase font-bold mb-2" style={{ color: 'var(--accent-teal)' }}>{pillar.role}</p>
-                    {pillar.specialty && <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{pillar.specialty}</p>}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
 
           <div className="mt-16" data-testid="home-partners-section">
             <h3 className="text-2xl font-bold text-center mb-10" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>

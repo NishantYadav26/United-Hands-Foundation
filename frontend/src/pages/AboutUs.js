@@ -1,9 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
-import { MapPin, Heart, Users, Award, Target } from 'lucide-react';
+import { MapPin, Heart, Award, Target } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import usePageRevealAnimation from '@/hooks/usePageRevealAnimation';
-import usePillarScrollAnimation from '@/hooks/usePillarScrollAnimation';
 import axios from 'axios';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
@@ -15,7 +14,6 @@ const AboutUs = () => {
   const [locations, setLocations] = useState([]);
   const normalizeCategory = (category) => (category || '').toString().trim().toLowerCase();
   const isPartner = (category) => normalizeCategory(category).startsWith('partner');
-  const teamPillars = pillars.filter((pillar) => !isPartner(pillar.category));
   const partners = pillars.filter((pillar) => isPartner(pillar.category));
   const founders = useMemo(() => ([
     siteAssets.founder_1 ? {
@@ -47,7 +45,6 @@ through medical camps, health awareness drives, and community outreach programs.
   const visibleLocations = locations.length > 0 ? locations : fallbackLocations;
 
   usePageRevealAnimation(`${pillars.length}-${partners.length}-${visibleLocations.length}`);
-  usePillarScrollAnimation(`about-${teamPillars.length}`);
 
   useEffect(() => {
     const fetchAssets = async () => {
@@ -216,63 +213,40 @@ children to the elderly — has access to dignity, care, opportunities, and hope
         </section>
       )}
 
-      {/* Team Pillars - Dynamic */}
+      {/* Partners - Dynamic */}
       {pillars.length > 0 && (
-        <section className="py-16 px-6 reveal-section" data-testid="about-pillars">
+        <section className="py-16 px-6 reveal-section" data-testid="about-partners-section">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-4xl font-medium text-center mb-12" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
-              Our <span className="text-gradient-orange">Pillars</span>
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
-              {teamPillars.map(pillar => (
-                <div key={pillar.id} className="card-elevated p-8 rounded-lg hover-lift text-center pop-card-lr pillar-card h-full flex flex-col" data-testid={`about-pillar-${pillar.id}`}>
-                  {pillar.image_url ? (
-                    <img src={pillar.image_url} alt={pillar.name} className="w-20 h-20 rounded-full mx-auto mb-5 object-cover identity-lock" />
-                  ) : (
-                    <div className="w-20 h-20 rounded-full mx-auto mb-5 flex items-center justify-center" style={{ background: 'var(--bg-surface)' }}>
-                      <Users style={{ color: 'var(--accent-teal)' }} size={32} />
-                    </div>
-                  )}
-                  <h3 className="text-xl font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{pillar.name}</h3>
-                  <p className="text-xs tracking-[0.15em] uppercase font-bold mb-3" style={{ color: 'var(--accent-teal)' }}>{pillar.role}</p>
-                  {pillar.specialty && <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{pillar.specialty}</p>}
-                  {pillar.bio_detailed && <p className="text-sm mt-2 leading-relaxed" style={{ color: 'var(--text-muted)' }}>{pillar.bio_detailed}</p>}
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-14" data-testid="about-partners-section">
-              <h3 className="text-3xl font-medium text-center mb-8" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
-                Our <span className="text-gradient-blue">Partners</span>
-              </h3>
-              {partners.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
-                  {partners.map((partner) => (
-                    <div key={partner.id} className="card-elevated p-8 rounded-lg hover-lift text-center partner-card group pop-card-lr" data-testid={`about-partner-${partner.id}`}>
-                      {partner.image_url && (
-                        <div className="w-24 h-24 mx-auto mb-4 overflow-hidden rounded-full border blue-border">
-                          <img
-                            src={partner.image_url}
-                            alt={partner.name}
-                            className="w-full h-full object-cover identity-lock"
-                          />
-                        </div>
-                      )}
-                      <h4 className="text-xl font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{partner.name}</h4>
-                      <p className="text-xs tracking-[0.15em] uppercase font-bold mb-3" style={{ color: 'var(--accent-teal)' }}>{partner.role}</p>
-                      {partner.specialty && <p className="partner-description text-sm" style={{ color: 'var(--text-muted)' }}>{partner.specialty}</p>}
-                      {partner.bio_detailed && <p className="partner-description text-sm mt-2 leading-relaxed" style={{ color: 'var(--text-muted)' }}>{partner.bio_detailed}</p>}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="card-elevated p-8 rounded-lg text-center">
-                  <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                    Partner profiles will appear here as soon as they are added from the dashboard.
-                  </p>
-                </div>
-              )}
-            </div>
+            <h3 className="text-3xl font-medium text-center mb-8" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+              Our <span className="text-gradient-blue">Partners</span>
+            </h3>
+            {partners.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
+                {partners.map((partner) => (
+                  <div key={partner.id} className="card-elevated p-8 rounded-lg hover-lift text-center partner-card group pop-card-lr" data-testid={`about-partner-${partner.id}`}>
+                    {partner.image_url && (
+                      <div className="w-24 h-24 mx-auto mb-4 overflow-hidden rounded-full border blue-border">
+                        <img
+                          src={partner.image_url}
+                          alt={partner.name}
+                          className="w-full h-full object-cover identity-lock"
+                        />
+                      </div>
+                    )}
+                    <h4 className="text-xl font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{partner.name}</h4>
+                    <p className="text-xs tracking-[0.15em] uppercase font-bold mb-3" style={{ color: 'var(--accent-teal)' }}>{partner.role}</p>
+                    {partner.specialty && <p className="partner-description text-sm" style={{ color: 'var(--text-muted)' }}>{partner.specialty}</p>}
+                    {partner.bio_detailed && <p className="partner-description text-sm mt-2 leading-relaxed" style={{ color: 'var(--text-muted)' }}>{partner.bio_detailed}</p>}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="card-elevated p-8 rounded-lg text-center">
+                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                  Partner profiles will appear here as soon as they are added from the dashboard.
+                </p>
+              </div>
+            )}
           </div>
         </section>
       )}
