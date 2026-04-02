@@ -1420,14 +1420,21 @@ async def delete_gallery_image(image_id: str, admin_email: str = Depends(verify_
 async def get_stats():
     total_donations = await db.donations.count_documents({"status": "approved"})
     total_amount = 0
-    
+
     approved_donations = await db.donations.find({"status": "approved"}, {"_id": 0}).to_list(1000)
     for donation in approved_donations:
         total_amount += donation.get('amount', 0)
-    
+
+    stories = await db.success_stories.find({}, {"_id": 0, "patient_count": 1, "location": 1}).to_list(1000)
+    story_beneficiaries = sum(max(0, story.get("patient_count", 0)) for story in stories)
+
+    # Maintains existing baseline impact while allowing admin-managed stories to raise the count.
+    patients_served = 2000 + story_beneficiaries
+    districts_covered = len({story.get("location") for story in stories if story.get("location")}) or 5
+
     return {
-        "patients_served": 2000,
-        "districts_covered": 5,
+        "patients_served": patients_served,
+        "districts_covered": districts_covered,
         "total_donations": total_donations,
         "total_amount": total_amount
     }
