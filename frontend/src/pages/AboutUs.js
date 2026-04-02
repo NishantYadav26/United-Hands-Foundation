@@ -115,12 +115,15 @@ through medical camps, health awareness drives, and community outreach programs.
       {/* Mission & Vision */}
       <section className="py-16 px-6 reveal-section" style={{ background: 'var(--bg-surface)' }} data-testid="about-mission">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <div className="card-elevated p-10 rounded-lg">
+          <div className="card-elevated p-10 rounded-lg group transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(46,125,50,0.18)] hover:bg-[linear-gradient(135deg,#ecfdf3_0%,#dff7ea_52%,#f4fff8_100%)]">
             <Target className="mb-6" style={{ color: 'var(--accent-teal)' }} size={40} />
             <h2 className="text-3xl font-medium mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               Our <span className="text-gradient-blue">Mission</span>
             </h2>
-            <p className="leading-relaxed whitespace-pre-line" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-sm mb-3" style={{ color: 'var(--text-muted)' }}>
+              Hover to explore our complete mission.
+            </p>
+            <p className="leading-relaxed whitespace-pre-line lg:max-h-24 lg:overflow-hidden transition-all duration-300 lg:group-hover:max-h-[420px]" style={{ color: 'var(--text-muted)' }}>
               {`To unite hands and hearts in serving underserved communities through integrated
 programs in healthcare, elderly care, palliative support, education, and livelihood.
 To ensure accessible, affordable, and holistic health services in both rural and tribal
@@ -133,12 +136,15 @@ To create a platform where communities actively participate in their own growth,
 leading to sustainable and inclusive development`}
             </p>
           </div>
-          <div className="card-elevated p-10 rounded-lg">
+          <div className="card-elevated p-10 rounded-lg group transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(46,125,50,0.18)] hover:bg-[linear-gradient(135deg,#ecfdf3_0%,#dff7ea_52%,#f4fff8_100%)]">
             <Award className="mb-6" style={{ color: 'var(--accent-gold)' }} size={40} />
             <h2 className="text-3xl font-medium mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               Our <span className="text-gradient-orange">Vision</span>
             </h2>
-            <p className="leading-relaxed whitespace-pre-line" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-sm mb-3" style={{ color: 'var(--text-muted)' }}>
+              Hover to reveal our guiding vision.
+            </p>
+            <p className="leading-relaxed whitespace-pre-line lg:max-h-10 lg:overflow-hidden transition-all duration-300 lg:group-hover:max-h-40" style={{ color: 'var(--text-muted)' }}>
               {`build a compassionate, healthy, and self-reliant society where every individual — from
 children to the elderly — has access to dignity, care, opportunities, and hope.`}
             </p>
