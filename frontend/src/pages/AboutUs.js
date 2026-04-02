@@ -11,12 +11,7 @@ const API = `${BACKEND_URL}/api`;
 
 const AboutUs = () => {
   const [siteAssets, setSiteAssets] = useState({});
-  const [pillars, setPillars] = useState([]);
   const [locations, setLocations] = useState([]);
-  const normalizeCategory = (category) => (category || '').toString().trim().toLowerCase();
-  const isPartner = (category) => normalizeCategory(category).startsWith('partner');
-  const partners = pillars.filter((pillar) => isPartner(pillar.category));
-  const teamPillars = pillars.filter((pillar) => !isPartner(pillar.category));
   const founders = useMemo(() => ([
     siteAssets.founder_1 ? {
       key: 'founder-1',
@@ -46,8 +41,7 @@ through medical camps, health awareness drives, and community outreach programs.
   ];
   const visibleLocations = locations.length > 0 ? locations : fallbackLocations;
 
-  usePageRevealAnimation(`${pillars.length}-${partners.length}-${visibleLocations.length}`);
-  usePillarScrollAnimation(`${teamPillars.length}-${partners.length}`);
+  usePageRevealAnimation(`${visibleLocations.length}`);
 
   useEffect(() => {
     const fetchAssets = async () => {
@@ -58,12 +52,6 @@ through medical camps, health awareness drives, and community outreach programs.
         setSiteAssets(map);
       } catch (error) { console.error('Failed to fetch assets:', error); }
     };
-    const fetchPillars = async () => {
-      try {
-        const response = await axios.get(`${API}/pillars`);
-        setPillars(response.data);
-      } catch (error) { console.error('Failed to fetch pillars:', error); }
-    };
     const fetchLocations = async () => {
       try {
         const response = await axios.get(`${API}/locations`);
@@ -71,7 +59,6 @@ through medical camps, health awareness drives, and community outreach programs.
       } catch (error) { console.error('Failed to fetch locations:', error); }
     };
     fetchAssets();
-    fetchPillars();
     fetchLocations();
   }, []);
 
@@ -212,76 +199,6 @@ children to the elderly — has access to dignity, care, opportunities, and hope
                 </div>
               )}
             </div>
-          </div>
-        </section>
-      )}
-
-      {/* Partners - Dynamic */}
-      {pillars.length > 0 && (
-        <section className="py-16 px-6 reveal-section" data-testid="about-partners-section">
-          <div className="max-w-6xl mx-auto">
-            <h3 className="text-3xl font-medium text-center mb-8" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
-              Our <span className="text-gradient-gold">Pillars</span>
-            </h3>
-            {teamPillars.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10 items-stretch mb-14">
-                {teamPillars.map((pillar) => (
-                  <div key={pillar.id} className="card-elevated p-8 rounded-lg hover-lift text-center group pop-card-lr pillar-card h-full flex flex-col" data-testid={`about-pillar-${pillar.id}`}>
-                    {pillar.image_url && (
-                      <div className="w-24 h-24 mx-auto mb-5 overflow-hidden rounded-full border blue-border">
-                        <img
-                          src={pillar.image_url}
-                          alt={pillar.name}
-                          className="w-full h-full object-cover identity-lock"
-                        />
-                      </div>
-                    )}
-                    <h4 className="text-xl font-medium mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{pillar.name}</h4>
-                    <p className="text-xs tracking-[0.15em] uppercase font-bold mb-4" style={{ color: 'var(--accent-gold)' }}>{pillar.role}</p>
-                    {pillar.specialty && <p className="partner-description text-sm mb-2" style={{ color: 'var(--text-muted)' }}>{pillar.specialty}</p>}
-                    {pillar.bio_detailed && <p className="partner-description text-sm mt-2 leading-relaxed" style={{ color: 'var(--text-muted)' }}>{pillar.bio_detailed}</p>}
-                    <div className="mt-auto pt-2" />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="card-elevated p-8 rounded-lg text-center mb-14">
-                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                  Pillar profiles will appear here as soon as they are added from the dashboard.
-                </p>
-              </div>
-            )}
-
-            <h3 className="text-3xl font-medium text-center mb-8" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
-              Our <span className="text-gradient-blue">Partners</span>
-            </h3>
-            {partners.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
-                {partners.map((partner) => (
-                  <div key={partner.id} className="card-elevated p-8 rounded-lg hover-lift text-center partner-card group pop-card-lr pillar-card" data-testid={`about-partner-${partner.id}`}>
-                    {partner.image_url && (
-                      <div className="w-24 h-24 mx-auto mb-4 overflow-hidden rounded-full border blue-border">
-                        <img
-                          src={partner.image_url}
-                          alt={partner.name}
-                          className="w-full h-full object-cover identity-lock"
-                        />
-                      </div>
-                    )}
-                    <h4 className="text-xl font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{partner.name}</h4>
-                    <p className="text-xs tracking-[0.15em] uppercase font-bold mb-3" style={{ color: 'var(--accent-teal)' }}>{partner.role}</p>
-                    {partner.specialty && <p className="partner-description text-sm" style={{ color: 'var(--text-muted)' }}>{partner.specialty}</p>}
-                    {partner.bio_detailed && <p className="partner-description text-sm mt-2 leading-relaxed" style={{ color: 'var(--text-muted)' }}>{partner.bio_detailed}</p>}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="card-elevated p-8 rounded-lg text-center">
-                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                  Partner profiles will appear here as soon as they are added from the dashboard.
-                </p>
-              </div>
-            )}
           </div>
         </section>
       )}
