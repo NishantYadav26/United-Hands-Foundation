@@ -106,7 +106,7 @@ const Footer = () => {
               Societies Reg: Latur/0000171/2020 | Registered: 04/08/2020
             </p>
             <p className="text-xs mt-3 leading-relaxed" style={{ color: '#A7B1BC' }}>
-              Account Name: United Hands Foundation | Account Number: 09900100048917 | IFSC: BARB0LATURX
+              Account Name: United Hands Foundation | Account Number: 09900100048917 | IFSC: BARB0(zero)LATURX
             </p>
           </div>
           <p className="text-sm text-center" style={{ color: '#A7B1BC' }}>
