@@ -9,15 +9,17 @@ const usePillarScrollAnimation = (rerunKey) => {
     const intersectionObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          entry.target.classList.add('pillar-show');
-          intersectionObserver.unobserve(entry.target);
-          observedElements.delete(entry.target);
+          if (entry.isIntersecting) {
+            entry.target.classList.add('pillar-show');
+            return;
+          }
+
+          entry.target.classList.remove('pillar-show');
         });
       },
       {
-        threshold: 0.2,
-        rootMargin: '0px 0px -10% 0px'
+        threshold: 0.6,
+        rootMargin: '0px 0px -100px 0px'
       }
     );
 
