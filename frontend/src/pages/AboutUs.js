@@ -3,6 +3,7 @@ import { MapPin, Heart, Users, Award, Target } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import usePageRevealAnimation from '@/hooks/usePageRevealAnimation';
+import usePillarScrollAnimation from '@/hooks/usePillarScrollAnimation';
 import axios from 'axios';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
@@ -46,6 +47,7 @@ through medical camps, health awareness drives, and community outreach programs.
   const visibleLocations = locations.length > 0 ? locations : fallbackLocations;
 
   usePageRevealAnimation(`${pillars.length}-${partners.length}-${visibleLocations.length}`);
+  usePillarScrollAnimation(`about-${teamPillars.length}`);
 
   useEffect(() => {
     const fetchAssets = async () => {
@@ -106,13 +108,13 @@ through medical camps, health awareness drives, and community outreach programs.
   }, [founders.length]);
 
   useEffect(() => {
-    const pillarsSection = document.querySelector('[data-testid="about-pillars"]');
-    if (!pillarsSection) return undefined;
+    const foundersSection = document.querySelector('[data-testid="about-founders"]');
+    if (!foundersSection) return undefined;
 
-    const pillarElements = pillarsSection.querySelectorAll('[data-testid^="about-pillar-"]');
-    if (!pillarElements.length) return undefined;
+    const founderElements = foundersSection.querySelectorAll('[data-testid^="about-founder-"]');
+    if (!founderElements.length) return undefined;
 
-    pillarElements.forEach((element, index) => {
+    founderElements.forEach((element, index) => {
       element.classList.add('pillar-hidden');
       element.classList.add(index % 2 === 0 ? 'from-left' : 'from-right');
     });
@@ -131,10 +133,11 @@ through medical camps, health awareness drives, and community outreach programs.
       }
     );
 
-    pillarElements.forEach((element) => observer.observe(element));
+    founderElements.forEach((element) => observer.observe(element));
 
     return () => observer.disconnect();
-  }, [teamPillars.length]);
+  }, [founders.length]);
+
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-deep)' }}>
