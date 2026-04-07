@@ -58,7 +58,10 @@ const AdminDashboard = () => {
 
   const fetchDonations = async () => {
     try {
-      const response = await axios.get(`${API}/donations`);
+      const token = localStorage.getItem('uhf_admin_token');
+      const response = await axios.get(`${API}/donations`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       setDonations(response.data);
     } catch (error) {
       console.error('Failed to fetch donations:', error);
