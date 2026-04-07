@@ -283,7 +283,7 @@ const Donate = () => {
                   </div>
                   <div className="p-4 rounded-lg mb-6" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)' }}>
                     <p className="text-xs tracking-[0.12em] uppercase font-bold mb-2" style={{ color: 'var(--accent-teal)' }}>
-                      Bank Transfer Details
+                      Bank Details
                     </p>
                     <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
                       Account Name: United Hands Foundation
