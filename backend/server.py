@@ -59,8 +59,8 @@ razorpay_client = razorpay.Client(auth=(
 
 # Resend configuration
 resend.api_key = os.getenv("RESEND_API_KEY", "re_placeholder")
-REQUIRED_SENDER_EMAIL = "UnitedHandsFoundation@uhf.org.in"
-SENDER_EMAIL = os.getenv("SENDER_EMAIL", REQUIRED_SENDER_EMAIL)
+REQUIRED_SENDER_EMAIL = "onboarding@uhf.org.in"
+SENDER_EMAIL = REQUIRED_SENDER_EMAIL
 
 # Security
 security = HTTPBearer()
@@ -500,8 +500,8 @@ async def send_receipt_email(donor_email: str, donor_name: str, receipt_number: 
     try:
         if not resend.api_key or resend.api_key == "re_placeholder":
             raise RuntimeError("Resend API key is not configured")
-        if SENDER_EMAIL.strip().lower() != REQUIRED_SENDER_EMAIL.lower():
-            raise RuntimeError(f"Sender email must be {REQUIRED_SENDER_EMAIL}")
+        if not donor_email:
+            raise RuntimeError("Donor email is missing")
 
         import base64
         pdf_base64 = base64.b64encode(pdf_buffer.read()).decode('utf-8')
