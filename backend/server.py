@@ -59,7 +59,8 @@ razorpay_client = razorpay.Client(auth=(
 
 # Resend configuration
 resend.api_key = os.getenv("RESEND_API_KEY", "re_placeholder")
-SENDER_EMAIL = os.getenv("SENDER_EMAIL", "onboarding@resend.dev")
+REQUIRED_SENDER_EMAIL = "UnitedHandsFoundation@uhf.org.in"
+SENDER_EMAIL = os.getenv("SENDER_EMAIL", REQUIRED_SENDER_EMAIL)
 
 # Security
 security = HTTPBearer()
@@ -497,6 +498,11 @@ def create_80g_receipt_pdf(donation: dict, receipt_number: str) -> BytesIO:
 
 async def send_receipt_email(donor_email: str, donor_name: str, receipt_number: str, pdf_buffer: BytesIO):
     try:
+        if not resend.api_key or resend.api_key == "re_placeholder":
+            raise RuntimeError("Resend API key is not configured")
+        if SENDER_EMAIL.strip().lower() != REQUIRED_SENDER_EMAIL.lower():
+            raise RuntimeError(f"Sender email must be {REQUIRED_SENDER_EMAIL}")
+
         import base64
         pdf_base64 = base64.b64encode(pdf_buffer.read()).decode('utf-8')
         
@@ -738,7 +744,7 @@ async def create_donation(donation: DonationCreate):
     return donation_obj
 
 @api_router.get("/donations", response_model=List[Donation])
-async def get_donations(status: Optional[str] = None):
+async def get_donations(status: Optional[str] = None, admin_email: str = Depends(verify_token)):
     query = {}
     if status:
         query["status"] = status
@@ -805,7 +811,7 @@ async def approve_donation(approval: DonationApproval, admin_email: str = Depend
             logger.error(f"Email sending failed: {str(e)}")
             return {
                 "status": "success",
-                "message": f"Donation approved but email failed: {str(e)}",
+                "message": "Donation approved but receipt email failed. Please verify Resend sender/domain settings.",
                 "receipt_number": receipt_number
             }
     else:
@@ -947,6 +953,15 @@ async def verify_razorpay_payment(data: dict = Body(...)):
     except Exception:
         raise HTTPException(status_code=400, detail="Payment verification failed")
     
+    project_id = data.get("project_id", "")
+    project_title = ""
+    if project_id:
+        project = await db.projects.find_one({"id": project_id}, {"_id": 0, "title": 1})
+        if project:
+            project_title = project.get("title", "")
+
+    receipt_number = await generate_receipt_number()
+
     # Auto-create and approve donation
     donation_doc = {
         "id": str(uuid.uuid4()),
@@ -956,8 +971,10 @@ async def verify_razorpay_payment(data: dict = Body(...)):
         "donor_pan": data.get("donor_pan", ""),
         "amount": data.get("amount", 0),
         "utr_number": data.get("razorpay_payment_id"),
-        "project_id": data.get("project_id", ""),
+        "project_id": project_id,
+        "project_title": project_title,
         "status": "approved",
+        "receipt_number": receipt_number,
         "payment_method": "razorpay",
         "razorpay_order_id": data.get("razorpay_order_id"),
         "razorpay_payment_id": data.get("razorpay_payment_id"),
@@ -965,8 +982,40 @@ async def verify_razorpay_payment(data: dict = Body(...)):
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     await db.donations.insert_one(donation_doc)
-    
-    return {"status": "success", "message": "Payment verified and donation recorded", "donation_id": donation_doc["id"]}
+
+    if project_id:
+        await db.projects.update_one(
+            {"id": project_id},
+            {"$inc": {"raised_amount": donation_doc["amount"]}}
+        )
+
+    email_error = None
+    try:
+        pdf_buffer = create_80g_receipt_pdf(donation_doc, receipt_number)
+        await send_receipt_email(
+            donation_doc["donor_email"],
+            donation_doc["donor_name"],
+            receipt_number,
+            pdf_buffer
+        )
+    except Exception as e:
+        email_error = str(e)
+        logger.error(f"Razorpay donation email sending failed: {email_error}")
+
+    if email_error:
+        return {
+            "status": "success",
+            "message": "Payment verified and donation recorded, but receipt email failed. Please verify Resend sender/domain settings.",
+            "donation_id": donation_doc["id"],
+            "receipt_number": receipt_number
+        }
+
+    return {
+        "status": "success",
+        "message": "Payment verified, donation recorded, and receipt sent",
+        "donation_id": donation_doc["id"],
+        "receipt_number": receipt_number
+    }
 
 @api_router.post("/press-media", response_model=PressMedia)
 async def create_press_media(media: PressMediaCreate):
