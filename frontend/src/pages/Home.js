@@ -673,7 +673,7 @@ const Home = () => {
               Our <span className="text-gradient-gold">Pillars</span>
             </h3>
             {teamPillarCards.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 team-pillars-rotating-grid">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 team-pillars-drop-grid">
                 {teamPillarCards.map((pillar) => (
                   <div key={pillar.id} className="card-elevated p-6 rounded-lg hover-lift text-center pop-card-lr pillar-card" data-testid={`home-pillar-${pillar.id}`}>
                     {pillar.image_url && (

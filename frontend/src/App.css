@@ -435,32 +435,49 @@ input:focus, select:focus, textarea:focus {
   backface-visibility: hidden;
 }
 
-.team-pillars-rotating-grid {
-  perspective: 1200px;
+.team-pillars-drop-grid .pillar-card {
+  opacity: 0;
+  animation: pillar-drop-bounce 1.2s ease-out forwards;
 }
 
-.team-pillars-rotating-grid .pillar-card {
-  transform-style: preserve-3d;
-  animation: pillar-earth-rotate 12s linear infinite;
+.team-pillars-drop-grid .pillar-card:nth-child(2) {
+  animation-delay: 0.12s;
 }
 
-.team-pillars-rotating-grid .pillar-card:nth-child(2) {
-  animation-delay: -4s;
+.team-pillars-drop-grid .pillar-card:nth-child(3) {
+  animation-delay: 0.24s;
 }
 
-.team-pillars-rotating-grid .pillar-card:nth-child(3) {
-  animation-delay: -8s;
+.team-pillars-drop-grid .pillar-card:nth-child(4) {
+  animation-delay: 0.36s;
 }
 
-@keyframes pillar-earth-rotate {
+.team-pillars-drop-grid .pillar-card:nth-child(5) {
+  animation-delay: 0.48s;
+}
+
+.team-pillars-drop-grid .pillar-card:nth-child(6) {
+  animation-delay: 0.6s;
+}
+
+@keyframes pillar-drop-bounce {
   0% {
-    transform: rotateY(0deg) rotateX(2deg);
+    opacity: 0;
+    transform: translateY(-180px) scale(0.92);
   }
-  50% {
-    transform: rotateY(180deg) rotateX(-2deg);
+  60% {
+    opacity: 1;
+    transform: translateY(18px) scale(1.02);
+  }
+  78% {
+    transform: translateY(-10px) scale(0.99);
+  }
+  92% {
+    transform: translateY(6px) scale(1.005);
   }
   100% {
-    transform: rotateY(360deg) rotateX(2deg);
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -471,8 +488,9 @@ input:focus, select:focus, textarea:focus {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .team-pillars-rotating-grid .pillar-card {
+  .team-pillars-drop-grid .pillar-card {
     animation: none !important;
+    opacity: 1 !important;
     transform: none !important;
   }
 }
