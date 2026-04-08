@@ -435,9 +435,63 @@ input:focus, select:focus, textarea:focus {
   backface-visibility: hidden;
 }
 
+.team-pillars-drop-grid .pillar-card {
+  opacity: 0;
+  animation: pillar-drop-bounce 1.2s ease-out forwards;
+}
+
+.team-pillars-drop-grid .pillar-card:nth-child(2) {
+  animation-delay: 0.12s;
+}
+
+.team-pillars-drop-grid .pillar-card:nth-child(3) {
+  animation-delay: 0.24s;
+}
+
+.team-pillars-drop-grid .pillar-card:nth-child(4) {
+  animation-delay: 0.36s;
+}
+
+.team-pillars-drop-grid .pillar-card:nth-child(5) {
+  animation-delay: 0.48s;
+}
+
+.team-pillars-drop-grid .pillar-card:nth-child(6) {
+  animation-delay: 0.6s;
+}
+
+@keyframes pillar-drop-bounce {
+  0% {
+    opacity: 0;
+    transform: translateY(-180px) scale(0.92);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(18px) scale(1.02);
+  }
+  78% {
+    transform: translateY(-10px) scale(0.99);
+  }
+  92% {
+    transform: translateY(6px) scale(1.005);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @media (max-width: 768px) {
   .pop-card-lr:hover {
     transform: translateY(-4px) scale(1.01);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .team-pillars-drop-grid .pillar-card {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 
