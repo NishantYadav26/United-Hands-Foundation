@@ -5,6 +5,10 @@ import { toast } from 'sonner';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
 const API = `${BACKEND_URL}/api`;
+const formatBeneficiariesLabel = (value) => {
+  const count = Number(value);
+  return Number.isFinite(count) && count > 0 ? `${count} beneficiaries` : 'Beneficiaries';
+};
 
 const SuccessStoriesManagement = () => {
   const [stories, setStories] = useState([]);
@@ -13,7 +17,7 @@ const SuccessStoriesManagement = () => {
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
     location: 'Latur',
-    patient_count: 0,
+    patient_count: '',
     date: new Date().toISOString().split('T')[0],
     story_text: '',
     category: 'General',
@@ -37,7 +41,7 @@ const SuccessStoriesManagement = () => {
   };
 
   const resetForm = () => {
-    setFormData({ location: 'Latur', patient_count: 0, date: new Date().toISOString().split('T')[0], story_text: '', category: 'General', images: [] });
+    setFormData({ location: 'Latur', patient_count: '', date: new Date().toISOString().split('T')[0], story_text: '', category: 'General', images: [] });
     setEditingId(null);
     setShowForm(false);
   };
@@ -47,11 +51,15 @@ const SuccessStoriesManagement = () => {
     if (!formData.story_text) { toast.error('Story text is required'); return; }
     try {
       const token = localStorage.getItem('uhf_admin_token');
+      const payload = {
+        ...formData,
+        patient_count: parseInt(formData.patient_count, 10) || 0
+      };
       if (editingId) {
-        await axios.put(`${API}/success-stories/${editingId}`, formData, { headers: { Authorization: `Bearer ${token}` } });
+        await axios.put(`${API}/success-stories/${editingId}`, payload, { headers: { Authorization: `Bearer ${token}` } });
         toast.success('Story updated!');
       } else {
-        await axios.post(`${API}/success-stories`, formData, { headers: { Authorization: `Bearer ${token}` } });
+        await axios.post(`${API}/success-stories`, payload, { headers: { Authorization: `Bearer ${token}` } });
         toast.success('Story created!');
       }
       resetForm();
@@ -64,7 +72,7 @@ const SuccessStoriesManagement = () => {
   const handleEdit = (story) => {
     setFormData({
       location: story.location,
-      patient_count: story.patient_count,
+      patient_count: story.patient_count ?? '',
       date: story.date,
       story_text: story.story_text,
       category: story.category || 'General',
@@ -111,7 +119,7 @@ const SuccessStoriesManagement = () => {
               {categories.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
             <input type="number" placeholder="Beneficiaries" value={formData.patient_count}
-              onChange={e => setFormData({...formData, patient_count: parseInt(e.target.value) || 0})}
+              onChange={e => setFormData({...formData, patient_count: e.target.value})}
               className="rounded px-4 py-3 text-sm focus:outline-none" style={{background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', color: 'var(--text-primary)'}}
               data-testid="story-count-input"
             />
@@ -158,7 +166,7 @@ const SuccessStoriesManagement = () => {
               </div>
               <p className="leading-relaxed mb-3" style={{color: 'var(--text-primary)'}}>{story.story_text}</p>
               <div className="flex justify-between text-xs" style={{color: 'var(--text-muted)'}}>
-                <span>{story.patient_count} beneficiaries</span>
+                <span>{formatBeneficiariesLabel(story.patient_count)}</span>
                 <span>{story.date}</span>
               </div>
             </div>

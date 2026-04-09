@@ -27,6 +27,11 @@ const normalizeStats = (data) => ({
   total_amount: toNumber(data?.total_amount)
 });
 
+const formatBeneficiariesLabel = (value) => {
+  const count = Number(value);
+  return Number.isFinite(count) && count > 0 ? `${count} beneficiaries` : 'Beneficiaries';
+};
+
 const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
 const API = `${BACKEND_URL}/api`;
 const HOME_CACHE_KEY = 'uhf_home_cache_v1';
@@ -122,8 +127,9 @@ const Home = () => {
         });
 
       // Keep pillars in critical requests so Team/Partner sections render reliably on first paint.
+      const requestStamp = Date.now();
       const criticalRequests = await Promise.allSettled([
-        axios.get(`${API}/stats`, { timeout: REQUEST_TIMEOUT_MS }),
+        axios.get(`${API}/stats`, { timeout: REQUEST_TIMEOUT_MS, params: { t: requestStamp } }),
         axios.get(`${API}/locations`, { timeout: REQUEST_TIMEOUT_MS }),
         axios.get(`${API}/pillars`, { timeout: REQUEST_TIMEOUT_MS })
       ]);
@@ -151,7 +157,7 @@ const Home = () => {
       }
 
       Promise.allSettled([
-        axios.get(`${API}/success-stories?limit=3`, { timeout: REQUEST_TIMEOUT_MS }),
+        axios.get(`${API}/success-stories?limit=3`, { timeout: REQUEST_TIMEOUT_MS, params: { t: requestStamp } }),
         axios.get(`${API}/gallery`, { timeout: REQUEST_TIMEOUT_MS })
       ]).then((deferredRequests) => {
         if (!isMounted) return;
@@ -172,9 +178,14 @@ const Home = () => {
     };
 
     fetchHomeData();
+    const handleWindowFocus = () => {
+      fetchHomeData();
+    };
+    window.addEventListener('focus', handleWindowFocus);
 
     return () => {
       isMounted = false;
+      window.removeEventListener('focus', handleWindowFocus);
     };
   }, []);
 
@@ -648,7 +659,7 @@ const Home = () => {
                   </div>
                   <p className="leading-relaxed mb-6" style={{ color: 'var(--text-primary)' }}>{story.story_text}</p>
                   <div className="flex justify-between items-center text-xs" style={{ color: 'var(--text-muted)' }}>
-                    <span>{story.patient_count} beneficiaries</span>
+                    <span>{formatBeneficiariesLabel(story.patient_count)}</span>
                     <span>{new Date(story.date).toLocaleDateString()}</span>
                   </div>
                 </div>
