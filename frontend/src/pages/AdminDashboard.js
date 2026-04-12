@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   BookOpen,
@@ -19,17 +19,18 @@ import {
 import Footer from '@/components/Footer';
 import usePageRevealAnimation from '@/hooks/usePageRevealAnimation';
 import Navbar from '@/components/Navbar';
-import MediaLibrary from '@/components/MediaLibrary';
-import TeamPillars from '@/components/TeamPillars';
-import ProjectsManagement from '@/components/ProjectsManagement';
-import GalleryManagement from '@/components/GalleryManagement';
-import PressManagement from '@/components/PressManagement';
-import VideosManagement from '@/components/VideosManagement';
-import SuccessStoriesManagement from '@/components/SuccessStoriesManagement';
-import LocationsManagement from '@/components/LocationsManagement';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { Switch } from '@/components/ui/switch';
+
+const MediaLibrary = lazy(() => import('@/components/MediaLibrary'));
+const TeamPillars = lazy(() => import('@/components/TeamPillars'));
+const ProjectsManagement = lazy(() => import('@/components/ProjectsManagement'));
+const GalleryManagement = lazy(() => import('@/components/GalleryManagement'));
+const PressManagement = lazy(() => import('@/components/PressManagement'));
+const VideosManagement = lazy(() => import('@/components/VideosManagement'));
+const SuccessStoriesManagement = lazy(() => import('@/components/SuccessStoriesManagement'));
+const LocationsManagement = lazy(() => import('@/components/LocationsManagement'));
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
 const API = `${BACKEND_URL}/api`;
@@ -137,6 +138,19 @@ const AdminDashboard = () => {
 
   const pendingDonations = donations.filter(d => d.status === 'pending');
   const approvedDonations = donations.filter(d => d.status === 'approved');
+
+  const renderLazyTab = (Component) => (
+    <Suspense
+      fallback={
+        <div className="glass-morph p-8 rounded reveal-section text-center py-12">
+          <Loader2 className="animate-spin mx-auto mb-4" style={{ color: 'var(--accent-warm)' }} size={36} />
+          <p style={{ color: 'var(--text-muted)' }}>Loading section...</p>
+        </div>
+      }
+    >
+      <Component />
+    </Suspense>
+  );
 
   return (
     <div className="min-h-screen" style={{background: 'var(--bg-deep)'}}>
@@ -380,9 +394,9 @@ const AdminDashboard = () => {
             </div>
           )}
 
-          {activeTab === 'projects' && <ProjectsManagement />}
+          {activeTab === 'projects' && renderLazyTab(ProjectsManagement)}
 
-          {activeTab === 'gallery' && <GalleryManagement />}
+          {activeTab === 'gallery' && renderLazyTab(GalleryManagement)}
 
           {activeTab === 'settings' && settings && (
             <div className="glass-morph p-8 rounded reveal-section" data-testid="settings-panel">
@@ -557,23 +571,23 @@ const AdminDashboard = () => {
           )}
 
           {/* Media Library Tab */}
-          {activeTab === 'media' && <MediaLibrary />}
+          {activeTab === 'media' && renderLazyTab(MediaLibrary)}
 
           {/* Team Pillars Tab */}
-          {activeTab === 'pillars' && <TeamPillars />}
+          {activeTab === 'pillars' && renderLazyTab(TeamPillars)}
 
           {/* Videos Tab */}
-          {activeTab === 'press' && <PressManagement />}
+          {activeTab === 'press' && renderLazyTab(PressManagement)}
 
           {/* Videos Tab */}
-          {activeTab === 'videos' && <VideosManagement />}
+          {activeTab === 'videos' && renderLazyTab(VideosManagement)}
 
 
           {/* Success Stories Tab */}
-          {activeTab === 'stories' && <SuccessStoriesManagement />}
+          {activeTab === 'stories' && renderLazyTab(SuccessStoriesManagement)}
 
           {/* Locations Tab */}
-          {activeTab === 'locations' && <LocationsManagement />}
+          {activeTab === 'locations' && renderLazyTab(LocationsManagement)}
         </div>
       </div>
 
