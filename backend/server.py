@@ -207,6 +207,7 @@ class SuccessStory(BaseModel):
     patient_count: int
     date: str
     story_text: str
+    category: str = "General"
     images: List[str] = []
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -1589,6 +1590,8 @@ app.add_middleware(
 async def ensure_indexes():
     await db.images.create_index("id", unique=True)
     await db.images.create_index("public_id", unique=True)
+    await db.success_stories.create_index("id", unique=True)
+    await db.success_stories.create_index([("created_at", -1)])
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
