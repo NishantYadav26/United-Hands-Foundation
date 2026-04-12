@@ -3,12 +3,9 @@ import { Upload, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import usePageRevealAnimation from '@/hooks/usePageRevealAnimation';
-import axios from 'axios';
 import { toast } from 'sonner';
 import { useSearchParams } from 'react-router-dom';
-
-const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
-const API = `${BACKEND_URL}/api`;
+import { apiClient, getCached } from '@/lib/apiClient';
 
 const Donate = () => {
   const [searchParams] = useSearchParams();
@@ -55,7 +52,7 @@ const Donate = () => {
 
   const fetchQrCode = async () => {
     try {
-      const response = await axios.get(`${API}/site-assets/qr_code`);
+      const response = await getCached(`/site-assets/qr_code`, { cacheTtlMs: 3600000 });
       setQrCodeUrl(response.data.asset_url);
     } catch (error) {
       console.error('Failed to fetch QR code:', error);
@@ -64,7 +61,7 @@ const Donate = () => {
 
   const fetchPaymentMode = async () => {
     try {
-      const response = await axios.get(`${API}/admin/settings`);
+      const response = await getCached(`/admin/settings`, { cacheTtlMs: 300000 });
       setPaymentMode(response.data.payment_mode || 'manual_qr');
     } catch (error) {
       console.error('Failed to fetch payment mode:', error);
@@ -73,7 +70,7 @@ const Donate = () => {
 
   const fetchProjects = async () => {
     try {
-      const response = await axios.get(`${API}/projects?active_only=true`);
+      const response = await getCached(`/projects?active_only=true`, { cacheTtlMs: 300000 });
       setProjects(response.data);
     } catch (error) {
       console.error('Failed to fetch projects:', error);
@@ -112,7 +109,7 @@ const Donate = () => {
         return;
       }
 
-      const response = await axios.post(`${API}/razorpay/create-order`, {
+      const response = await apiClient.post(`/razorpay/create-order`, {
         amount: parseInt(formData.amount),
         donor_name: formData.donor_name,
         donor_email: formData.donor_email,
@@ -134,7 +131,7 @@ const Donate = () => {
         order_id: order_id,
         handler: async function (razorpayResponse) {
           try {
-            await axios.post(`${API}/razorpay/verify`, {
+            await apiClient.post(`/razorpay/verify`, {
               razorpay_order_id: razorpayResponse.razorpay_order_id,
               razorpay_payment_id: razorpayResponse.razorpay_payment_id,
               razorpay_signature: razorpayResponse.razorpay_signature,
@@ -179,7 +176,7 @@ const Donate = () => {
       const reader = new FileReader();
       reader.onloadend = async () => {
         const base64Screenshot = reader.result;
-        await axios.post(`${API}/donations`, {
+        await apiClient.post(`/donations`, {
           ...formData,
           amount: parseInt(formData.amount),
           screenshot_url: base64Screenshot

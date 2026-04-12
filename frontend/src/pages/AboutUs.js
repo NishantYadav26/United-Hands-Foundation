@@ -3,10 +3,7 @@ import { MapPin, Heart, Award, Target } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import usePageRevealAnimation from '@/hooks/usePageRevealAnimation';
-import axios from 'axios';
-
-const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
-const API = `${BACKEND_URL}/api`;
+import { getCached } from '@/lib/apiClient';
 
 const AboutUs = () => {
   const [siteAssets, setSiteAssets] = useState({});
@@ -25,7 +22,7 @@ const AboutUs = () => {
   useEffect(() => {
     const fetchAssets = async () => {
       try {
-        const response = await axios.get(`${API}/site-assets`);
+        const response = await getCached(`/site-assets`, { cacheTtlMs: 300000 });
         const map = {};
         (response.data.assets || []).forEach(a => { map[a.asset_key] = a.asset_url; });
         setSiteAssets(map);
@@ -33,7 +30,7 @@ const AboutUs = () => {
     };
     const fetchLocations = async () => {
       try {
-        const response = await axios.get(`${API}/locations`);
+        const response = await getCached(`/locations`, { cacheTtlMs: 300000 });
         setLocations(Array.isArray(response.data) ? response.data : []);
       } catch (error) { console.error('Failed to fetch locations:', error); }
     };

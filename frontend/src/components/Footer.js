@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Heart, Mail, MapPin, Phone, Facebook, Instagram, Youtube } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import { getCached } from '@/lib/apiClient';
 
-const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
-const API = `${BACKEND_URL}/api`;
 
 const Footer = () => {
   const [socialLinks, setSocialLinks] = useState({ facebook_url: '', instagram_url: '', youtube_url: '' });
@@ -12,7 +10,7 @@ const Footer = () => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const response = await axios.get(`${API}/admin/settings`);
+        const response = await getCached(`/admin/settings`, { cacheTtlMs: 300000 });
         setSocialLinks({
           facebook_url: response.data.facebook_url || '',
           instagram_url: response.data.instagram_url || '',

@@ -1,8 +1,9 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Body, Depends, status, UploadFile, File, Form
+from fastapi import FastAPI, APIRouter, HTTPException, Body, Depends, status, UploadFile, File, Form, Request
 from fastapi.responses import FileResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
+from starlette.responses import Response
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
@@ -1577,6 +1578,34 @@ async def seed_projects():
     return {"status": "success", "message": f"Seeded {len(default_projects)} default projects"}
 
 app.include_router(api_router)
+
+
+PUBLIC_CACHE_ROUTES = (
+    "/api/stats",
+    "/api/locations",
+    "/api/pillars",
+    "/api/gallery",
+    "/api/videos",
+    "/api/press-media",
+    "/api/site-assets",
+    "/api/projects"
+)
+
+@app.middleware("http")
+async def set_cache_headers(request: Request, call_next):
+    response: Response = await call_next(request)
+
+    if request.method != "GET" or response.status_code >= 400:
+        return response
+
+    path = request.url.path
+
+    if path.startswith(PUBLIC_CACHE_ROUTES):
+        response.headers["Cache-Control"] = "public, max-age=300, s-maxage=300, stale-while-revalidate=600"
+    elif path.endswith((".js", ".css", ".png", ".jpg", ".jpeg", ".webp", ".svg", ".gif", ".ico", ".avif")):
+        response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+
+    return response
 
 app.add_middleware(
     CORSMiddleware,

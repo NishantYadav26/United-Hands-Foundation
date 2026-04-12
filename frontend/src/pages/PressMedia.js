@@ -3,14 +3,11 @@ import { Filter, Loader2, Video } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import usePageRevealAnimation from '@/hooks/usePageRevealAnimation';
-import axios from 'axios';
 import Masonry from 'react-masonry-css';
 import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 import Zoom from 'yet-another-react-lightbox/plugins/zoom';
-
-const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
-const API = `${BACKEND_URL}/api`;
+import { getCached } from '@/lib/apiClient';
 
 const PressMedia = () => {
   const [pressItems, setPressItems] = useState([]);
@@ -32,7 +29,7 @@ const PressMedia = () => {
       const params = {};
       if (selectedDistrict && selectedDistrict !== 'All') params.district = selectedDistrict;
       if (selectedYear && selectedYear !== 'All') params.year = selectedYear;
-      const response = await axios.get(`${API}/press-media`, { params });
+      const response = await getCached(`/press-media`, { params, cacheTtlMs: 180000 });
       setPressItems(response.data);
     } catch (error) {
       console.error('Failed to fetch press media:', error);
@@ -43,7 +40,7 @@ const PressMedia = () => {
 
   const fetchVideos = useCallback(async () => {
     try {
-      const response = await axios.get(`${API}/videos`);
+      const response = await getCached(`/videos`, { cacheTtlMs: 180000 });
       setVideos(response.data);
     } catch (error) {
       console.error('Failed to fetch videos:', error);
