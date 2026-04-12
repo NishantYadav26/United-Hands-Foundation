@@ -8,11 +8,10 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import PillarsOfImpact from '@/components/PillarsOfImpact';
 import usePillarScrollAnimation from '@/hooks/usePillarScrollAnimation';
-import axios from 'axios';
+import { getCached } from '@/lib/apiClient';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Add this helper to prevent .map crashes
 const ensureArray = (data) => (Array.isArray(data) ? data : []);
 
 const toNumber = (value) => {
@@ -27,8 +26,6 @@ const normalizeStats = (data) => ({
   total_amount: toNumber(data?.total_amount)
 });
 
-const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
-const API = `${BACKEND_URL}/api`;
 const HOME_CACHE_KEY = 'uhf_home_cache_v1';
 const REQUEST_TIMEOUT_MS = 4500;
 const HOME_CACHE_TTL_MS = 30 * 60 * 1000;
@@ -109,7 +106,7 @@ const Home = () => {
     };
 
     const fetchHomeData = async () => {
-      axios.get(`${API}/site-assets`, { timeout: REQUEST_TIMEOUT_MS })
+      getCached(`/site-assets`, { timeout: REQUEST_TIMEOUT_MS, cacheTtlMs: 300000 })
         .then((assetsRes) => {
           if (!isMounted) return;
           const assetsMap = {};
@@ -123,9 +120,9 @@ const Home = () => {
 
       // Keep pillars in critical requests so Team/Partner sections render reliably on first paint.
       const criticalRequests = await Promise.allSettled([
-        axios.get(`${API}/stats`, { timeout: REQUEST_TIMEOUT_MS }),
-        axios.get(`${API}/locations`, { timeout: REQUEST_TIMEOUT_MS }),
-        axios.get(`${API}/pillars`, { timeout: REQUEST_TIMEOUT_MS })
+        getCached(`/stats`, { timeout: REQUEST_TIMEOUT_MS, cacheTtlMs: 120000 }),
+        getCached(`/locations`, { timeout: REQUEST_TIMEOUT_MS, cacheTtlMs: 300000 }),
+        getCached(`/pillars`, { timeout: REQUEST_TIMEOUT_MS, cacheTtlMs: 300000 })
       ]);
 
       if (!isMounted) return;
@@ -151,8 +148,8 @@ const Home = () => {
       }
 
       Promise.allSettled([
-        axios.get(`${API}/success-stories?limit=3`, { timeout: REQUEST_TIMEOUT_MS }),
-        axios.get(`${API}/gallery`, { timeout: REQUEST_TIMEOUT_MS })
+        getCached(`/success-stories?limit=3`, { timeout: REQUEST_TIMEOUT_MS, cacheTtlMs: 180000 }),
+        getCached(`/gallery`, { timeout: REQUEST_TIMEOUT_MS, cacheTtlMs: 180000 })
       ]).then((deferredRequests) => {
         if (!isMounted) return;
         const [storiesRes, galleryRes] = deferredRequests;

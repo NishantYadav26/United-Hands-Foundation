@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import axios from 'axios';
+import { getCached } from '@/lib/apiClient';
 
-const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
-const API = `${BACKEND_URL}/api`;
 
 const AnimatedLogo = ({ size = 'md', visualScale = 1, className = '' }) => {
   const [logoUrl, setLogoUrl] = useState('');
@@ -11,7 +9,7 @@ const AnimatedLogo = ({ size = 'md', visualScale = 1, className = '' }) => {
   useEffect(() => {
     const fetchLogo = async () => {
       try {
-        const response = await axios.get(`${API}/site-assets/logo`);
+        const response = await getCached(`/site-assets/logo`, { cacheTtlMs: 3600000 });
         setLogoUrl(response.data.asset_url);
       } catch (error) {
         console.error('Failed to fetch logo:', error);
@@ -45,6 +43,8 @@ const AnimatedLogo = ({ size = 'md', visualScale = 1, className = '' }) => {
         style={{ transform: `scale(${logoScale})`, transition: 'transform 0.3s ease' }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        loading="lazy"
+        decoding="async"
       />
     </div>
   );

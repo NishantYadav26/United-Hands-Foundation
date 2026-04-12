@@ -1,17 +1,25 @@
-import { useEffect } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Home from "@/pages/Home";
-import Donate from "@/pages/Donate";
-import AdminDashboard from "@/pages/AdminDashboard";
-import PressMedia from "@/pages/PressMedia";
-import Transparency from "@/pages/Transparency";
-import AboutUs from "@/pages/AboutUs";
-import TrackMyImpact from "@/pages/TrackMyImpact";
-import UserAuth from "@/pages/UserAuth";
 import usePillarScrollAnimation from "@/hooks/usePillarScrollAnimation";
 import "@/App.css";
+
+const Home = lazy(() => import("@/pages/Home"));
+const Donate = lazy(() => import("@/pages/Donate"));
+const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
+const PressMedia = lazy(() => import("@/pages/PressMedia"));
+const Transparency = lazy(() => import("@/pages/Transparency"));
+const AboutUs = lazy(() => import("@/pages/AboutUs"));
+const TrackMyImpact = lazy(() => import("@/pages/TrackMyImpact"));
+const UserAuth = lazy(() => import("@/pages/UserAuth"));
+
+const isLowEndDevice = () => {
+  const coreCount = navigator.hardwareConcurrency || 4;
+  const deviceMemory = navigator.deviceMemory || 4;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  return reducedMotion || coreCount <= 4 || deviceMemory <= 2;
+};
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('uhf_admin_token');
@@ -25,7 +33,7 @@ const AppRoutes = () => {
   usePillarScrollAnimation(location.pathname);
 
   useEffect(() => {
-    if (location.pathname === '/') return;
+    if (location.pathname === '/' || isLowEndDevice()) return;
 
     const sections = gsap.utils.toArray('section');
     sections.forEach((section) => {
@@ -52,24 +60,26 @@ const AppRoutes = () => {
   }, [location.pathname]);
 
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/about" element={<AboutUs />} />
-      <Route path="/donate" element={<Donate />} />
-      <Route path="/press" element={<PressMedia />} />
-      <Route path="/transparency" element={<Transparency />} />
-      <Route path="/track-impact" element={<TrackMyImpact />} />
-      <Route path="/login" element={<UserAuth />} />
-      <Route path="/uhf-admin" element={<UserAuth />} />
-      <Route
-        path="/uhf-admin/dashboard"
-        element={
-          <ProtectedRoute>
-            <AdminDashboard />
-          </ProtectedRoute>
-        }
-      />
-    </Routes>
+    <Suspense fallback={<div className="min-h-screen" style={{ background: 'var(--bg-deep)' }} />}>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/donate" element={<Donate />} />
+        <Route path="/press" element={<PressMedia />} />
+        <Route path="/transparency" element={<Transparency />} />
+        <Route path="/track-impact" element={<TrackMyImpact />} />
+        <Route path="/login" element={<UserAuth />} />
+        <Route path="/uhf-admin" element={<UserAuth />} />
+        <Route
+          path="/uhf-admin/dashboard"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </Suspense>
   );
 };
 
