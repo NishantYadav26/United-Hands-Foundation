@@ -18,6 +18,8 @@
   --glass-bg: rgba(255, 255, 255, 0.82);
   --glass-border: rgba(31, 111, 109, 0.1);
   --hero-dark: #0B1F3A;
+  --font-sans: 'Outfit', 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
+  --font-serif: 'Cormorant Garamond', 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', serif;
 }
 
 * {
@@ -29,12 +31,12 @@ body {
   padding: 0;
   background: var(--bg-deep);
   color: var(--text-primary);
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--font-sans);
   scroll-behavior: smooth;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: var(--font-serif);
 }
 
 .identity-lock {
@@ -232,6 +234,12 @@ img {
 input:focus, select:focus, textarea:focus {
   border-color: var(--accent-teal) !important;
   box-shadow: 0 0 0 2px rgba(31, 111, 109, 0.1);
+}
+
+input,
+select,
+textarea {
+  font-family: var(--font-sans);
 }
 
 /* Masonry styles */
