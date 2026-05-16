@@ -1,7 +1,5 @@
 import { Suspense, lazy, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import usePillarScrollAnimation from "@/hooks/usePillarScrollAnimation";
 import "@/App.css";
 
@@ -26,7 +24,6 @@ const ProtectedRoute = ({ children }) => {
   return token ? children : <Navigate to="/uhf-admin" replace />;
 };
 
-gsap.registerPlugin(ScrollTrigger);
 
 const AppRoutes = () => {
   const location = useLocation();
@@ -35,27 +32,41 @@ const AppRoutes = () => {
   useEffect(() => {
     if (location.pathname === '/' || isLowEndDevice()) return;
 
-    const sections = gsap.utils.toArray('section');
-    sections.forEach((section) => {
-      gsap.fromTo(
-        section,
-        { opacity: 0, y: 28 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.9,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: section,
-            start: 'top 90%',
-            once: true
+    let cleanup = () => {};
+
+    const loadRouteAnimations = async () => {
+      const { default: gsap } = await import('gsap');
+      const { ScrollTrigger } = await import('gsap/ScrollTrigger');
+      gsap.registerPlugin(ScrollTrigger);
+
+      const sections = gsap.utils.toArray('section');
+      sections.forEach((section) => {
+        gsap.fromTo(
+          section,
+          { opacity: 0, y: 28 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.9,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: section,
+              start: 'top 90%',
+              once: true
+            }
           }
-        }
-      );
-    });
+        );
+      });
+
+      cleanup = () => {
+        ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+      };
+    };
+
+    loadRouteAnimations();
 
     return () => {
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+      cleanup();
     };
   }, [location.pathname]);
 
