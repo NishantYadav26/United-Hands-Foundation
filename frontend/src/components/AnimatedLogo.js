@@ -1,9 +1,21 @@
 import { useEffect, useMemo, useState } from 'react';
 import { getCached } from '@/lib/apiClient';
 
+const HOME_CACHE_KEY = 'uhf_home_cache_v1';
+
+const readCachedLogo = () => {
+  try {
+    const cached = localStorage.getItem(HOME_CACHE_KEY);
+    if (!cached) return '';
+    const parsed = JSON.parse(cached);
+    return parsed?.siteAssets?.logo || '';
+  } catch (error) {
+    return '';
+  }
+};
 
 const AnimatedLogo = ({ size = 'md', visualScale = 1, className = '' }) => {
-  const [logoUrl, setLogoUrl] = useState('');
+  const [logoUrl, setLogoUrl] = useState(() => readCachedLogo());
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
@@ -43,8 +55,9 @@ const AnimatedLogo = ({ size = 'md', visualScale = 1, className = '' }) => {
         style={{ transform: `scale(${logoScale})`, transition: 'transform 0.3s ease' }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        loading="lazy"
-        decoding="async"
+        loading="eager"
+        fetchPriority="high"
+        decoding="sync"
       />
     </div>
   );

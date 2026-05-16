@@ -104,6 +104,18 @@ const Home = () => {
     };
 
     const fetchHomeData = async () => {
+      getCached(`/site-assets/hero_background`, { timeout: 2500, cacheTtlMs: 300000 })
+        .then((heroRes) => {
+          if (!isMounted) return;
+          const heroUrl = heroRes?.data?.asset_url;
+          if (heroUrl) {
+            setSiteAssets((prev) => ({ ...prev, hero_background: heroUrl }));
+          }
+        })
+        .catch(() => {
+          // fallback to full site-assets payload below
+        });
+
       getCached(`/site-assets`, { timeout: REQUEST_TIMEOUT_MS, cacheTtlMs: 300000 })
         .then((assetsRes) => {
           if (!isMounted) return;
