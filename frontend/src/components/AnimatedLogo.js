@@ -1,16 +1,36 @@
 import { useEffect, useMemo, useState } from 'react';
 import { getCached } from '@/lib/apiClient';
 
+const HOME_CACHE_KEY = 'uhf_home_cache_v1';
+const PERMANENT_LOGO_KEY = 'uhf_permanent_logo_url';
+
+const readCachedLogo = () => {
+  try {
+    const permanentLogo = localStorage.getItem(PERMANENT_LOGO_KEY);
+    if (permanentLogo) return permanentLogo;
+
+    const cached = localStorage.getItem(HOME_CACHE_KEY);
+    if (!cached) return '';
+    const parsed = JSON.parse(cached);
+    return parsed?.siteAssets?.logo || '';
+  } catch (error) {
+    return '';
+  }
+};
 
 const AnimatedLogo = ({ size = 'md', visualScale = 1, className = '' }) => {
-  const [logoUrl, setLogoUrl] = useState('');
+  const [logoUrl, setLogoUrl] = useState(() => readCachedLogo());
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     const fetchLogo = async () => {
       try {
         const response = await getCached(`/site-assets/logo`, { cacheTtlMs: 3600000 });
-        setLogoUrl(response.data.asset_url);
+        const nextLogo = response?.data?.asset_url || '';
+        if (nextLogo) {
+          localStorage.setItem(PERMANENT_LOGO_KEY, nextLogo);
+          setLogoUrl(nextLogo);
+        }
       } catch (error) {
         console.error('Failed to fetch logo:', error);
       }
@@ -43,8 +63,9 @@ const AnimatedLogo = ({ size = 'md', visualScale = 1, className = '' }) => {
         style={{ transform: `scale(${logoScale})`, transition: 'transform 0.3s ease' }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        loading="lazy"
-        decoding="async"
+        loading="eager"
+        fetchPriority="high"
+        decoding="sync"
       />
     </div>
   );

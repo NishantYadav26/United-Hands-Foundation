@@ -2,17 +2,15 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { Users, MapPin, Heart, TrendingUp } from 'lucide-react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import PillarsOfImpact from '@/components/PillarsOfImpact';
 import usePillarScrollAnimation from '@/hooks/usePillarScrollAnimation';
 import { getCached } from '@/lib/apiClient';
 
-gsap.registerPlugin(ScrollTrigger);
 
 const ensureArray = (data) => (Array.isArray(data) ? data : []);
+
 
 const toNumber = (value) => {
   const num = Number(value);
@@ -27,19 +25,22 @@ const normalizeStats = (data) => ({
 });
 
 const HOME_CACHE_KEY = 'uhf_home_cache_v1';
+const PERMANENT_HERO_KEY = 'uhf_permanent_hero_background_url';
 const REQUEST_TIMEOUT_MS = 4500;
 const HOME_CACHE_TTL_MS = 30 * 60 * 1000;
 
 const readCachedSiteAssets = () => {
   try {
+    const permanentHero = localStorage.getItem(PERMANENT_HERO_KEY);
     const cached = localStorage.getItem(HOME_CACHE_KEY);
-    if (!cached) return {};
+    const baseAssets = permanentHero ? { hero_background: permanentHero } : {};
+    if (!cached) return baseAssets;
 
     const parsed = JSON.parse(cached);
     const isFresh = parsed?.timestamp && (Date.now() - parsed.timestamp) < HOME_CACHE_TTL_MS;
-    if (!isFresh || !parsed?.siteAssets || typeof parsed.siteAssets !== 'object') return {};
+    if (!isFresh || !parsed?.siteAssets || typeof parsed.siteAssets !== 'object') return baseAssets;
 
-    return parsed.siteAssets;
+    return { ...parsed.siteAssets, ...baseAssets };
   } catch (error) {
     return {};
   }
@@ -106,11 +107,27 @@ const Home = () => {
     };
 
     const fetchHomeData = async () => {
+      getCached(`/site-assets/hero_background`, { timeout: 2500, cacheTtlMs: 300000 })
+        .then((heroRes) => {
+          if (!isMounted) return;
+          const heroUrl = heroRes?.data?.asset_url;
+          if (heroUrl) {
+            localStorage.setItem(PERMANENT_HERO_KEY, heroUrl);
+            setSiteAssets((prev) => ({ ...prev, hero_background: heroUrl }));
+          }
+        })
+        .catch(() => {
+          // fallback to full site-assets payload below
+        });
+
       getCached(`/site-assets`, { timeout: REQUEST_TIMEOUT_MS, cacheTtlMs: 300000 })
         .then((assetsRes) => {
           if (!isMounted) return;
           const assetsMap = {};
           (assetsRes.data.assets || []).forEach((a) => { assetsMap[a.asset_key] = a.asset_url; });
+          if (assetsMap.hero_background) {
+            localStorage.setItem(PERMANENT_HERO_KEY, assetsMap.hero_background);
+          }
           setSiteAssets(assetsMap);
           cacheSiteAssets(assetsMap);
         })
@@ -118,16 +135,14 @@ const Home = () => {
           console.error('Failed to fetch site assets:', error);
         });
 
-      // Keep pillars in critical requests so Team/Partner sections render reliably on first paint.
       const criticalRequests = await Promise.allSettled([
         getCached(`/stats`, { timeout: REQUEST_TIMEOUT_MS, cacheTtlMs: 120000 }),
-        getCached(`/locations`, { timeout: REQUEST_TIMEOUT_MS, cacheTtlMs: 300000 }),
-        getCached(`/pillars`, { timeout: REQUEST_TIMEOUT_MS, cacheTtlMs: 300000 })
+        getCached(`/locations`, { timeout: REQUEST_TIMEOUT_MS, cacheTtlMs: 300000 })
       ]);
 
       if (!isMounted) return;
 
-      const [statsRes, locationsRes, pillarsRes] = criticalRequests;
+      const [statsRes, locationsRes] = criticalRequests;
 
       if (statsRes.status === 'fulfilled') {
         setStats(normalizeStats(statsRes.value.data));
@@ -141,30 +156,34 @@ const Home = () => {
         console.error('Failed to fetch locations:', locationsRes.reason);
       }
 
-      if (pillarsRes.status === 'fulfilled') {
-        setPillars(ensureArray(pillarsRes.value.data));
-      } else {
-        console.error('Failed to fetch pillars:', pillarsRes.reason);
-      }
+      const schedule = window.requestIdleCallback || ((cb) => setTimeout(cb, 120));
+      schedule(() => {
+        Promise.allSettled([
+          getCached(`/pillars`, { timeout: REQUEST_TIMEOUT_MS, cacheTtlMs: 300000 }),
+          getCached(`/success-stories?limit=3`, { timeout: REQUEST_TIMEOUT_MS, cacheTtlMs: 180000 }),
+          getCached(`/gallery`, { timeout: REQUEST_TIMEOUT_MS, cacheTtlMs: 180000 })
+        ]).then((deferredRequests) => {
+          if (!isMounted) return;
+          const [pillarsRes, storiesRes, galleryRes] = deferredRequests;
 
-      Promise.allSettled([
-        getCached(`/success-stories?limit=3`, { timeout: REQUEST_TIMEOUT_MS, cacheTtlMs: 180000 }),
-        getCached(`/gallery`, { timeout: REQUEST_TIMEOUT_MS, cacheTtlMs: 180000 })
-      ]).then((deferredRequests) => {
-        if (!isMounted) return;
-        const [storiesRes, galleryRes] = deferredRequests;
+          if (pillarsRes.status === 'fulfilled') {
+            setPillars(ensureArray(pillarsRes.value.data));
+          } else {
+            console.error('Failed to fetch pillars:', pillarsRes.reason);
+          }
 
-        if (storiesRes.status === 'fulfilled') {
-          setSuccessStories(ensureArray(storiesRes.value.data));
-        } else {
-          console.error('Failed to fetch success stories:', storiesRes.reason);
-        }
+          if (storiesRes.status === 'fulfilled') {
+            setSuccessStories(ensureArray(storiesRes.value.data));
+          } else {
+            console.error('Failed to fetch success stories:', storiesRes.reason);
+          }
 
-        if (galleryRes.status === 'fulfilled') {
-          setGalleryImages(ensureArray(galleryRes.value.data));
-        } else {
-          console.error('Failed to fetch gallery:', galleryRes.reason);
-        }
+          if (galleryRes.status === 'fulfilled') {
+            setGalleryImages(ensureArray(galleryRes.value.data));
+          } else {
+            console.error('Failed to fetch gallery:', galleryRes.reason);
+          }
+        });
       });
     };
 
@@ -187,14 +206,21 @@ const Home = () => {
     const isSmallScreen = window.matchMedia('(max-width: 768px)').matches;
     if (reducedMotion) return;
 
-    const yOffset = isSmallScreen ? 24 : 36;
-    const heroYOffset = isSmallScreen ? 28 : 50;
+    let cleanup = () => {};
 
-    gsap.fromTo(
-      heroRef.current,
-      { opacity: 0, y: heroYOffset },
-      { opacity: 1, y: 0, duration: isSmallScreen ? 0.8 : 1.1, ease: 'power2.out' }
-    );
+    const runHomeAnimations = async () => {
+      const { default: gsap } = await import('gsap');
+      const { ScrollTrigger } = await import('gsap/ScrollTrigger');
+      gsap.registerPlugin(ScrollTrigger);
+
+      const yOffset = isSmallScreen ? 24 : 36;
+      const heroYOffset = isSmallScreen ? 28 : 50;
+
+      gsap.fromTo(
+        heroRef.current,
+        { opacity: 0, y: heroYOffset },
+        { opacity: 1, y: 0, duration: isSmallScreen ? 0.8 : 1.1, ease: 'power2.out' }
+      );
 
     if (statsRef.current && stats.patients_served > 0) {
       const statElements = statsRef.current.querySelectorAll('.stat-number');
@@ -381,8 +407,15 @@ const Home = () => {
       );
     }
 
+      cleanup = () => {
+        ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+      };
+    };
+
+    runHomeAnimations();
+
     return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+      cleanup();
     };
   }, [stats]);
 
