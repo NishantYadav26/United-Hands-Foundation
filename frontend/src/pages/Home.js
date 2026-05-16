@@ -25,19 +25,22 @@ const normalizeStats = (data) => ({
 });
 
 const HOME_CACHE_KEY = 'uhf_home_cache_v1';
+const PERMANENT_HERO_KEY = 'uhf_permanent_hero_background_url';
 const REQUEST_TIMEOUT_MS = 4500;
 const HOME_CACHE_TTL_MS = 30 * 60 * 1000;
 
 const readCachedSiteAssets = () => {
   try {
+    const permanentHero = localStorage.getItem(PERMANENT_HERO_KEY);
     const cached = localStorage.getItem(HOME_CACHE_KEY);
-    if (!cached) return {};
+    const baseAssets = permanentHero ? { hero_background: permanentHero } : {};
+    if (!cached) return baseAssets;
 
     const parsed = JSON.parse(cached);
     const isFresh = parsed?.timestamp && (Date.now() - parsed.timestamp) < HOME_CACHE_TTL_MS;
-    if (!isFresh || !parsed?.siteAssets || typeof parsed.siteAssets !== 'object') return {};
+    if (!isFresh || !parsed?.siteAssets || typeof parsed.siteAssets !== 'object') return baseAssets;
 
-    return parsed.siteAssets;
+    return { ...parsed.siteAssets, ...baseAssets };
   } catch (error) {
     return {};
   }
@@ -109,6 +112,7 @@ const Home = () => {
           if (!isMounted) return;
           const heroUrl = heroRes?.data?.asset_url;
           if (heroUrl) {
+            localStorage.setItem(PERMANENT_HERO_KEY, heroUrl);
             setSiteAssets((prev) => ({ ...prev, hero_background: heroUrl }));
           }
         })
@@ -121,6 +125,9 @@ const Home = () => {
           if (!isMounted) return;
           const assetsMap = {};
           (assetsRes.data.assets || []).forEach((a) => { assetsMap[a.asset_key] = a.asset_url; });
+          if (assetsMap.hero_background) {
+            localStorage.setItem(PERMANENT_HERO_KEY, assetsMap.hero_background);
+          }
           setSiteAssets(assetsMap);
           cacheSiteAssets(assetsMap);
         })
