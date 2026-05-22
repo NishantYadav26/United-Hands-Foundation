@@ -115,14 +115,16 @@ transition-all duration-300
                 Initiatives
                 <ChevronDown size={14} className={`transition-transform duration-200 ${isInitiativesOpen ? 'rotate-180' : ''}`} />
               </button>
-              <div
-                className={`absolute left-1/2 -translate-x-1/2 mt-3 w-56 rounded-xl border border-black/5 bg-white/95 shadow-lg backdrop-blur-md p-2 transition-all duration-200 origin-top ${isInitiativesOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-1 pointer-events-none'}`}
-                role="menu"
-              >
-                <Link to="/projects" className="block rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--accent-teal)] hover:bg-black/[0.03] transition-colors" role="menuitem">Our Projects</Link>
-                <Link to="/events" className="block rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--accent-teal)] hover:bg-black/[0.03] transition-colors" role="menuitem">Events</Link>
-                <Link to="/track-impact" className="block rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--accent-teal)] hover:bg-black/[0.03] transition-colors" data-testid="nav-track" role="menuitem">Track Impact</Link>
-                <Link to="/press" className="block rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--accent-teal)] hover:bg-black/[0.03] transition-colors" data-testid="nav-press" role="menuitem">Press</Link>
+              <div className="absolute left-1/2 top-full -translate-x-1/2 pt-2">
+                <div
+                  className={`w-56 rounded-xl border border-black/5 bg-white/95 shadow-lg backdrop-blur-md p-2 transition-all duration-200 origin-top ${isInitiativesOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-1 pointer-events-none'}`}
+                  role="menu"
+                >
+                  <Link to="/projects" className="block rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--accent-teal)] hover:bg-black/[0.03] transition-colors" role="menuitem">Our Projects</Link>
+                  <Link to="/events" className="block rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--accent-teal)] hover:bg-black/[0.03] transition-colors" role="menuitem">Events</Link>
+                  <Link to="/track-impact" className="block rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--accent-teal)] hover:bg-black/[0.03] transition-colors" data-testid="nav-track" role="menuitem">Track Impact</Link>
+                  <Link to="/press" className="block rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--accent-teal)] hover:bg-black/[0.03] transition-colors" data-testid="nav-press" role="menuitem">Press</Link>
+                </div>
               </div>
             </div>
             <a href="#contact" onClick={scrollToFooter} className="text-sm font-semibold text-[var(--accent-teal)] hover:text-[var(--accent-teal)] transition-colors duration-200 flex items-center gap-1" data-testid="nav-contact">
