@@ -657,18 +657,17 @@ const Home = () => {
       </section>
 
       {/* Success Stories */}
-      {successStories.length > 0 && (
-        <section
-          className="py-20 px-6 reveal-section"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(6, 20, 38, 0.78), rgba(6, 20, 38, 0.78)), url('https://res.cloudinary.com/datcgiuci/image/upload/v1779448651/ChatGPT_Image_May_22_2026_04_46_50_PM_bb7zbd.png')",
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat'
-          }}
-          data-testid="success-stories-section"
-        >
+      <section
+        className="py-20 px-6 reveal-section"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(6, 20, 38, 0.45), rgba(6, 20, 38, 0.45)), url('https://res.cloudinary.com/datcgiuci/image/upload/v1779448651/ChatGPT_Image_May_22_2026_04_46_50_PM_bb7zbd.png')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+        data-testid="success-stories-section"
+      >
           <div className="max-w-7xl mx-auto">
             <h2
               className="text-4xl sm:text-5xl font-medium tracking-tight text-center mb-14"
@@ -677,24 +676,31 @@ const Home = () => {
               Stories of <span className="text-gradient-orange">Hope</span>
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {successStories.map((story) => (
-                <div key={story.id} className="card-elevated p-8 rounded-lg hover-lift story-card" data-testid={`story-${story.id}`}>
-                  <div className="flex items-center gap-2 mb-4">
-                    <MapPin style={{ color: 'var(--accent-teal)' }} size={18} />
-                    <span className="text-sm font-semibold" style={{ color: 'var(--accent-teal)' }}>{story.location}</span>
+            {successStories.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {successStories.map((story) => (
+                  <div key={story.id} className="card-elevated p-8 rounded-lg hover-lift story-card" data-testid={`story-${story.id}`}>
+                    <div className="flex items-center gap-2 mb-4">
+                      <MapPin style={{ color: 'var(--accent-teal)' }} size={18} />
+                      <span className="text-sm font-semibold" style={{ color: 'var(--accent-teal)' }}>{story.location}</span>
+                    </div>
+                    <p className="leading-relaxed mb-6" style={{ color: 'var(--text-primary)' }}>{story.story_text}</p>
+                    <div className="flex justify-between items-center text-xs" style={{ color: 'var(--text-muted)' }}>
+                      <span>{story.patient_count} beneficiaries</span>
+                      <span>{new Date(story.date).toLocaleDateString()}</span>
+                    </div>
                   </div>
-                  <p className="leading-relaxed mb-6" style={{ color: 'var(--text-primary)' }}>{story.story_text}</p>
-                  <div className="flex justify-between items-center text-xs" style={{ color: 'var(--text-muted)' }}>
-                    <span>{story.patient_count} beneficiaries</span>
-                    <span>{new Date(story.date).toLocaleDateString()}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="card-elevated p-8 rounded-lg text-center max-w-3xl mx-auto">
+                <p className="text-sm" style={{ color: 'var(--text-primary)' }}>
+                  Stories of Hope will appear here soon.
+                </p>
+              </div>
+            )}
           </div>
         </section>
-      )}
 
       {/* Team Section */}
       <section className="py-20 px-6 reveal-section" data-testid="home-team-section">
