@@ -97,6 +97,8 @@ transition-all duration-300
             <Link to="/about" className="text-sm font-semibold text-[var(--accent-teal)] hover:text-[var(--accent-teal)] transition-colors duration-200" data-testid="nav-about">About</Link>
             <Link to="/press" className="text-sm font-semibold text-[var(--accent-teal)] hover:text-[var(--accent-teal)] transition-colors duration-200" data-testid="nav-press">Press</Link>
             <Link to="/transparency" className="text-sm font-semibold text-[var(--accent-teal)] hover:text-[var(--accent-teal)] transition-colors duration-200" data-testid="nav-transparency">Transparency</Link>
+            <Link to="/projects" className="text-sm font-semibold text-[var(--accent-teal)] hover:text-[var(--accent-teal)] transition-colors duration-200">Our Projects</Link>
+            <Link to="/events" className="text-sm font-semibold text-[var(--accent-teal)] hover:text-[var(--accent-teal)] transition-colors duration-200">Events</Link>
             <Link to="/track-impact" className="text-sm font-semibold text-[var(--accent-teal)] hover:text-[var(--accent-teal)] transition-colors duration-200" data-testid="nav-track">Track Impact</Link>
             <a href="#contact" onClick={scrollToFooter} className="text-sm font-semibold text-[var(--accent-teal)] hover:text-[var(--accent-teal)] transition-colors duration-200 flex items-center gap-1" data-testid="nav-contact">
               <Phone size={13} />
@@ -158,7 +160,9 @@ transition-all duration-300
             <Link to="/about" className="font-semibold py-2 text-sm text-black/80 hover:text-[var(--accent-teal)] transition-colors duration-200" onClick={() => setMobileMenuOpen(false)}>About</Link>
             <Link to="/press" className="font-semibold py-2 text-sm text-black/80 hover:text-[var(--accent-teal)] transition-colors duration-200" onClick={() => setMobileMenuOpen(false)}>Press</Link>
             <Link to="/transparency" className="font-semibold py-2 text-sm text-black/80 hover:text-[var(--accent-teal)] transition-colors duration-200" onClick={() => setMobileMenuOpen(false)}>Transparency</Link>
-            <Link to="/track-impact" className="font-semibold py-2 text-sm text-black/80 hover:text-[var(--accent-teal)] transition-colors duration-200" onClick={() => setMobileMenuOpen(false)}>Track My Impact</Link>
+            <Link to="/projects" className="font-semibold py-2 text-sm text-black/80 hover:text-[var(--accent-teal)] transition-colors duration-200" onClick={() => setMobileMenuOpen(false)}>Our Projects</Link>
+            <Link to="/events" className="font-semibold py-2 text-sm text-black/80 hover:text-[var(--accent-teal)] transition-colors duration-200" onClick={() => setMobileMenuOpen(false)}>Events</Link>
+            <Link to="/track-impact" className="font-semibold py-2 text-sm text-black/80 hover:text-[var(--accent-teal)] transition-colors duration-200" onClick={() => setMobileMenuOpen(false)}>Track Impact</Link>
             <a href="#contact" onClick={(e) => { scrollToFooter(e); setMobileMenuOpen(false); }} className="font-semibold py-2 text-sm text-black/80 hover:text-[var(--accent-teal)] transition-colors duration-200 flex items-center gap-1">
               <Phone size={14} />
               Contact Us

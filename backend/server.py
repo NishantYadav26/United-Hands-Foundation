@@ -240,12 +240,31 @@ class PressMediaCreate(BaseModel):
     image_url: str
     category: Optional[str] = None
 
+class Event(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    slug: str
+    description: str
+    images: List[str] = []
+    date: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class EventCreate(BaseModel):
+    title: str
+    slug: str
+    description: str
+    images: List[str]
+    date: str
+
 class Project(BaseModel):
     model_config = ConfigDict(extra="ignore")
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     title: str
     category: str
+    slug: Optional[str] = None
     description: str
     hero_image: str
     images: List[str] = []
@@ -257,6 +276,7 @@ class Project(BaseModel):
 class ProjectCreate(BaseModel):
     title: str
     category: str
+    slug: Optional[str] = None
     description: str
     hero_image: str
     images: List[str] = []
@@ -1138,6 +1158,40 @@ async def delete_project(project_id: str, admin_email: str = Depends(verify_toke
         raise HTTPException(status_code=404, detail="Project not found")
     return {"status": "success", "message": "Project deleted"}
 
+
+@api_router.post("/events", response_model=Event)
+async def create_event(event: EventCreate, admin_email: str = Depends(verify_token)):
+    if len(event.images) != 2:
+        raise HTTPException(status_code=400, detail="Exactly 2 images are required")
+    event_obj = Event(**event.model_dump())
+    doc = event_obj.model_dump()
+    doc["created_at"] = doc["created_at"].isoformat()
+    await db.events.insert_one(doc)
+    return event_obj
+
+@api_router.get("/events", response_model=List[Event])
+async def get_events():
+    events = await db.events.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    for event in events:
+        if isinstance(event['created_at'], str):
+            event['created_at'] = datetime.fromisoformat(event['created_at'])
+    return events
+
+@api_router.get("/events/{slug}", response_model=Event)
+async def get_event(slug: str):
+    event = await db.events.find_one({"slug": slug}, {"_id": 0})
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    if isinstance(event['created_at'], str):
+        event['created_at'] = datetime.fromisoformat(event['created_at'])
+    return Event(**event)
+
+@api_router.delete("/events/{event_id}")
+async def delete_event(event_id: str, admin_email: str = Depends(verify_token)):
+    result = await db.events.delete_one({"id": event_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Event not found")
+    return {"status": "success", "message": "Event deleted"}
 @api_router.post("/videos", response_model=VideoContent)
 async def create_video(video: VideoContentCreate, admin_email: str = Depends(verify_token)):
     video_obj = VideoContent(**video.model_dump())

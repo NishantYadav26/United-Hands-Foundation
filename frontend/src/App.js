@@ -11,6 +11,10 @@ const Transparency = lazy(() => import("@/pages/Transparency"));
 const AboutUs = lazy(() => import("@/pages/AboutUs"));
 const TrackMyImpact = lazy(() => import("@/pages/TrackMyImpact"));
 const UserAuth = lazy(() => import("@/pages/UserAuth"));
+const Projects = lazy(() => import("@/pages/Projects"));
+const ProjectDetail = lazy(() => import("@/pages/ProjectDetail"));
+const Events = lazy(() => import("@/pages/Events"));
+const EventDetail = lazy(() => import("@/pages/EventDetail"));
 
 const isLowEndDevice = () => {
   const coreCount = navigator.hardwareConcurrency || 4;
@@ -79,6 +83,10 @@ const AppRoutes = () => {
         <Route path="/press" element={<PressMedia />} />
         <Route path="/transparency" element={<Transparency />} />
         <Route path="/track-impact" element={<TrackMyImpact />} />
+        <Route path="/projects" element={<Projects />} />
+        <Route path="/projects/:slug" element={<ProjectDetail />} />
+        <Route path="/events" element={<Events />} />
+        <Route path="/events/:slug" element={<EventDetail />} />
         <Route path="/login" element={<UserAuth />} />
         <Route path="/uhf-admin" element={<UserAuth />} />
         <Route

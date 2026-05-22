@@ -4,7 +4,6 @@ import { createPortal } from 'react-dom';
 import { Users, MapPin, Heart, TrendingUp } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import PillarsOfImpact from '@/components/PillarsOfImpact';
 import usePillarScrollAnimation from '@/hooks/usePillarScrollAnimation';
 import { getCached } from '@/lib/apiClient';
 
@@ -538,7 +537,6 @@ const Home = () => {
       </section>
 
       {/* Pillars of Impact */}
-      <PillarsOfImpact />
 
       {/* Heartiest Moments Gallery */}
       {galleryImages.length > 0 && (
