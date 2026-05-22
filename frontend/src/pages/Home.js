@@ -658,7 +658,17 @@ const Home = () => {
 
       {/* Success Stories */}
       {successStories.length > 0 && (
-        <section className="py-20 px-6 reveal-section" style={{ background: 'var(--bg-surface)' }} data-testid="success-stories-section">
+        <section
+          className="py-20 px-6 reveal-section"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(6, 20, 38, 0.78), rgba(6, 20, 38, 0.78)), url('https://res.cloudinary.com/datcgiuci/image/upload/v1779448651/ChatGPT_Image_May_22_2026_04_46_50_PM_bb7zbd.png')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+          data-testid="success-stories-section"
+        >
           <div className="max-w-7xl mx-auto">
             <h2
               className="text-4xl sm:text-5xl font-medium tracking-tight text-center mb-14"
