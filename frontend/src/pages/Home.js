@@ -661,7 +661,7 @@ const Home = () => {
         className="py-20 px-6 reveal-section"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(6, 20, 38, 0.45), rgba(6, 20, 38, 0.45)), url('https://res.cloudinary.com/datcgiuci/image/upload/v1779448651/ChatGPT_Image_May_22_2026_04_46_50_PM_bb7zbd.png')",
+            "linear-gradient(rgba(6, 20, 38, 0.22), rgba(6, 20, 38, 0.22)), url('https://res.cloudinary.com/datcgiuci/image/upload/v1779448651/ChatGPT_Image_May_22_2026_04_46_50_PM_bb7zbd.png')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
@@ -671,9 +671,9 @@ const Home = () => {
           <div className="max-w-7xl mx-auto">
             <h2
               className="text-4xl sm:text-5xl font-medium tracking-tight text-center mb-14"
-              style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}
+              style={{ fontFamily: 'Cormorant Garamond, serif', color: '#ffffff' }}
             >
-              Stories of <span className="text-gradient-orange">Hope</span>
+              Stories of <span style={{ color: '#ffffff' }}>Hope</span>
             </h2>
 
             {successStories.length > 0 ? (
