@@ -621,7 +621,16 @@ const Home = () => {
           <p className="text-center text-base mb-14" style={{ color: 'var(--text-muted)' }}>Transforming lives across communities, one step at a time</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="card-elevated p-10 rounded-lg hover-lift text-center impact-stat-card" data-testid="stat-patients">
+            <div
+              className="card-elevated p-10 rounded-lg hover-lift text-center impact-stat-card"
+              data-testid="stat-patients"
+              style={{
+                backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.72)), url('https://res.cloudinary.com/datcgiuci/image/upload/v1779450400/lives_thced_pinuwy.jpg')",
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat'
+              }}
+            >
               <Users className="mx-auto mb-5" style={{ color: 'var(--accent-teal)' }} size={44} />
               <div className="stat-number text-5xl font-medium mb-3" data-value={stats.patients_served} style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                 0
@@ -629,7 +638,16 @@ const Home = () => {
               <p className="text-xs tracking-[0.2em] uppercase font-bold" style={{ color: 'var(--accent-teal)' }}>Lives Touched</p>
             </div>
 
-            <div className="card-elevated p-10 rounded-lg hover-lift text-center impact-stat-card" data-testid="stat-districts">
+            <div
+              className="card-elevated p-10 rounded-lg hover-lift text-center impact-stat-card"
+              data-testid="stat-districts"
+              style={{
+                backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.72)), url('https://res.cloudinary.com/datcgiuci/image/upload/v1779450399/map_bijono.jpg')",
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat'
+              }}
+            >
               <MapPin className="mx-auto mb-5" style={{ color: 'var(--accent-gold)' }} size={44} />
               <div className="stat-number text-5xl font-medium mb-3" data-value={stats.districts_covered} style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                 0
@@ -637,7 +655,16 @@ const Home = () => {
               <p className="text-xs tracking-[0.2em] uppercase font-bold" style={{ color: 'var(--accent-gold)' }}>Districts Covered</p>
             </div>
 
-            <div className="card-elevated p-10 rounded-lg hover-lift text-center impact-stat-card" data-testid="stat-donations">
+            <div
+              className="card-elevated p-10 rounded-lg hover-lift text-center impact-stat-card"
+              data-testid="stat-donations"
+              style={{
+                backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.72)), url('https://res.cloudinary.com/datcgiuci/image/upload/v1779450399/donation_rec_o1qj6z.jpg')",
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat'
+              }}
+            >
               <Heart className="mx-auto mb-5" style={{ color: 'var(--accent-teal)' }} size={44} />
               <div className="stat-number text-5xl font-medium mb-3" data-value={stats.total_donations} style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                 0
@@ -645,7 +672,13 @@ const Home = () => {
               <p className="text-xs tracking-[0.2em] uppercase font-bold" style={{ color: 'var(--accent-teal)' }}>Donations Received</p>
             </div>
 
-            <div className="card-elevated p-10 rounded-lg hover-lift text-center impact-stat-card" data-testid="stat-amount">
+            <div
+              className="card-elevated p-10 rounded-lg hover-lift text-center impact-stat-card"
+              data-testid="stat-amount"
+              style={{
+                backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.86))"
+              }}
+            >
               <TrendingUp className="mx-auto mb-5" style={{ color: 'var(--accent-gold)' }} size={44} />
               <div className="stat-number text-5xl font-medium mb-3" data-value={stats.total_amount} style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                 0
