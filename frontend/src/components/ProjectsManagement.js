@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Plus, Edit, Trash2, Upload, X, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
 const API = `${BACKEND_URL}/api`;
@@ -13,6 +14,7 @@ const ProjectsManagement = () => {
   const [formData, setFormData] = useState({
     title: '',
     category: '',
+    slug: '',
     description: '',
     hero_image: '',
     images: [],
@@ -151,6 +153,7 @@ const ProjectsManagement = () => {
     setFormData({
       title: '',
       category: '',
+      slug: '',
       description: '',
       hero_image: '',
       images: [],
@@ -170,6 +173,7 @@ const ProjectsManagement = () => {
     setFormData({
       title: project.title,
       category: project.category,
+      slug: project.slug || '',
       description: project.description,
       hero_image: project.hero_image,
       images: project.images || [],
@@ -226,6 +230,7 @@ const ProjectsManagement = () => {
               className="bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)]" 
             />
             
+            <input placeholder="Slug (project-url)" value={formData.slug} onChange={e => setFormData({...formData, slug: e.target.value})} className="bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)]" />
             <textarea 
               placeholder="Description" 
               value={formData.description} 
@@ -258,7 +263,7 @@ const ProjectsManagement = () => {
             {formData.hero_image ? (
               <div className="flex flex-col sm:flex-row items-center gap-4">
                 <img 
-                  src={formData.hero_image} 
+                  src={optimizeCloudinaryUrl(formData.hero_image,{width:600})} 
                   alt="Preview" 
                   className="w-32 h-32 object-cover rounded"
                 />
@@ -312,7 +317,7 @@ const ProjectsManagement = () => {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {formData.images.map((image, index) => (
                   <div key={`${image}-${index}`} className="relative">
-                    <img src={image} alt={`Gallery ${index + 1}`} className="w-full h-24 object-cover rounded" />
+                    <img src={optimizeCloudinaryUrl(image,{width:600})} alt={`Gallery ${index + 1}`} className="w-full h-24 object-cover rounded" />
                     <button
                       type="button"
                       onClick={() => setFormData((prev) => ({
@@ -362,7 +367,7 @@ const ProjectsManagement = () => {
                 <div className="h-48 bg-[var(--bg-surface)] rounded mb-4 overflow-hidden">
                   {project.hero_image ? (
                     <img 
-                      src={project.hero_image} 
+                      src={optimizeCloudinaryUrl(project.hero_image,{width:600})} 
                       alt={project.title} 
                       className="w-full h-full object-cover"
                     />

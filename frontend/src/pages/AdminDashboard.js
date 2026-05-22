@@ -31,6 +31,7 @@ const PressManagement = lazy(() => import('@/components/PressManagement'));
 const VideosManagement = lazy(() => import('@/components/VideosManagement'));
 const SuccessStoriesManagement = lazy(() => import('@/components/SuccessStoriesManagement'));
 const LocationsManagement = lazy(() => import('@/components/LocationsManagement'));
+const EventsManagement = lazy(() => import('@/components/EventsManagement'));
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
 const API = `${BACKEND_URL}/api`;
@@ -295,6 +296,7 @@ const AdminDashboard = () => {
               <MapPin size={16} />
               Locations
             </button>
+            <button onClick={() => setActiveTab('events')} className={`pb-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold tracking-[0.1em] uppercase transition-colors whitespace-nowrap ${activeTab === 'events' ? 'text-[var(--accent-warm)] border-b-2 border-[var(--accent-warm)]' : 'text-[var(--text-muted)]'}`}>Events</button>
             <button
               onClick={() => setActiveTab('settings')}
               className={`pb-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold tracking-[0.1em] uppercase transition-colors whitespace-nowrap ${
@@ -588,6 +590,7 @@ const AdminDashboard = () => {
 
           {/* Locations Tab */}
           {activeTab === 'locations' && renderLazyTab(LocationsManagement)}
+          {activeTab === 'events' && renderLazyTab(EventsManagement)}
         </div>
       </div>
 
