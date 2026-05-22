@@ -1192,6 +1192,22 @@ async def delete_event(event_id: str, admin_email: str = Depends(verify_token)):
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Event not found")
     return {"status": "success", "message": "Event deleted"}
+
+@api_router.put("/events/{event_id}")
+async def update_event(event_id: str, event: EventCreate, admin_email: str = Depends(verify_token)):
+    if len(event.images) != 2:
+        raise HTTPException(status_code=400, detail="Exactly 2 images are required")
+
+    existing = await db.events.find_one({"id": event_id}, {"_id": 0})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    await db.events.update_one(
+        {"id": event_id},
+        {"$set": event.model_dump()}
+    )
+    return {"status": "success", "message": "Event updated"}
+
 @api_router.post("/videos", response_model=VideoContent)
 async def create_video(video: VideoContentCreate, admin_email: str = Depends(verify_token)):
     video_obj = VideoContent(**video.model_dump())
