@@ -625,7 +625,7 @@ const Home = () => {
               className="card-elevated p-10 rounded-lg hover-lift text-center impact-stat-card"
               data-testid="stat-patients"
               style={{
-                backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.72)), url('https://res.cloudinary.com/datcgiuci/image/upload/v1779450400/lives_thced_pinuwy.jpg')",
+                backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.45)), url('https://res.cloudinary.com/datcgiuci/image/upload/v1779450400/lives_thced_pinuwy.jpg')",
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat'
@@ -642,7 +642,7 @@ const Home = () => {
               className="card-elevated p-10 rounded-lg hover-lift text-center impact-stat-card"
               data-testid="stat-districts"
               style={{
-                backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.72)), url('https://res.cloudinary.com/datcgiuci/image/upload/v1779450399/map_bijono.jpg')",
+                backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.45)), url('https://res.cloudinary.com/datcgiuci/image/upload/v1779450399/map_bijono.jpg')",
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat'
@@ -659,7 +659,7 @@ const Home = () => {
               className="card-elevated p-10 rounded-lg hover-lift text-center impact-stat-card"
               data-testid="stat-donations"
               style={{
-                backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.72)), url('https://res.cloudinary.com/datcgiuci/image/upload/v1779450399/donation_rec_o1qj6z.jpg')",
+                backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.45)), url('https://res.cloudinary.com/datcgiuci/image/upload/v1779450399/donation_rec_o1qj6z.jpg')",
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat'
@@ -676,7 +676,7 @@ const Home = () => {
               className="card-elevated p-10 rounded-lg hover-lift text-center impact-stat-card"
               data-testid="stat-amount"
               style={{
-                backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.86))"
+                backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.55))"
               }}
             >
               <TrendingUp className="mx-auto mb-5" style={{ color: 'var(--accent-gold)' }} size={44} />
