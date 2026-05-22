@@ -50,6 +50,10 @@ const Donate = () => {
     fetchPaymentMode();
   }, []);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, []);
+
   const fetchQrCode = async () => {
     try {
       const response = await getCached(`/site-assets/qr_code`, { cacheTtlMs: 3600000 });
@@ -78,7 +82,7 @@ const Donate = () => {
   };
 
   const generateUPIIntent = () => {
-    const upiId = 'unitedhands@upi';
+    const upiId = 'unit90288824917@barodampay';
     const name = 'United Hands Foundation';
     const amount = formData.amount || '500';
     return `upi://pay?pa=${upiId}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR`;
@@ -265,7 +269,7 @@ const Donate = () => {
                           <span className="text-gray-400 text-sm">Loading QR Code...</span>
                         </div>
                       )}
-                      <p className="text-gray-600 text-sm font-mono mb-4">UPI: unitedhands@upi</p>
+                      <p className="text-gray-600 text-sm font-mono mb-4">UPI: unit90288824917@barodampay</p>
                       {formData.amount && (
                         <a
                           href={generateUPIIntent()}
