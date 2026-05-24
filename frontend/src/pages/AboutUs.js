@@ -30,7 +30,6 @@ const AboutUs = () => {
 
   const [particlesReady, setParticlesReady] = useState(false);
   const [isReducedParticleMode, setIsReducedParticleMode] = useState(false);
-  const [activeCard, setActiveCard] = useState(null);
 
   useEffect(() => {
     initParticlesEngine(async engine => {
@@ -52,61 +51,67 @@ const AboutUs = () => {
   }, []);
 
 
-  useEffect(() => {
-    if (!activeCard) return undefined;
-    const timer = window.setTimeout(() => setActiveCard(null), 1600);
-    return () => window.clearTimeout(timer);
-  }, [activeCard]);
-
-  const buildCardParticleOptions = useMemo(() => (cardKey) => {
-    const isActive = activeCard === cardKey;
-    return {
-      background: { color: { value: 'transparent' } },
-      fpsLimit: 60,
-      detectRetina: true,
-      fullScreen: { enable: false },
-      particles: {
-        number: { value: isReducedParticleMode ? (isActive ? 22 : 14) : (isActive ? 54 : 34) },
-        color: { value: ['#101010', '#1b1b1b', '#2b2b2b'] },
-        shape: { type: 'circle' },
-        opacity: { value: { min: 0.1, max: 0.35 }, random: { enable: true } },
-        size: { value: { min: 1, max: 3.4 }, random: { enable: true } },
-        move: {
-          enable: true,
-          speed: isActive ? { min: 0.45, max: 0.82 } : { min: 0.2, max: 0.48 },
-          direction: 'none',
-          random: true,
-          straight: false,
-          outModes: { default: 'bounce' }
-        },
-        blur: { value: isActive ? 2 : 3, enable: true }
+  const missionParticleOptions = useMemo(() => ({
+    background: { color: { value: 'transparent' } },
+    fpsLimit: 60,
+    detectRetina: true,
+    fullScreen: { enable: false },
+    interactivity: {
+      detectsOn: 'parent',
+      events: {
+        onHover: { enable: !isReducedParticleMode, mode: 'repulse' },
+        onClick: { enable: true, mode: 'repulse' },
+        resize: { enable: true }
       },
-      interactivity: {
-        events: {
-          onHover: { enable: true, mode: 'attract' },
-          resize: { enable: true }
-        },
-        modes: {
-          attract: {
-            distance: isActive ? 220 : 150,
-            duration: 1,
-            easing: 'ease-out-quad',
-            factor: isActive ? 0.85 : 0.5,
-            maxSpeed: isActive ? 1 : 0.6,
-            speed: isActive ? 0.8 : 0.4
-          }
+      modes: {
+        repulse: {
+          distance: isReducedParticleMode ? 95 : 165,
+          duration: 1.2,
+          speed: 0.5,
+          factor: 100
         }
+      }
+    },
+    particles: {
+      number: { value: isReducedParticleMode ? 16 : 40, density: { enable: true, area: 1200 } },
+      color: { value: ['#101010', '#1b1b1b', '#2b2b2b'] },
+      shape: { type: 'circle' },
+      opacity: { value: { min: 0.1, max: 0.35 }, random: { enable: true } },
+      size: { value: { min: 1, max: 3.4 }, random: { enable: true } },
+      move: {
+        enable: true,
+        speed: { min: 0.25, max: 0.55 },
+        direction: 'none',
+        random: true,
+        straight: false,
+        outModes: { default: 'bounce' }
       },
-      polygon: {
-        draw: { enable: false },
-        move: { radius: 10 },
-        inline: { arrangement: 'equidistant' },
-        type: 'inline'
-      },
-      pauseOnBlur: true,
-      pauseOnOutsideViewport: true
-    };
-  }, [activeCard, isReducedParticleMode]);
+      blur: { value: 3, enable: true }
+    },
+    pauseOnBlur: true,
+    pauseOnOutsideViewport: true
+  }), [isReducedParticleMode]);
+
+  const visionParticleOptions = useMemo(() => ({
+    ...missionParticleOptions,
+    interactivity: {
+      ...missionParticleOptions.interactivity,
+      events: {
+        ...missionParticleOptions.interactivity.events,
+        onHover: { enable: false, mode: 'repulse' },
+        onClick: { enable: false, mode: 'repulse' }
+      }
+    },
+    particles: {
+      ...missionParticleOptions.particles,
+      number: { value: isReducedParticleMode ? 12 : 28, density: { enable: true, area: 1300 } },
+      move: {
+        ...missionParticleOptions.particles.move,
+        speed: { min: 0.2, max: 0.45 }
+      }
+    }
+  }), [isReducedParticleMode, missionParticleOptions]);
+
   useEffect(() => {
     const fetchAssets = async () => {
       try {
@@ -176,15 +181,12 @@ const AboutUs = () => {
           <div
             className="relative rounded-2xl p-8 md:p-10 border border-white/50 bg-white/40 backdrop-blur-md shadow-[0_18px_45px_-25px_rgba(0,0,0,0.55)] transition-all duration-700 ease-out hover:-translate-y-1"
             style={{ boxShadow: '0 18px 45px -25px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.45)' }}
-            onMouseEnter={() => setActiveCard('mission')}
-            onMouseLeave={() => setActiveCard(null)}
-            onTouchStart={() => setActiveCard('mission')}
           >
             {particlesReady && (
               <Particles
                 id="mission-card-particles"
                 className="absolute -inset-2 z-0 pointer-events-none"
-                options={buildCardParticleOptions('mission')}
+                options={missionParticleOptions}
               />
             )}
             <div className="relative z-10">
@@ -205,15 +207,12 @@ const AboutUs = () => {
           <div
             className="relative rounded-2xl p-8 md:p-10 border border-white/50 bg-white/40 backdrop-blur-md shadow-[0_18px_45px_-25px_rgba(0,0,0,0.55)] transition-all duration-700 ease-out hover:-translate-y-1"
             style={{ boxShadow: '0 18px 45px -25px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.45)' }}
-            onMouseEnter={() => setActiveCard('vision')}
-            onMouseLeave={() => setActiveCard(null)}
-            onTouchStart={() => setActiveCard('vision')}
           >
             {particlesReady && (
               <Particles
                 id="vision-card-particles"
                 className="absolute -inset-2 z-0 pointer-events-none"
-                options={buildCardParticleOptions('vision')}
+                options={visionParticleOptions}
               />
             )}
             <div className="relative z-10">
