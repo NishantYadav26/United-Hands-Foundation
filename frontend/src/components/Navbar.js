@@ -95,16 +95,16 @@ transition-all duration-300
 
           {/* Desktop Menu */}
           <div className="hidden lg:flex items-center gap-4 xl:gap-6">
-            <Link to="/" className="text-sm font-semibold text-[var(--accent-teal)] hover:text-[var(--accent-teal)] transition-colors duration-200" data-testid="nav-home">Home</Link>
-            <Link to="/about" className="text-sm font-semibold text-[var(--accent-teal)] hover:text-[var(--accent-teal)] transition-colors duration-200" data-testid="nav-about">About</Link>
-            <Link to="/transparency" className="text-sm font-semibold text-[var(--accent-teal)] hover:text-[var(--accent-teal)] transition-colors duration-200" data-testid="nav-transparency">Transparency</Link>
+            <Link to="/" className="nav-link text-sm font-medium text-[var(--accent-teal)] hover:text-[var(--accent-teal-light)] transition-colors duration-200" data-testid="nav-home">Home</Link>
+            <Link to="/about" className="nav-link text-sm font-medium text-[var(--accent-teal)] hover:text-[var(--accent-teal-light)] transition-colors duration-200" data-testid="nav-about">About</Link>
+            <Link to="/transparency" className="nav-link text-sm font-medium text-[var(--accent-teal)] hover:text-[var(--accent-teal-light)] transition-colors duration-200" data-testid="nav-transparency">Transparency</Link>
             <div
               className="relative"
               onMouseEnter={() => setIsInitiativesOpen(true)}
               onMouseLeave={() => setIsInitiativesOpen(false)}
             >
               <button
-                className="text-sm font-semibold text-[var(--accent-teal)] transition-all duration-200 flex items-center gap-1.5"
+                className="nav-link text-sm font-medium text-[var(--accent-teal)] transition-all duration-200 flex items-center gap-1.5"
                 aria-expanded={isInitiativesOpen}
                 aria-haspopup="true"
                 onFocus={() => setIsInitiativesOpen(true)}
@@ -127,7 +127,7 @@ transition-all duration-300
                 </div>
               </div>
             </div>
-            <a href="#contact" onClick={scrollToFooter} className="text-sm font-semibold text-[var(--accent-teal)] hover:text-[var(--accent-teal)] transition-colors duration-200 flex items-center gap-1" data-testid="nav-contact">
+            <a href="#contact" onClick={scrollToFooter} className="nav-link text-sm font-medium text-[var(--accent-teal)] hover:text-[var(--accent-teal-light)] transition-colors duration-200 flex items-center gap-1" data-testid="nav-contact">
               <Phone size={13} />
               Contact
             </a>
