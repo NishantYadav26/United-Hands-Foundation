@@ -67,20 +67,20 @@ const AboutUs = () => {
         repulse: {
           distance: isReducedParticleMode ? 95 : 165,
           duration: 1.2,
-          speed: 0.5,
+          speed: 0.85,
           factor: 100
         }
       }
     },
     particles: {
-      number: { value: isReducedParticleMode ? 16 : 40, density: { enable: true, area: 1200 } },
+      number: { value: isReducedParticleMode ? 26 : 68, density: { enable: true, area: 1200 } },
       color: { value: ['#101010', '#1b1b1b', '#2b2b2b'] },
       shape: { type: 'circle' },
       opacity: { value: { min: 0.1, max: 0.35 }, random: { enable: true } },
       size: { value: { min: 1, max: 3.4 }, random: { enable: true } },
       move: {
         enable: true,
-        speed: { min: 0.25, max: 0.55 },
+        speed: { min: 0.45, max: 0.95 },
         direction: 'none',
         random: true,
         straight: false,
@@ -104,10 +104,10 @@ const AboutUs = () => {
     },
     particles: {
       ...missionParticleOptions.particles,
-      number: { value: isReducedParticleMode ? 12 : 28, density: { enable: true, area: 1300 } },
+      number: { value: isReducedParticleMode ? 20 : 46, density: { enable: true, area: 1300 } },
       move: {
         ...missionParticleOptions.particles.move,
-        speed: { min: 0.2, max: 0.45 }
+        speed: { min: 0.38, max: 0.78 }
       }
     }
   }), [isReducedParticleMode, missionParticleOptions]);
