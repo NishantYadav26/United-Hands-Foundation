@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { MapPin, Heart, Award, Target, CheckCircle2 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import usePageRevealAnimation from '@/hooks/usePageRevealAnimation';
 import { getCached } from '@/lib/apiClient';
+import Particles, { initParticlesEngine } from '@tsparticles/react';
+import { loadSlim } from '@tsparticles/slim';
 
 const AboutUs = () => {
   const [siteAssets, setSiteAssets] = useState({});
@@ -26,6 +28,85 @@ const AboutUs = () => {
 
   usePageRevealAnimation(`${visibleLocations.length}`);
 
+  const [particlesReady, setParticlesReady] = useState(false);
+  const [isReducedParticleMode, setIsReducedParticleMode] = useState(false);
+  const [activeCard, setActiveCard] = useState(null);
+
+  useEffect(() => {
+    initParticlesEngine(async engine => {
+      await loadSlim(engine);
+    }).then(() => setParticlesReady(true));
+  }, []);
+
+  useEffect(() => {
+    const updateReducedMode = () => {
+      const touchDevice = window.matchMedia('(hover: none)').matches || window.matchMedia('(pointer: coarse)').matches;
+      const narrowScreen = window.innerWidth < 768;
+      setIsReducedParticleMode(touchDevice || narrowScreen);
+    };
+
+    updateReducedMode();
+    window.addEventListener('resize', updateReducedMode);
+
+    return () => window.removeEventListener('resize', updateReducedMode);
+  }, []);
+
+
+  useEffect(() => {
+    if (!activeCard) return undefined;
+    const timer = window.setTimeout(() => setActiveCard(null), 1600);
+    return () => window.clearTimeout(timer);
+  }, [activeCard]);
+
+  const buildCardParticleOptions = useMemo(() => (cardKey) => {
+    const isActive = activeCard === cardKey;
+    return {
+      background: { color: { value: 'transparent' } },
+      fpsLimit: 60,
+      detectRetina: true,
+      fullScreen: { enable: false },
+      particles: {
+        number: { value: isReducedParticleMode ? (isActive ? 22 : 14) : (isActive ? 54 : 34) },
+        color: { value: ['#101010', '#1b1b1b', '#2b2b2b'] },
+        shape: { type: 'circle' },
+        opacity: { value: { min: 0.1, max: 0.35 }, random: { enable: true } },
+        size: { value: { min: 1, max: 3.4 }, random: { enable: true } },
+        move: {
+          enable: true,
+          speed: isActive ? { min: 0.45, max: 0.82 } : { min: 0.2, max: 0.48 },
+          direction: 'none',
+          random: true,
+          straight: false,
+          outModes: { default: 'bounce' }
+        },
+        blur: { value: isActive ? 2 : 3, enable: true }
+      },
+      interactivity: {
+        events: {
+          onHover: { enable: true, mode: 'attract' },
+          resize: { enable: true }
+        },
+        modes: {
+          attract: {
+            distance: isActive ? 220 : 150,
+            duration: 1,
+            easing: 'ease-out-quad',
+            factor: isActive ? 0.85 : 0.5,
+            maxSpeed: isActive ? 1 : 0.6,
+            speed: isActive ? 0.8 : 0.4
+          }
+        }
+      },
+      polygon: {
+        draw: { enable: false },
+        move: { radius: 10 },
+        inline: { arrangement: 'equidistant' },
+        type: 'inline'
+      },
+      pauseOnBlur: true,
+      pauseOnOutsideViewport: true
+    };
+  }, [activeCard, isReducedParticleMode]);
   useEffect(() => {
     const fetchAssets = async () => {
       try {
@@ -86,32 +167,65 @@ const AboutUs = () => {
       </section>
 
       {/* Mission & Vision */}
-      <section className="py-16 px-6 reveal-section" style={{ background: 'var(--bg-surface)' }} data-testid="about-mission">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <div className="card-elevated p-10 rounded-lg">
+      <section
+        className="py-24 px-6 reveal-section relative overflow-hidden"
+        style={{ background: 'var(--bg-surface)' }}
+        data-testid="about-mission"
+      >
+        <div className="relative z-10 max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12">
+          <div
+            className="relative rounded-2xl p-8 md:p-10 border border-white/50 bg-white/40 backdrop-blur-md shadow-[0_18px_45px_-25px_rgba(0,0,0,0.55)] transition-all duration-700 ease-out hover:-translate-y-1"
+            style={{ boxShadow: '0 18px 45px -25px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.45)' }}
+            onMouseEnter={() => setActiveCard('mission')}
+            onMouseLeave={() => setActiveCard(null)}
+            onTouchStart={() => setActiveCard('mission')}
+          >
+            {particlesReady && (
+              <Particles
+                id="mission-card-particles"
+                className="absolute -inset-2 z-0 pointer-events-none"
+                options={buildCardParticleOptions('mission')}
+              />
+            )}
+            <div className="relative z-10">
             <Target className="mb-6" style={{ color: 'var(--accent-teal)' }} size={40} />
             <h2 className="text-3xl font-medium mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               Our <span className="text-gradient-blue">Mission</span>
             </h2>
-            <ul className="space-y-3">
+            <ul className="space-y-4">
               {missionPoints.map(point => (
                 <li key={point} className="flex gap-3 items-start">
                   <CheckCircle2 size={18} className="mt-1 shrink-0" style={{ color: 'var(--accent-teal)' }} />
-                  <span className="leading-relaxed" style={{ color: 'var(--text-muted)' }}>{point}</span>
+                  <span className="leading-relaxed font-light tracking-[0.01em]" style={{ color: 'var(--text-muted)' }}>{point}</span>
                 </li>
               ))}
             </ul>
+            </div>
           </div>
-          <div className="card-elevated p-10 rounded-lg">
+          <div
+            className="relative rounded-2xl p-8 md:p-10 border border-white/50 bg-white/40 backdrop-blur-md shadow-[0_18px_45px_-25px_rgba(0,0,0,0.55)] transition-all duration-700 ease-out hover:-translate-y-1"
+            style={{ boxShadow: '0 18px 45px -25px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.45)' }}
+            onMouseEnter={() => setActiveCard('vision')}
+            onMouseLeave={() => setActiveCard(null)}
+            onTouchStart={() => setActiveCard('vision')}
+          >
+            {particlesReady && (
+              <Particles
+                id="vision-card-particles"
+                className="absolute -inset-2 z-0 pointer-events-none"
+                options={buildCardParticleOptions('vision')}
+              />
+            )}
+            <div className="relative z-10">
             <Award className="mb-6" style={{ color: 'var(--accent-gold)' }} size={40} />
             <h2 className="text-3xl font-medium mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               Our <span className="text-gradient-orange">Vision</span>
             </h2>
-            <p className="leading-relaxed mb-5" style={{ color: 'var(--text-muted)' }}>
+            <p className="leading-relaxed mb-6 font-light tracking-[0.01em]" style={{ color: 'var(--text-muted)' }}>
               Build a compassionate, healthy, and self-reliant society where every individual —
               from children to the elderly — has access to dignity, care, opportunities, and hope.
             </p>
-            <div className="border-l-2 pl-4 space-y-4" style={{ borderColor: 'var(--accent-gold)' }}>
+            <div className="border-l-2 pl-5 space-y-4" style={{ borderColor: 'var(--accent-gold)' }}>
               <p style={{ color: 'var(--text-muted)' }}><span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Care:</span> Human-first support that protects dignity.</p>
               <p style={{ color: 'var(--text-muted)' }}><span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Access:</span> Services delivered where people need them most.</p>
               <p style={{ color: 'var(--text-muted)' }}><span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Impact:</span> Long-term change through local participation.</p>
