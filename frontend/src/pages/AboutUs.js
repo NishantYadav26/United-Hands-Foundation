@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { MapPin, Heart, Award, Target, CheckCircle2 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import usePageRevealAnimation from '@/hooks/usePageRevealAnimation';
 import { getCached } from '@/lib/apiClient';
+import Particles, { initParticlesEngine } from '@tsparticles/react';
+import { loadSlim } from '@tsparticles/slim';
 
 const AboutUs = () => {
   const [siteAssets, setSiteAssets] = useState({});
@@ -25,6 +27,90 @@ const AboutUs = () => {
   ];
 
   usePageRevealAnimation(`${visibleLocations.length}`);
+
+  const [particlesReady, setParticlesReady] = useState(false);
+  const [isReducedParticleMode, setIsReducedParticleMode] = useState(false);
+
+  useEffect(() => {
+    initParticlesEngine(async engine => {
+      await loadSlim(engine);
+    }).then(() => setParticlesReady(true));
+  }, []);
+
+  useEffect(() => {
+    const updateReducedMode = () => {
+      const touchDevice = window.matchMedia('(hover: none)').matches || window.matchMedia('(pointer: coarse)').matches;
+      const narrowScreen = window.innerWidth < 768;
+      setIsReducedParticleMode(touchDevice || narrowScreen);
+    };
+
+    updateReducedMode();
+    window.addEventListener('resize', updateReducedMode);
+
+    return () => window.removeEventListener('resize', updateReducedMode);
+  }, []);
+
+
+  const missionParticleOptions = useMemo(() => ({
+    background: { color: { value: 'transparent' } },
+    fpsLimit: 60,
+    detectRetina: true,
+    fullScreen: { enable: false },
+    interactivity: {
+      detectsOn: 'parent',
+      events: {
+        onHover: { enable: !isReducedParticleMode, mode: 'repulse' },
+        onClick: { enable: true, mode: 'repulse' },
+        resize: { enable: true }
+      },
+      modes: {
+        repulse: {
+          distance: isReducedParticleMode ? 95 : 165,
+          duration: 1.2,
+          speed: 0.5,
+          factor: 100
+        }
+      }
+    },
+    particles: {
+      number: { value: isReducedParticleMode ? 16 : 40, density: { enable: true, area: 1200 } },
+      color: { value: ['#101010', '#1b1b1b', '#2b2b2b'] },
+      shape: { type: 'circle' },
+      opacity: { value: { min: 0.1, max: 0.35 }, random: { enable: true } },
+      size: { value: { min: 1, max: 3.4 }, random: { enable: true } },
+      move: {
+        enable: true,
+        speed: { min: 0.25, max: 0.55 },
+        direction: 'none',
+        random: true,
+        straight: false,
+        outModes: { default: 'bounce' }
+      },
+      blur: { value: 3, enable: true }
+    },
+    pauseOnBlur: true,
+    pauseOnOutsideViewport: true
+  }), [isReducedParticleMode]);
+
+  const visionParticleOptions = useMemo(() => ({
+    ...missionParticleOptions,
+    interactivity: {
+      ...missionParticleOptions.interactivity,
+      events: {
+        ...missionParticleOptions.interactivity.events,
+        onHover: { enable: false, mode: 'repulse' },
+        onClick: { enable: false, mode: 'repulse' }
+      }
+    },
+    particles: {
+      ...missionParticleOptions.particles,
+      number: { value: isReducedParticleMode ? 12 : 28, density: { enable: true, area: 1300 } },
+      move: {
+        ...missionParticleOptions.particles.move,
+        speed: { min: 0.2, max: 0.45 }
+      }
+    }
+  }), [isReducedParticleMode, missionParticleOptions]);
 
   useEffect(() => {
     const fetchAssets = async () => {
@@ -86,35 +172,63 @@ const AboutUs = () => {
       </section>
 
       {/* Mission & Vision */}
-      <section className="py-16 px-6 reveal-section" style={{ background: 'var(--bg-surface)' }} data-testid="about-mission">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <div className="card-elevated p-10 rounded-lg">
+      <section
+        className="py-24 px-6 reveal-section relative overflow-hidden"
+        style={{ background: 'var(--bg-surface)' }}
+        data-testid="about-mission"
+      >
+        <div className="relative z-10 max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12">
+          <div
+            className="relative rounded-2xl p-8 md:p-10 border border-white/50 bg-white/40 backdrop-blur-md shadow-[0_18px_45px_-25px_rgba(0,0,0,0.55)] transition-all duration-700 ease-out hover:-translate-y-1"
+            style={{ boxShadow: '0 18px 45px -25px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.45)' }}
+          >
+            {particlesReady && (
+              <Particles
+                id="mission-card-particles"
+                className="absolute -inset-2 z-0 pointer-events-none"
+                options={missionParticleOptions}
+              />
+            )}
+            <div className="relative z-10">
             <Target className="mb-6" style={{ color: 'var(--accent-teal)' }} size={40} />
             <h2 className="text-3xl font-medium mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               Our <span className="text-gradient-blue">Mission</span>
             </h2>
-            <ul className="space-y-3">
+            <ul className="space-y-4">
               {missionPoints.map(point => (
                 <li key={point} className="flex gap-3 items-start">
                   <CheckCircle2 size={18} className="mt-1 shrink-0" style={{ color: 'var(--accent-teal)' }} />
-                  <span className="leading-relaxed" style={{ color: 'var(--text-muted)' }}>{point}</span>
+                  <span className="leading-relaxed font-light tracking-[0.01em]" style={{ color: 'var(--text-muted)' }}>{point}</span>
                 </li>
               ))}
             </ul>
+            </div>
           </div>
-          <div className="card-elevated p-10 rounded-lg">
+          <div
+            className="relative rounded-2xl p-8 md:p-10 border border-white/50 bg-white/40 backdrop-blur-md shadow-[0_18px_45px_-25px_rgba(0,0,0,0.55)] transition-all duration-700 ease-out hover:-translate-y-1"
+            style={{ boxShadow: '0 18px 45px -25px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.45)' }}
+          >
+            {particlesReady && (
+              <Particles
+                id="vision-card-particles"
+                className="absolute -inset-2 z-0 pointer-events-none"
+                options={visionParticleOptions}
+              />
+            )}
+            <div className="relative z-10">
             <Award className="mb-6" style={{ color: 'var(--accent-gold)' }} size={40} />
             <h2 className="text-3xl font-medium mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               Our <span className="text-gradient-orange">Vision</span>
             </h2>
-            <p className="leading-relaxed mb-5" style={{ color: 'var(--text-muted)' }}>
+            <p className="leading-relaxed mb-6 font-light tracking-[0.01em]" style={{ color: 'var(--text-muted)' }}>
               Build a compassionate, healthy, and self-reliant society where every individual —
               from children to the elderly — has access to dignity, care, opportunities, and hope.
             </p>
-            <div className="border-l-2 pl-4 space-y-4" style={{ borderColor: 'var(--accent-gold)' }}>
+            <div className="border-l-2 pl-5 space-y-4" style={{ borderColor: 'var(--accent-gold)' }}>
               <p style={{ color: 'var(--text-muted)' }}><span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Care:</span> Human-first support that protects dignity.</p>
               <p style={{ color: 'var(--text-muted)' }}><span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Access:</span> Services delivered where people need them most.</p>
               <p style={{ color: 'var(--text-muted)' }}><span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Impact:</span> Long-term change through local participation.</p>
+            </div>
             </div>
           </div>
         </div>
