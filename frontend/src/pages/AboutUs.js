@@ -30,7 +30,7 @@ const AboutUs = () => {
 
   const [particlesReady, setParticlesReady] = useState(false);
   const [isReducedParticleMode, setIsReducedParticleMode] = useState(false);
-  const [isMissionHovered, setIsMissionHovered] = useState(false);
+  const [activeCard, setActiveCard] = useState(null);
 
   useEffect(() => {
     initParticlesEngine(async engine => {
@@ -51,79 +51,62 @@ const AboutUs = () => {
     return () => window.removeEventListener('resize', updateReducedMode);
   }, []);
 
-  const baseParticleCount = isReducedParticleMode ? 10 : 32;
-  const hoverParticleCount = isReducedParticleMode ? 14 : 52;
 
-  const missionParticleOptions = useMemo(() => ({
-    background: { color: { value: 'transparent' } },
-    fpsLimit: 60,
-    detectRetina: true,
-    particles: {
-      number: {
-        value: isMissionHovered ? hoverParticleCount : baseParticleCount,
-        density: { enable: true, area: 1300 }
-      },
-      color: { value: ['#0f0f0f', '#1a1a1a', '#2a2a2a'] },
-      shape: { type: 'circle' },
-      opacity: {
-        value: { min: 0.1, max: 0.35 },
-        random: { enable: true },
-        animation: {
+  useEffect(() => {
+    if (!activeCard) return undefined;
+    const timer = window.setTimeout(() => setActiveCard(null), 1600);
+    return () => window.clearTimeout(timer);
+  }, [activeCard]);
+
+  const buildCardParticleOptions = useMemo(() => (cardKey) => {
+    const isActive = activeCard === cardKey;
+    return {
+      background: { color: { value: 'transparent' } },
+      fpsLimit: 60,
+      detectRetina: true,
+      fullScreen: { enable: false },
+      particles: {
+        number: { value: isReducedParticleMode ? (isActive ? 22 : 14) : (isActive ? 54 : 34) },
+        color: { value: ['#101010', '#1b1b1b', '#2b2b2b'] },
+        shape: { type: 'circle' },
+        opacity: { value: { min: 0.1, max: 0.35 }, random: { enable: true } },
+        size: { value: { min: 1, max: 3.4 }, random: { enable: true } },
+        move: {
           enable: true,
-          speed: 0.12,
-          minimumValue: 0.1,
-          sync: false
-        }
-      },
-      size: {
-        value: { min: 1.2, max: 4.2 },
-        random: { enable: true }
-      },
-      move: {
-        enable: true,
-        speed: isMissionHovered ? { min: 0.55, max: 0.8 } : { min: 0.26, max: 0.52 },
-        direction: 'none',
-        random: true,
-        straight: false,
-        outModes: { default: 'out' },
-        attract: { enable: false },
-        decay: 0.03
-      },
-      blur: { value: isMissionHovered ? 3 : 4, enable: true },
-      shadow: {
-        enable: true,
-        color: '#1a1a1a',
-        blur: 12,
-        offset: { x: 0, y: 0 }
-      }
-    },
-    interactivity: {
-      events: {
-        onHover: { enable: !isReducedParticleMode, mode: ['attract', 'bubble'] },
-        resize: { enable: true }
-      },
-      modes: {
-        attract: {
-          distance: 240,
-          duration: 1,
-          easing: 'ease-out-quad',
-          factor: 0.5,
-          maxSpeed: 0.9,
-          speed: 0.55
+          speed: isActive ? { min: 0.45, max: 0.82 } : { min: 0.2, max: 0.48 },
+          direction: 'none',
+          random: true,
+          straight: false,
+          outModes: { default: 'bounce' }
         },
-        bubble: {
-          distance: 260,
-          duration: 1,
-          opacity: 0.35,
-          size: 5,
-          speed: 0.7
+        blur: { value: isActive ? 2 : 3, enable: true }
+      },
+      interactivity: {
+        events: {
+          onHover: { enable: true, mode: 'attract' },
+          resize: { enable: true }
+        },
+        modes: {
+          attract: {
+            distance: isActive ? 220 : 150,
+            duration: 1,
+            easing: 'ease-out-quad',
+            factor: isActive ? 0.85 : 0.5,
+            maxSpeed: isActive ? 1 : 0.6,
+            speed: isActive ? 0.8 : 0.4
+          }
         }
-      }
-    },
-    pauseOnBlur: true,
-    pauseOnOutsideViewport: true
-  }), [baseParticleCount, hoverParticleCount, isMissionHovered, isReducedParticleMode]);
-
+      },
+      polygon: {
+        draw: { enable: false },
+        move: { radius: 10 },
+        inline: { arrangement: 'equidistant' },
+        type: 'inline'
+      },
+      pauseOnBlur: true,
+      pauseOnOutsideViewport: true
+    };
+  }, [activeCard, isReducedParticleMode]);
   useEffect(() => {
     const fetchAssets = async () => {
       try {
@@ -188,18 +171,23 @@ const AboutUs = () => {
         className="py-24 px-6 reveal-section relative overflow-hidden"
         style={{ background: 'var(--bg-surface)' }}
         data-testid="about-mission"
-        onMouseEnter={() => setIsMissionHovered(true)}
-        onMouseLeave={() => setIsMissionHovered(false)}
       >
-        {particlesReady && (
-          <Particles
-            id="mission-vision-particles"
-            className="absolute inset-0 z-0 pointer-events-none"
-            options={missionParticleOptions}
-          />
-        )}
         <div className="relative z-10 max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12">
-          <div className="rounded-2xl p-8 md:p-10 border border-white/50 bg-white/40 backdrop-blur-md shadow-[0_18px_45px_-25px_rgba(0,0,0,0.55)] transition-all duration-700 ease-out hover:-translate-y-1" style={{ boxShadow: '0 18px 45px -25px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.45)' }}>
+          <div
+            className="relative rounded-2xl p-8 md:p-10 border border-white/50 bg-white/40 backdrop-blur-md shadow-[0_18px_45px_-25px_rgba(0,0,0,0.55)] transition-all duration-700 ease-out hover:-translate-y-1"
+            style={{ boxShadow: '0 18px 45px -25px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.45)' }}
+            onMouseEnter={() => setActiveCard('mission')}
+            onMouseLeave={() => setActiveCard(null)}
+            onTouchStart={() => setActiveCard('mission')}
+          >
+            {particlesReady && (
+              <Particles
+                id="mission-card-particles"
+                className="absolute -inset-2 z-0 pointer-events-none"
+                options={buildCardParticleOptions('mission')}
+              />
+            )}
+            <div className="relative z-10">
             <Target className="mb-6" style={{ color: 'var(--accent-teal)' }} size={40} />
             <h2 className="text-3xl font-medium mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               Our <span className="text-gradient-blue">Mission</span>
@@ -212,8 +200,23 @@ const AboutUs = () => {
                 </li>
               ))}
             </ul>
+            </div>
           </div>
-          <div className="rounded-2xl p-8 md:p-10 border border-white/50 bg-white/40 backdrop-blur-md shadow-[0_18px_45px_-25px_rgba(0,0,0,0.55)] transition-all duration-700 ease-out hover:-translate-y-1" style={{ boxShadow: '0 18px 45px -25px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.45)' }}>
+          <div
+            className="relative rounded-2xl p-8 md:p-10 border border-white/50 bg-white/40 backdrop-blur-md shadow-[0_18px_45px_-25px_rgba(0,0,0,0.55)] transition-all duration-700 ease-out hover:-translate-y-1"
+            style={{ boxShadow: '0 18px 45px -25px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.45)' }}
+            onMouseEnter={() => setActiveCard('vision')}
+            onMouseLeave={() => setActiveCard(null)}
+            onTouchStart={() => setActiveCard('vision')}
+          >
+            {particlesReady && (
+              <Particles
+                id="vision-card-particles"
+                className="absolute -inset-2 z-0 pointer-events-none"
+                options={buildCardParticleOptions('vision')}
+              />
+            )}
+            <div className="relative z-10">
             <Award className="mb-6" style={{ color: 'var(--accent-gold)' }} size={40} />
             <h2 className="text-3xl font-medium mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               Our <span className="text-gradient-orange">Vision</span>
@@ -226,6 +229,7 @@ const AboutUs = () => {
               <p style={{ color: 'var(--text-muted)' }}><span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Care:</span> Human-first support that protects dignity.</p>
               <p style={{ color: 'var(--text-muted)' }}><span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Access:</span> Services delivered where people need them most.</p>
               <p style={{ color: 'var(--text-muted)' }}><span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Impact:</span> Long-term change through local participation.</p>
+            </div>
             </div>
           </div>
         </div>
