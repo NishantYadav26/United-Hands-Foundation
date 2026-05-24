@@ -30,6 +30,7 @@ const AboutUs = () => {
 
   const [particlesReady, setParticlesReady] = useState(false);
   const [isReducedParticleMode, setIsReducedParticleMode] = useState(false);
+  const [isMissionHovered, setIsMissionHovered] = useState(false);
 
   useEffect(() => {
     initParticlesEngine(async engine => {
@@ -50,16 +51,19 @@ const AboutUs = () => {
     return () => window.removeEventListener('resize', updateReducedMode);
   }, []);
 
+  const baseParticleCount = isReducedParticleMode ? 10 : 32;
+  const hoverParticleCount = isReducedParticleMode ? 14 : 52;
+
   const missionParticleOptions = useMemo(() => ({
     background: { color: { value: 'transparent' } },
     fpsLimit: 60,
     detectRetina: true,
     particles: {
       number: {
-        value: isReducedParticleMode ? 8 : 22,
+        value: isMissionHovered ? hoverParticleCount : baseParticleCount,
         density: { enable: true, area: 1300 }
       },
-      color: { value: ['#d4af37', '#f5efe6', '#84a98c'] },
+      color: { value: ['#0f0f0f', '#1a1a1a', '#2a2a2a'] },
       shape: { type: 'circle' },
       opacity: {
         value: { min: 0.1, max: 0.35 },
@@ -77,7 +81,7 @@ const AboutUs = () => {
       },
       move: {
         enable: true,
-        speed: { min: 0.22, max: 0.58 },
+        speed: isMissionHovered ? { min: 0.55, max: 0.8 } : { min: 0.26, max: 0.52 },
         direction: 'none',
         random: true,
         straight: false,
@@ -85,33 +89,40 @@ const AboutUs = () => {
         attract: { enable: false },
         decay: 0.03
       },
-      blur: { value: 4, enable: true },
+      blur: { value: isMissionHovered ? 3 : 4, enable: true },
       shadow: {
         enable: true,
-        color: '#f5efe6',
+        color: '#1a1a1a',
         blur: 12,
         offset: { x: 0, y: 0 }
       }
     },
     interactivity: {
       events: {
-        onHover: { enable: !isReducedParticleMode, mode: 'attract' },
+        onHover: { enable: !isReducedParticleMode, mode: ['attract', 'bubble'] },
         resize: { enable: true }
       },
       modes: {
         attract: {
-          distance: 140,
-          duration: 0.8,
+          distance: 240,
+          duration: 1,
           easing: 'ease-out-quad',
-          factor: 0.35,
-          maxSpeed: 0.45,
-          speed: 0.28
+          factor: 0.5,
+          maxSpeed: 0.9,
+          speed: 0.55
+        },
+        bubble: {
+          distance: 260,
+          duration: 1,
+          opacity: 0.35,
+          size: 5,
+          speed: 0.7
         }
       }
     },
     pauseOnBlur: true,
     pauseOnOutsideViewport: true
-  }), [isReducedParticleMode]);
+  }), [baseParticleCount, hoverParticleCount, isMissionHovered, isReducedParticleMode]);
 
   useEffect(() => {
     const fetchAssets = async () => {
@@ -173,7 +184,13 @@ const AboutUs = () => {
       </section>
 
       {/* Mission & Vision */}
-      <section className="py-24 px-6 reveal-section relative overflow-hidden" style={{ background: 'var(--bg-surface)' }} data-testid="about-mission">
+      <section
+        className="py-24 px-6 reveal-section relative overflow-hidden"
+        style={{ background: 'var(--bg-surface)' }}
+        data-testid="about-mission"
+        onMouseEnter={() => setIsMissionHovered(true)}
+        onMouseLeave={() => setIsMissionHovered(false)}
+      >
         {particlesReady && (
           <Particles
             id="mission-vision-particles"
