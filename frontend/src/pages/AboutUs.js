@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MapPin, Heart, Award, Target } from 'lucide-react';
+import { MapPin, Heart, Award, Target, CheckCircle2 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import usePageRevealAnimation from '@/hooks/usePageRevealAnimation';
@@ -16,6 +16,13 @@ const AboutUs = () => {
     { name: 'Panchgani', description: 'Rural health programs' }
   ];
   const visibleLocations = locations.length > 0 ? locations : fallbackLocations;
+  const missionPoints = [
+    'Serve underserved communities through healthcare, education, elderly care, and livelihood support.',
+    'Make health services affordable and accessible in rural and tribal areas.',
+    'Empower women, youth, and marginalized groups through skills and opportunity.',
+    'Provide comfort, dignity, and companionship for elderly and palliative care beneficiaries.',
+    'Build community-led solutions for sustainable and inclusive development.'
+  ];
 
   usePageRevealAnimation(`${visibleLocations.length}`);
 
@@ -44,53 +51,71 @@ const AboutUs = () => {
 
       {/* Hero */}
       <section className="pt-28 pb-16 px-6 reveal-section" data-testid="about-hero">
-        <div className="max-w-5xl mx-auto text-center">
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-medium tracking-tight mb-6 text-gradient-gold" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
-            About Us
-          </h1>
-          <p className="text-lg leading-relaxed max-w-3xl mx-auto" style={{ color: 'var(--text-muted)' }}>
-            United Hands Foundation is a registered non-profit committed to healthcare,
-            education, disaster relief, and community upliftment across Maharashtra since 2020.
-          </p>
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+          <div>
+            <span className="inline-block text-xs tracking-[0.2em] uppercase mb-4" style={{ color: 'var(--accent-teal)' }}>
+              United Hands Foundation
+            </span>
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-medium tracking-tight mb-6 text-gradient-gold" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+              About Us
+            </h1>
+            <p className="text-lg leading-relaxed max-w-2xl" style={{ color: 'var(--text-muted)' }}>
+              United Hands Foundation is a registered non-profit committed to healthcare,
+              education, disaster relief, and community upliftment across Maharashtra since 2020.
+            </p>
+          </div>
+          <div className="card-elevated rounded-lg p-8">
+            <h2 className="text-2xl mb-5" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+              At a Glance
+            </h2>
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                { label: 'Founded', value: '2020' },
+                { label: 'Focus Areas', value: '4+' },
+                { label: 'Locations', value: `${visibleLocations.length}` },
+                { label: 'Approach', value: 'Community-led' }
+              ].map(item => (
+                <div key={item.label} className="rounded p-4" style={{ background: 'var(--bg-surface)' }}>
+                  <p className="text-xs uppercase tracking-[0.12em] mb-1" style={{ color: 'var(--accent-teal)' }}>{item.label}</p>
+                  <p className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>{item.value}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Mission & Vision */}
       <section className="py-16 px-6 reveal-section" style={{ background: 'var(--bg-surface)' }} data-testid="about-mission">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <div className="card-elevated about-hover-card p-10 rounded-lg group transition-all duration-500 hover:-translate-y-1">
-        <Target className="mb-6" style={{ color: 'var(--accent-teal)' }} size={40} />
+          <div className="card-elevated p-10 rounded-lg">
+            <Target className="mb-6" style={{ color: 'var(--accent-teal)' }} size={40} />
             <h2 className="text-3xl font-medium mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               Our <span className="text-gradient-blue">Mission</span>
             </h2>
-            <p className="text-sm mb-3" style={{ color: 'var(--accent-teal)' }}>
-              Hover to explore our complete mission.
-            </p>
-            <p className="leading-relaxed whitespace-pre-line lg:max-h-24 lg:overflow-hidden transition-all duration-300 lg:group-hover:max-h-[420px]" style={{ color: 'var(--text-muted)' }}>
-              {`To unite hands and hearts in serving underserved communities through integrated
-programs in healthcare, elderly care, palliative support, education, and livelihood.
-To ensure accessible, affordable, and holistic health services in both rural and tribal
-areas.
-To empower women, youth, and marginalized groups through skill development,
-education, and livelihood opportunities.
-To provide comfort, dignity, and companionship to the elderly and those in palliative
-care.
-To create a platform where communities actively participate in their own growth,
-leading to sustainable and inclusive development`}
-            </p>
+            <ul className="space-y-3">
+              {missionPoints.map(point => (
+                <li key={point} className="flex gap-3 items-start">
+                  <CheckCircle2 size={18} className="mt-1 shrink-0" style={{ color: 'var(--accent-teal)' }} />
+                  <span className="leading-relaxed" style={{ color: 'var(--text-muted)' }}>{point}</span>
+                </li>
+              ))}
+            </ul>
           </div>
-          <div className="card-elevated about-hover-card p-10 rounded-lg group transition-all duration-500 hover:-translate-y-1">
-              <Award className="mb-6" style={{ color: 'var(--accent-gold)' }} size={40} />
+          <div className="card-elevated p-10 rounded-lg">
+            <Award className="mb-6" style={{ color: 'var(--accent-gold)' }} size={40} />
             <h2 className="text-3xl font-medium mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               Our <span className="text-gradient-orange">Vision</span>
             </h2>
-            <p className="text-sm mb-3" style={{ color: 'var(--accent-gold)' }}>
-              Hover to reveal our guiding vision.
+            <p className="leading-relaxed mb-5" style={{ color: 'var(--text-muted)' }}>
+              Build a compassionate, healthy, and self-reliant society where every individual —
+              from children to the elderly — has access to dignity, care, opportunities, and hope.
             </p>
-            <p className="leading-relaxed whitespace-pre-line lg:max-h-10 lg:overflow-hidden transition-all duration-300 lg:group-hover:max-h-40" style={{ color: 'var(--text-muted)' }}>
-              {`build a compassionate, healthy, and self-reliant society where every individual — from
-children to the elderly — has access to dignity, care, opportunities, and hope.`}
-            </p>
+            <div className="border-l-2 pl-4 space-y-4" style={{ borderColor: 'var(--accent-gold)' }}>
+              <p style={{ color: 'var(--text-muted)' }}><span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Care:</span> Human-first support that protects dignity.</p>
+              <p style={{ color: 'var(--text-muted)' }}><span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Access:</span> Services delivered where people need them most.</p>
+              <p style={{ color: 'var(--text-muted)' }}><span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Impact:</span> Long-term change through local participation.</p>
+            </div>
           </div>
         </div>
       </section>
