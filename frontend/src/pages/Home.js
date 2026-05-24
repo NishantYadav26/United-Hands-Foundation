@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { createPortal } from 'react-dom';
 import { Users, MapPin, Heart, TrendingUp } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -53,11 +52,9 @@ const Home = () => {
     total_amount: 0
   });
   const [successStories, setSuccessStories] = useState([]);
-  const [galleryImages, setGalleryImages] = useState([]);
   const [siteAssets, setSiteAssets] = useState(() => readCachedSiteAssets());
   const [pillars, setPillars] = useState([]);
   const [locations, setLocations] = useState([]);
-  const [isMobileGalleryModalOpen, setIsMobileGalleryModalOpen] = useState(false);
   const normalizeText = (value) => (value || '').toString().trim().toLowerCase();
   const isPartner = (pillar) => {
     const category = normalizeText(pillar?.category);
@@ -73,24 +70,7 @@ const Home = () => {
 
   const statsRef = useRef(null);
   const heroRef = useRef(null);
-  const openMobileGalleryModal = () => {
-    setIsMobileGalleryModalOpen(true);
-  };
 
-  const closeMobileGalleryModal = () => {
-    setIsMobileGalleryModalOpen(false);
-  };
-
-  useEffect(() => {
-    if (!isMobileGalleryModalOpen) return undefined;
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [isMobileGalleryModalOpen]);
 
   useEffect(() => {
     let isMounted = true;
@@ -159,11 +139,10 @@ const Home = () => {
       schedule(() => {
         Promise.allSettled([
           getCached(`/pillars`, { timeout: REQUEST_TIMEOUT_MS, cacheTtlMs: 300000 }),
-          getCached(`/success-stories?limit=3`, { timeout: REQUEST_TIMEOUT_MS, cacheTtlMs: 180000 }),
-          getCached(`/gallery`, { timeout: REQUEST_TIMEOUT_MS, cacheTtlMs: 180000 })
+          getCached(`/success-stories?limit=3`, { timeout: REQUEST_TIMEOUT_MS, cacheTtlMs: 180000 })
         ]).then((deferredRequests) => {
           if (!isMounted) return;
-          const [pillarsRes, storiesRes, galleryRes] = deferredRequests;
+          const [pillarsRes, storiesRes] = deferredRequests;
 
           if (pillarsRes.status === 'fulfilled') {
             setPillars(ensureArray(pillarsRes.value.data));
@@ -177,11 +156,6 @@ const Home = () => {
             console.error('Failed to fetch success stories:', storiesRes.reason);
           }
 
-          if (galleryRes.status === 'fulfilled') {
-            setGalleryImages(ensureArray(galleryRes.value.data));
-          } else {
-            console.error('Failed to fetch gallery:', galleryRes.reason);
-          }
         });
       });
     };
@@ -293,28 +267,6 @@ const Home = () => {
           }
         );
       });
-    }
-
-    if (gsap.utils.toArray('.gallery-card').length && document.querySelector('.gallery-animated-grid')) {
-      gsap.fromTo(
-        '.gallery-card',
-        { opacity: 0, y: 45, scale: 0.93 },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.85,
-          stagger: 0.1,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: '.gallery-animated-grid',
-            start: 'top 74%',
-            toggleActions: 'play none none none',
-            once: true,
-            invalidateOnRefresh: true
-          }
-        }
-      );
     }
 
     if (gsap.utils.toArray('.impact-stat-card').length) {
@@ -538,76 +490,7 @@ const Home = () => {
 
       {/* Pillars of Impact */}
 
-      {/* Heartiest Moments Gallery */}
-      {galleryImages.length > 0 && (
-        <section className="py-20 px-6 reveal-section" style={{ background: 'var(--bg-surface)' }} data-testid="heartiest-moments-section">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-4">
-              <Heart className="mx-auto mb-4" style={{ color: 'var(--accent-gold)' }} size={32} fill="var(--accent-gold)" />
-              <h2
-                className="text-4xl sm:text-5xl font-medium tracking-tight mb-4"
-                style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}
-              >
-                Heartiest <span className="text-gradient-orange">Moments</span>
-              </h2>
-              <p className="text-base mb-14" style={{ color: 'var(--text-muted)' }}>
-                Glimpses of hope, service, and transformation from the field
-              </p>
-            </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 gallery-animated-grid">
-              {galleryImages.map((image, index) => (
-                <div
-                  key={image.id}
-                  className="rounded-lg overflow-hidden hover-lift card-elevated gallery-card mobile-gallery-preview-card"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                  data-testid={`gallery-image-${image.id}`}
-                >
-                  <div className="h-64 overflow-hidden">
-                    <img
-                      src={image.image_url}
-                      alt={image.title}
-                      className="w-full h-full object-cover identity-lock transition-transform duration-500 hover:scale-105"
-                      loading={index < 3 ? 'eager' : 'lazy'}
-                      decoding="async"
-                    />
-                  </div>
-                  <div className="p-5">
-                    <h3 className="font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>{image.title}</h3>
-                    {image.description && (
-                      <p className="text-sm line-clamp-2" style={{ color: 'var(--text-muted)' }}>{image.description}</p>
-                    )}
-                    <span className="inline-block mt-2 text-xs px-2 py-1 rounded" style={{ background: 'var(--bg-surface)', color: 'var(--accent-teal)' }}>
-                      {image.category}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <button type="button" className="gallery-mobile-view-all-btn" onClick={openMobileGalleryModal}>
-              View all heartiest moments
-            </button>
-          </div>
-        </section>
-      )}
-      {isMobileGalleryModalOpen && createPortal(
-        <div className="gallery-mobile-modal is-open" role="dialog" aria-modal="true" aria-label="All photos">
-          <button type="button" className="gallery-mobile-modal-close" onClick={closeMobileGalleryModal} aria-label="Close gallery">
-            ×
-          </button>
-          <button type="button" className="gallery-mobile-modal-back" onClick={closeMobileGalleryModal}>
-            Back to home
-          </button>
-          <div className="gallery-mobile-modal-content">
-            {galleryImages.map((image, index) => (
-              <div key={`mobile-modal-image-${image.id || index}`} className="gallery-mobile-modal-item">
-                <img src={image.image_url} alt={image.title} className="w-full h-auto object-cover identity-lock" loading="lazy" decoding="async" />
-              </div>
-            ))}
-          </div>
-        </div>,
-        document.body
-      )}
 
       {/* Impact Stats */}
       <section ref={statsRef} id="impact" className="py-20 px-6 reveal-section" data-testid="impact-stats-section">
