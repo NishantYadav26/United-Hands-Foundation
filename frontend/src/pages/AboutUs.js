@@ -67,7 +67,7 @@ const AboutUs = () => {
         repulse: {
           distance: isReducedParticleMode ? 95 : 165,
           duration: 1.2,
-          speed: 0.5,
+          speed: 0.85,
           factor: 100
         }
       }
@@ -80,7 +80,7 @@ const AboutUs = () => {
       size: { value: { min: 1, max: 3.4 }, random: { enable: true } },
       move: {
         enable: true,
-        speed: { min: 0.25, max: 0.55 },
+        speed: { min: 0.45, max: 0.95 },
         direction: 'none',
         random: true,
         straight: false,
@@ -107,7 +107,7 @@ const AboutUs = () => {
       number: { value: isReducedParticleMode ? 20 : 46, density: { enable: true, area: 1300 } },
       move: {
         ...missionParticleOptions.particles.move,
-        speed: { min: 0.2, max: 0.45 }
+        speed: { min: 0.38, max: 0.78 }
       }
     }
   }), [isReducedParticleMode, missionParticleOptions]);
