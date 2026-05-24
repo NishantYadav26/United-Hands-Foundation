@@ -463,7 +463,7 @@ const Home = () => {
 
         <div className="max-w-5xl mx-auto text-center relative z-10">
           <h1
-            className="text-5xl sm:text-6xl lg:text-7xl font-medium tracking-tight leading-none mb-6"
+            className="text-5xl sm:text-6xl lg:text-7xl font-medium tracking-tight leading-none mb-6 hero-title"
             style={{
               fontFamily: 'Cormorant Garamond, serif',
               color: '#F6F3ED',
@@ -484,7 +484,7 @@ const Home = () => {
             </Link>
             <a
               href="#impact"
-              className="px-8 py-4 border-2 text-sm font-semibold tracking-[0.1em] uppercase transition-all rounded"
+              className="px-8 py-4 border-2 text-sm font-medium tracking-[0.1em] uppercase transition-all rounded"
               style={{ borderColor: 'rgba(246,243,237,0.6)', color: '#F6F3ED' }}
               onMouseEnter={e => { e.target.style.background = 'rgba(246,243,237,0.15)'; }}
               onMouseLeave={e => { e.target.style.background = 'transparent'; }}
@@ -516,7 +516,7 @@ const Home = () => {
             {visibleLocations.map((district, idx) => (
               <div
                 key={district.id || district.name}
-                className="text-center district-pill card-elevated hover-lift rounded-xl p-4"
+                className="text-center district-pill card-elevated hover-lift rounded-xl p-5"
                 style={{
                   background: idx % 2 === 0
                     ? 'linear-gradient(145deg, rgba(31,111,109,0.09), rgba(255,255,255,0.95))'
@@ -555,7 +555,7 @@ const Home = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 gallery-animated-grid">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 gallery-animated-grid">
               {galleryImages.map((image, index) => (
                 <div
                   key={image.id}
@@ -620,9 +620,9 @@ const Home = () => {
           </h2>
           <p className="text-center text-base mb-14" style={{ color: 'var(--text-muted)' }}>Transforming lives across communities, one step at a time</p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div
-              className="card-elevated p-10 rounded-lg hover-lift text-center impact-stat-card"
+              className="card-elevated p-5 rounded-lg hover-lift text-center impact-stat-card"
               data-testid="stat-patients"
               style={{
                 backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.45)), url('https://res.cloudinary.com/datcgiuci/image/upload/v1779450400/lives_thced_pinuwy.jpg')",
@@ -635,11 +635,12 @@ const Home = () => {
               <div className="stat-number text-5xl font-medium mb-3" data-value={stats.patients_served} style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                 0
               </div>
-              <p className="text-xs tracking-[0.2em] uppercase font-bold" style={{ color: 'var(--accent-teal)' }}>Lives Touched</p>
+              <p className="text-xs tracking-[0.2em] uppercase font-medium" style={{ color: 'var(--accent-teal)' }}>Lives Touched</p>
+              <div className="mt-4 h-2 rounded-full" style={{ background: 'rgba(31, 111, 109, 0.12)' }}><div className="h-2 rounded-full" style={{ width: '84%', background: 'var(--accent-teal)' }} /></div>
             </div>
 
             <div
-              className="card-elevated p-10 rounded-lg hover-lift text-center impact-stat-card"
+              className="card-elevated p-5 rounded-lg hover-lift text-center impact-stat-card"
               data-testid="stat-districts"
               style={{
                 backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.45)), url('https://res.cloudinary.com/datcgiuci/image/upload/v1779450399/map_bijono.jpg')",
@@ -652,11 +653,12 @@ const Home = () => {
               <div className="stat-number text-5xl font-medium mb-3" data-value={stats.districts_covered} style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                 0
               </div>
-              <p className="text-xs tracking-[0.2em] uppercase font-bold" style={{ color: 'var(--accent-gold)' }}>Districts Covered</p>
+              <p className="text-xs tracking-[0.2em] uppercase font-medium" style={{ color: 'var(--accent-gold)' }}>Districts Covered</p>
+              <div className="mt-4 h-2 rounded-full" style={{ background: 'rgba(198, 161, 91, 0.14)' }}><div className="h-2 rounded-full" style={{ width: '62%', background: 'var(--accent-gold)' }} /></div>
             </div>
 
             <div
-              className="card-elevated p-10 rounded-lg hover-lift text-center impact-stat-card"
+              className="card-elevated p-5 rounded-lg hover-lift text-center impact-stat-card"
               data-testid="stat-donations"
               style={{
                 backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.45)), url('https://res.cloudinary.com/datcgiuci/image/upload/v1779450399/donation_rec_o1qj6z.jpg')",
@@ -669,11 +671,12 @@ const Home = () => {
               <div className="stat-number text-5xl font-medium mb-3" data-value={stats.total_donations} style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                 0
               </div>
-              <p className="text-xs tracking-[0.2em] uppercase font-bold" style={{ color: 'var(--accent-teal)' }}>Donations Received</p>
+              <p className="text-xs tracking-[0.2em] uppercase font-medium" style={{ color: 'var(--accent-teal)' }}>Donations Received</p>
+              <div className="mt-4 h-2 rounded-full" style={{ background: 'rgba(31, 111, 109, 0.12)' }}><div className="h-2 rounded-full" style={{ width: '78%', background: 'var(--accent-teal)' }} /></div>
             </div>
 
             <div
-              className="card-elevated p-10 rounded-lg hover-lift text-center impact-stat-card"
+              className="card-elevated p-5 rounded-lg hover-lift text-center impact-stat-card"
               data-testid="stat-amount"
               style={{
                 backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.55))"
@@ -683,7 +686,8 @@ const Home = () => {
               <div className="stat-number text-5xl font-medium mb-3" data-value={stats.total_amount} style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                 0
               </div>
-              <p className="text-xs tracking-[0.2em] uppercase font-bold" style={{ color: 'var(--accent-gold)' }}>Total Raised (INR)</p>
+              <p className="text-xs tracking-[0.2em] uppercase font-medium" style={{ color: 'var(--accent-gold)' }}>Total Raised (INR)</p>
+              <div className="mt-4 h-2 rounded-full" style={{ background: 'rgba(198, 161, 91, 0.14)' }}><div className="h-2 rounded-full" style={{ width: '71%', background: 'var(--accent-gold)' }} /></div>
             </div>
           </div>
         </div>
@@ -750,11 +754,11 @@ const Home = () => {
               Our <span className="text-gradient-gold">Pillars</span>
             </h3>
             {teamPillarCards.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 team-pillars-drop-grid">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 team-pillars-drop-grid">
                 {teamPillarCards.map((pillar) => (
-                  <div key={pillar.id} className="card-elevated p-6 rounded-lg hover-lift text-center pop-card-lr pillar-card" data-testid={`home-pillar-${pillar.id}`}>
+                  <div key={pillar.id} className="card-elevated p-5 rounded-lg hover-lift text-center pop-card-lr pillar-card" data-testid={`home-pillar-${pillar.id}`}>
                     {pillar.image_url && (
-                      <div className="w-24 h-24 mx-auto mb-4 overflow-hidden rounded-full border blue-border">
+                      <div className="w-16 h-16 mx-auto mb-4 overflow-hidden rounded-full border blue-border">
                         <img
                           src={pillar.image_url}
                           alt={pillar.name}
@@ -765,7 +769,7 @@ const Home = () => {
                       </div>
                     )}
                     <h4 className="text-lg font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{pillar.name}</h4>
-                    <p className="text-xs tracking-[0.15em] uppercase font-bold mb-2" style={{ color: 'var(--accent-gold)' }}>{pillar.role}</p>
+                    <p className="text-xs tracking-[0.15em] uppercase font-medium mb-2" style={{ color: 'var(--accent-gold)' }}>{pillar.role}</p>
                     {pillar.specialty && <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{pillar.specialty}</p>}
                   </div>
                 ))}
@@ -784,11 +788,11 @@ const Home = () => {
               Our <span className="text-gradient-blue">Partners</span>
             </h3>
             {partnerCards.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 partners-animated-grid">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 partners-animated-grid">
                 {partnerCards.map((partner) => (
-                  <div key={partner.id} className="card-elevated p-6 rounded-lg hover-lift text-center partner-card home-people-card" data-testid={`partner-${partner.id}`}>
+                  <div key={partner.id} className="card-elevated p-5 rounded-lg hover-lift text-center partner-card home-people-card" data-testid={`partner-${partner.id}`}>
                     {partner.image_url && (
-                      <div className="w-24 h-24 mx-auto mb-4 overflow-hidden rounded-full border blue-border">
+                      <div className="w-16 h-16 mx-auto mb-4 overflow-hidden rounded-full border blue-border">
                         <img
                           src={partner.image_url}
                           alt={partner.name}
@@ -799,7 +803,7 @@ const Home = () => {
                       </div>
                     )}
                     <h4 className="text-lg font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{partner.name}</h4>
-                    <p className="text-xs tracking-[0.15em] uppercase font-bold mb-2" style={{ color: 'var(--accent-teal)' }}>{partner.role}</p>
+                    <p className="text-xs tracking-[0.15em] uppercase font-medium mb-2" style={{ color: 'var(--accent-teal)' }}>{partner.role}</p>
                     {partner.specialty && <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{partner.specialty}</p>}
                   </div>
                 ))}
