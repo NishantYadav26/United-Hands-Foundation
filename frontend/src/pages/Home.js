@@ -493,84 +493,69 @@ const Home = () => {
 
 
       {/* Impact Stats */}
-      <section ref={statsRef} id="impact" className="py-20 px-6 reveal-section" data-testid="impact-stats-section">
-        <div className="max-w-7xl mx-auto">
+      <section ref={statsRef} id="impact" className="impact-dashboard-section py-24 sm:py-28 px-6 reveal-section" data-testid="impact-stats-section">
+        <div className="impact-dashboard-bg" aria-hidden="true">
+          <img
+            src="https://res.cloudinary.com/datcgiuci/image/upload/f_auto,q_auto,w_2000/v1779450400/lives_thced_pinuwy.jpg"
+            alt=""
+            loading="lazy"
+            decoding="async"
+            className="impact-dashboard-bg-image"
+          />
+        </div>
+
+        <div className="max-w-7xl mx-auto relative z-10">
           <h2
-            className="text-4xl sm:text-5xl font-medium tracking-tight text-center mb-4"
+            className="text-4xl sm:text-5xl lg:text-6xl font-medium tracking-tight text-center mb-4"
             style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}
           >
             Our <span className="text-gradient-blue">Impact</span>
           </h2>
-          <p className="text-center text-base mb-14" style={{ color: 'var(--text-muted)' }}>Transforming lives across communities, one step at a time</p>
+          <p className="text-center text-base sm:text-lg max-w-3xl mx-auto mb-14" style={{ color: 'var(--text-muted)' }}>Transforming lives across communities with healthcare, dignity, and sustained hope.</p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
             <div
-              className="card-elevated p-5 rounded-lg hover-lift text-center impact-stat-card"
+              className="impact-dashboard-card impact-stat-card"
               data-testid="stat-patients"
-              style={{
-                backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.45)), url('https://res.cloudinary.com/datcgiuci/image/upload/v1779450400/lives_thced_pinuwy.jpg')",
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat'
-              }}
             >
-              <Users className="mx-auto mb-5" style={{ color: 'var(--accent-teal)' }} size={44} />
-              <div className="stat-number text-5xl font-medium mb-3" data-value={stats.patients_served} style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+              <div className="impact-icon-badge impact-icon-teal"><Users style={{ color: 'var(--accent-teal)' }} size={30} /></div>
+              <div className="stat-number impact-stat-number" data-value={stats.patients_served} style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                 0
               </div>
-              <p className="text-xs tracking-[0.2em] uppercase font-medium" style={{ color: 'var(--accent-teal)' }}>Lives Touched</p>
-              <div className="mt-4 h-2 rounded-full" style={{ background: 'rgba(31, 111, 109, 0.12)' }}><div className="h-2 rounded-full" style={{ width: '84%', background: 'var(--accent-teal)' }} /></div>
+              <p className="impact-stat-label" style={{ color: 'var(--accent-teal)' }}>Lives Touched</p>
             </div>
 
             <div
-              className="card-elevated p-5 rounded-lg hover-lift text-center impact-stat-card"
+              className="impact-dashboard-card impact-stat-card"
               data-testid="stat-districts"
-              style={{
-                backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.45)), url('https://res.cloudinary.com/datcgiuci/image/upload/v1779450399/map_bijono.jpg')",
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat'
-              }}
             >
-              <MapPin className="mx-auto mb-5" style={{ color: 'var(--accent-gold)' }} size={44} />
-              <div className="stat-number text-5xl font-medium mb-3" data-value={stats.districts_covered} style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+              <div className="impact-icon-badge impact-icon-gold"><MapPin style={{ color: 'var(--accent-gold)' }} size={30} /></div>
+              <div className="stat-number impact-stat-number" data-value={stats.districts_covered} style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                 0
               </div>
-              <p className="text-xs tracking-[0.2em] uppercase font-medium" style={{ color: 'var(--accent-gold)' }}>Districts Covered</p>
-              <div className="mt-4 h-2 rounded-full" style={{ background: 'rgba(198, 161, 91, 0.14)' }}><div className="h-2 rounded-full" style={{ width: '62%', background: 'var(--accent-gold)' }} /></div>
+              <p className="impact-stat-label" style={{ color: 'var(--accent-gold)' }}>Districts Covered</p>
             </div>
 
             <div
-              className="card-elevated p-5 rounded-lg hover-lift text-center impact-stat-card"
+              className="impact-dashboard-card impact-stat-card"
               data-testid="stat-donations"
-              style={{
-                backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.45)), url('https://res.cloudinary.com/datcgiuci/image/upload/v1779450399/donation_rec_o1qj6z.jpg')",
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat'
-              }}
             >
-              <Heart className="mx-auto mb-5" style={{ color: 'var(--accent-teal)' }} size={44} />
-              <div className="stat-number text-5xl font-medium mb-3" data-value={stats.total_donations} style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+              <div className="impact-icon-badge impact-icon-teal"><Heart style={{ color: 'var(--accent-teal)' }} size={30} /></div>
+              <div className="stat-number impact-stat-number" data-value={stats.total_donations} style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                 0
               </div>
-              <p className="text-xs tracking-[0.2em] uppercase font-medium" style={{ color: 'var(--accent-teal)' }}>Donations Received</p>
-              <div className="mt-4 h-2 rounded-full" style={{ background: 'rgba(31, 111, 109, 0.12)' }}><div className="h-2 rounded-full" style={{ width: '78%', background: 'var(--accent-teal)' }} /></div>
+              <p className="impact-stat-label" style={{ color: 'var(--accent-teal)' }}>Donations Received</p>
             </div>
 
             <div
-              className="card-elevated p-5 rounded-lg hover-lift text-center impact-stat-card"
+              className="impact-dashboard-card impact-stat-card"
               data-testid="stat-amount"
-              style={{
-                backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.55))"
-              }}
             >
-              <TrendingUp className="mx-auto mb-5" style={{ color: 'var(--accent-gold)' }} size={44} />
-              <div className="stat-number text-5xl font-medium mb-3" data-value={stats.total_amount} style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+              <div className="impact-icon-badge impact-icon-gold"><TrendingUp style={{ color: 'var(--accent-gold)' }} size={30} /></div>
+              <div className="stat-number impact-stat-number" data-value={stats.total_amount} style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                 0
               </div>
-              <p className="text-xs tracking-[0.2em] uppercase font-medium" style={{ color: 'var(--accent-gold)' }}>Total Raised (INR)</p>
-              <div className="mt-4 h-2 rounded-full" style={{ background: 'rgba(198, 161, 91, 0.14)' }}><div className="h-2 rounded-full" style={{ width: '71%', background: 'var(--accent-gold)' }} /></div>
+              <p className="impact-stat-label" style={{ color: 'var(--accent-gold)' }}>Total Raised (INR)</p>
             </div>
           </div>
         </div>
