@@ -1,4 +1,5 @@
 import { Suspense, lazy, useEffect } from "react";
+import FloatingEventsButton from "@/components/FloatingEventsButton";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import usePillarScrollAnimation from "@/hooks/usePillarScrollAnimation";
 import "@/App.css";
@@ -76,6 +77,7 @@ const AppRoutes = () => {
 
   return (
     <Suspense fallback={<div className="min-h-screen" style={{ background: 'var(--bg-deep)' }} />}>
+      <>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<AboutUs />} />
@@ -98,6 +100,8 @@ const AppRoutes = () => {
           }
         />
       </Routes>
+      <FloatingEventsButton />
+      </>
     </Suspense>
   );
 };
