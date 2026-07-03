@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Search, Download, Loader2, Heart } from 'lucide-react';
+import { Search, Download, Loader2 } from 'lucide-react';
+import AnimatedLogo from '@/components/AnimatedLogo';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import usePageRevealAnimation from '@/hooks/usePageRevealAnimation';
@@ -63,10 +64,10 @@ const TrackMyImpact = () => {
       <div className="pt-28 pb-24 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-14 reveal-section">
-            <Heart className="mx-auto mb-6" size={56} style={{ color: 'var(--accent-gold)' }} />
+            <AnimatedLogo size="lg" className="mx-auto mb-6" />
             <h1
-              className="text-5xl sm:text-6xl font-medium tracking-tight mb-6"
-              style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}
+              className="text-5xl sm:text-6xl font-bold tracking-tight mb-6"
+              style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}
               data-testid="track-title"
             >
               Track My <span className="text-gradient-orange">Impact</span>
@@ -125,7 +126,7 @@ const TrackMyImpact = () => {
           {/* Results */}
           {searched && (
             <div className="card-elevated p-8 rounded-lg reveal-section">
-              <h2 className="text-3xl font-medium mb-8" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+              <h2 className="text-3xl font-medium mb-8" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>
                 Your Donation <span className="text-gradient-blue">History</span>
               </h2>
 
@@ -150,7 +151,7 @@ const TrackMyImpact = () => {
                             )}
                           </div>
                           <div className="flex items-baseline gap-4">
-                            <span className="text-3xl font-medium" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+                            <span className="text-3xl font-medium" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>
                               ₹{donation.amount.toLocaleString()}
                             </span>
                             {donation.receipt_number && (

@@ -71,7 +71,7 @@ const UserAuth = () => {
         <div className="max-w-md mx-auto">
           <div className="card-elevated p-8 sm:p-10 rounded-lg reveal-section" data-testid="auth-form-container">
             <div className="text-center mb-8 reveal-section">
-              <h1 className="text-3xl sm:text-4xl font-medium mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+              <h1 className="text-3xl sm:text-4xl font-medium mb-2" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>
                 {isLogin ? 'Welcome Back' : 'Join Our Mission'}
               </h1>
               <p className="text-sm" style={{ color: 'var(--text-muted)' }}>

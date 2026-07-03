@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, LogIn, LogOut, User, Phone, LayoutDashboard, ChevronDown } from 'lucide-react';
+import { Menu, X, LogIn, LogOut, User, Phone, LayoutDashboard } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import AnimatedLogo from '@/components/AnimatedLogo';
 
@@ -8,8 +8,6 @@ const Navbar = () => {
   const [user, setUser] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [supportsBackdropFilter, setSupportsBackdropFilter] = useState(true);
-  const [isInitiativesOpen, setIsInitiativesOpen] = useState(false);
-  const [isMobileInitiativesOpen, setIsMobileInitiativesOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -50,8 +48,8 @@ const Navbar = () => {
 
   const scrollToFooter = (e) => {
     e.preventDefault();
-    const footer = document.querySelector('[data-testid="main-footer"]');
-    if (footer) footer.scrollIntoView({ behavior: 'smooth' });
+    const target = document.querySelector('#contact') || document.querySelector('[data-testid="main-footer"]');
+    if (target) target.scrollIntoView({ behavior: 'smooth' });
   };
 
   const isAdmin = user?.role === 'admin';
@@ -84,50 +82,21 @@ transition-all duration-300
             <AnimatedLogo size="md" visualScale={1.45} />
             <div className="hidden sm:block">
               <h1
-                className="text-lg sm:text-xl font-medium tracking-tight transition-all duration-300"
-                style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}
+                className="text-lg sm:text-xl font-semibold tracking-tight transition-all duration-300"
+                style={{ fontFamily: 'var(--font-heading)', color: 'var(--accent-teal)' }}
               >
                 United Hands
               </h1>
-              <p className="text-[10px] sm:text-xs tracking-[0.2em] uppercase" style={{ color: 'var(--text-muted)' }}>Foundation</p>
+              <p className="text-[10px] sm:text-xs tracking-[0.2em]" style={{ fontFamily: 'var(--font-heading)', color: 'var(--accent-teal)' }}>Foundation</p>
             </div>
           </div>
 
           {/* Desktop Menu */}
           <div className="hidden lg:flex items-center gap-4 xl:gap-6">
-            <Link to="/" className="nav-link text-sm font-medium text-[var(--accent-teal)] hover:text-[var(--accent-teal-light)] transition-colors duration-200" data-testid="nav-home">Home</Link>
-            <Link to="/about" className="nav-link text-sm font-medium text-[var(--accent-teal)] hover:text-[var(--accent-teal-light)] transition-colors duration-200" data-testid="nav-about">About</Link>
-            <Link to="/transparency" className="nav-link text-sm font-medium text-[var(--accent-teal)] hover:text-[var(--accent-teal-light)] transition-colors duration-200" data-testid="nav-transparency">Transparency</Link>
-            <div
-              className="relative"
-              onMouseEnter={() => setIsInitiativesOpen(true)}
-              onMouseLeave={() => setIsInitiativesOpen(false)}
-            >
-              <button
-                className="nav-link text-sm font-medium text-[var(--accent-teal)] transition-all duration-200 flex items-center gap-1.5"
-                aria-expanded={isInitiativesOpen}
-                aria-haspopup="true"
-                onFocus={() => setIsInitiativesOpen(true)}
-                onBlur={(e) => {
-                  if (!e.currentTarget.parentElement?.contains(e.relatedTarget)) setIsInitiativesOpen(false);
-                }}
-              >
-                Initiatives
-                <ChevronDown size={14} className={`transition-transform duration-200 ${isInitiativesOpen ? 'rotate-180' : ''}`} />
-              </button>
-              <div className="absolute left-1/2 top-full -translate-x-1/2 pt-2">
-                <div
-                  className={`w-56 rounded-xl border border-black/5 bg-white/95 shadow-lg backdrop-blur-md p-2 transition-all duration-200 origin-top ${isInitiativesOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-1 pointer-events-none'}`}
-                  role="menu"
-                >
-                  <Link to="/projects" className="block rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--accent-teal)] hover:bg-black/[0.03] transition-colors" role="menuitem">Our Projects</Link>
-                  <Link to="/events" className="block rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--accent-teal)] hover:bg-black/[0.03] transition-colors" role="menuitem">Events</Link>
-                  <Link to="/track-impact" className="block rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--accent-teal)] hover:bg-black/[0.03] transition-colors" data-testid="nav-track" role="menuitem">Track Impact</Link>
-                  <Link to="/press" className="block rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--accent-teal)] hover:bg-black/[0.03] transition-colors" data-testid="nav-press" role="menuitem">Press</Link>
-                </div>
-              </div>
-            </div>
-            <a href="#contact" onClick={scrollToFooter} className="nav-link text-sm font-medium text-[var(--accent-teal)] hover:text-[var(--accent-teal-light)] transition-colors duration-200 flex items-center gap-1" data-testid="nav-contact">
+            <Link to="/" className="nav-link text-[15px] font-semibold text-[var(--accent-teal)] hover:text-[var(--accent-warm-light)] transition-colors duration-200" data-testid="nav-home">Home</Link>
+            <Link to="/about" className="nav-link text-[15px] font-semibold text-[var(--accent-teal)] hover:text-[var(--accent-warm-light)] transition-colors duration-200" data-testid="nav-about">About</Link>
+            <Link to="/transparency" className="nav-link text-[15px] font-semibold text-[var(--accent-teal)] hover:text-[var(--accent-warm-light)] transition-colors duration-200" data-testid="nav-transparency">Transparency</Link>
+            <a href="#contact" onClick={scrollToFooter} className="nav-link text-[15px] font-semibold text-[var(--accent-teal)] hover:text-[var(--accent-warm-light)] transition-colors duration-200 flex items-center gap-1" data-testid="nav-contact">
               <Phone size={13} />
               Contact
             </a>
@@ -158,7 +127,7 @@ transition-all duration-300
               </div>
             ) : (
               <Link to="/login" data-testid="nav-login">
-                <button className="flex items-center gap-1.5 text-sm px-4 py-2 rounded transition-colors" style={{ color: 'var(--accent-teal)', border: '1px solid var(--accent-teal)' }}>
+                <button className="flex items-center gap-1.5 text-sm px-5 py-2 rounded-full transition-colors" style={{ color: 'var(--accent-teal)', border: '1.5px solid var(--accent-teal)' }}>
                   <LogIn size={14} />
                   Login
                 </button>
@@ -186,25 +155,6 @@ transition-all duration-300
             <Link to="/" className="font-semibold py-2 text-sm text-black/80 hover:text-[var(--accent-teal)] transition-colors duration-200" onClick={() => setMobileMenuOpen(false)}>Home</Link>
             <Link to="/about" className="font-semibold py-2 text-sm text-black/80 hover:text-[var(--accent-teal)] transition-colors duration-200" onClick={() => setMobileMenuOpen(false)}>About</Link>
             <Link to="/transparency" className="font-semibold py-2 text-sm text-black/80 hover:text-[var(--accent-teal)] transition-colors duration-200" onClick={() => setMobileMenuOpen(false)}>Transparency</Link>
-            <div className="py-1">
-              <button
-                className="w-full flex items-center justify-between font-semibold py-2 text-sm text-black/80 hover:text-[var(--accent-teal)] transition-colors duration-200"
-                onClick={() => setIsMobileInitiativesOpen((prev) => !prev)}
-                aria-expanded={isMobileInitiativesOpen}
-                aria-controls="mobile-initiatives"
-              >
-                Initiatives
-                <ChevronDown size={16} className={`transition-transform duration-200 ${isMobileInitiativesOpen ? 'rotate-180' : ''}`} />
-              </button>
-              <div id="mobile-initiatives" className={`overflow-hidden transition-all duration-300 ${isMobileInitiativesOpen ? 'max-h-52 mt-1' : 'max-h-0'}`}>
-                <div className="pl-3 border-l border-black/10 flex flex-col gap-1">
-                  <Link to="/projects" className="py-1.5 text-sm text-black/75 hover:text-[var(--accent-teal)]" onClick={() => setMobileMenuOpen(false)}>Our Projects</Link>
-                  <Link to="/events" className="py-1.5 text-sm text-black/75 hover:text-[var(--accent-teal)]" onClick={() => setMobileMenuOpen(false)}>Events</Link>
-                  <Link to="/track-impact" className="py-1.5 text-sm text-black/75 hover:text-[var(--accent-teal)]" onClick={() => setMobileMenuOpen(false)} data-testid="nav-track">Track Impact</Link>
-                  <Link to="/press" className="py-1.5 text-sm text-black/75 hover:text-[var(--accent-teal)]" onClick={() => setMobileMenuOpen(false)} data-testid="nav-press">Press</Link>
-                </div>
-              </div>
-            </div>
             <a href="#contact" onClick={(e) => { scrollToFooter(e); setMobileMenuOpen(false); }} className="font-semibold py-2 text-sm text-black/80 hover:text-[var(--accent-teal)] transition-colors duration-200 flex items-center gap-1">
               <Phone size={14} />
               Contact Us

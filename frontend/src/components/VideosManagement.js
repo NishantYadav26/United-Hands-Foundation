@@ -128,7 +128,7 @@ const VideosManagement = () => {
       <div className="flex justify-between items-center mb-8">
         <div className="flex items-center gap-3">
           <Video style={{color: 'var(--accent-warm)'}} size={28} />
-          <h2 className="text-3xl font-medium" style={{fontFamily: 'Cormorant Garamond, serif'}}>Video Clips</h2>
+          <h2 className="text-3xl font-medium" style={{fontFamily: 'var(--font-heading)'}}>Video Clips</h2>
         </div>
         <button onClick={() => setShowForm(!showForm)} className="btn-primary flex items-center gap-2" data-testid="add-video-btn">
           {showForm ? <X size={18} /> : <Plus size={18} />}

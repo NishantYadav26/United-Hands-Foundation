@@ -161,8 +161,8 @@ const AdminDashboard = () => {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-12 gap-4 reveal-section">
             <h1 
-              className="text-4xl sm:text-5xl lg:text-6xl font-medium tracking-tight"
-              style={{fontFamily: 'Cormorant Garamond, serif'}}
+              className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight"
+              style={{fontFamily: 'var(--font-heading)'}}
               data-testid="admin-title"
             >
               Admin <span className="text-gradient-blue">Dashboard</span>
@@ -181,7 +181,7 @@ const AdminDashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 reveal-section">
             <div className="glass-morph p-8 rounded reveal-section" data-testid="stat-card-pending">
               <Users className="mb-4" style={{color: 'var(--accent-warm)'}} size={32} />
-              <div className="text-4xl font-medium mb-2" style={{fontFamily: 'Cormorant Garamond, serif'}}>
+              <div className="text-4xl font-medium mb-2" style={{fontFamily: 'var(--font-heading)'}}>
                 {pendingDonations.length}
               </div>
               <p className="text-sm" style={{color: 'var(--text-muted)'}}>Pending Approvals</p>
@@ -189,7 +189,7 @@ const AdminDashboard = () => {
 
             <div className="glass-morph p-8 rounded reveal-section" data-testid="stat-card-approved">
               <CheckCircle className="mb-4" style={{color: 'var(--accent-teal)'}} size={32} />
-              <div className="text-4xl font-medium mb-2" style={{fontFamily: 'Cormorant Garamond, serif'}}>
+              <div className="text-4xl font-medium mb-2" style={{fontFamily: 'var(--font-heading)'}}>
                 {approvedDonations.length}
               </div>
               <p className="text-sm" style={{color: 'var(--text-muted)'}}>Approved Donations</p>
@@ -197,7 +197,7 @@ const AdminDashboard = () => {
 
             <div className="glass-morph p-8 rounded reveal-section" data-testid="stat-card-total">
               <DollarSign className="mb-4" style={{color: 'var(--accent-gold)'}} size={32} />
-              <div className="text-4xl font-medium mb-2" style={{fontFamily: 'Cormorant Garamond, serif'}}>
+              <div className="text-4xl font-medium mb-2" style={{fontFamily: 'var(--font-heading)'}}>
                 ₹{approvedDonations.reduce((sum, d) => sum + d.amount, 0).toLocaleString()}
               </div>
               <p className="text-sm" style={{color: 'var(--text-muted)'}}>Total Raised</p>
@@ -404,7 +404,7 @@ const AdminDashboard = () => {
             <div className="glass-morph p-8 rounded reveal-section" data-testid="settings-panel">
               <h2 
                 className="text-3xl font-medium mb-8"
-                style={{fontFamily: 'Cormorant Garamond, serif'}}
+                style={{fontFamily: 'var(--font-heading)'}}
               >
                 Payment Settings
               </h2>

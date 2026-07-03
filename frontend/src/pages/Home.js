@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, MapPin, Heart, TrendingUp } from 'lucide-react';
+import { Users, MapPin, Heart, TrendingUp, HandHeart, CalendarDays, Newspaper, Mail, Phone } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import usePillarScrollAnimation from '@/hooks/usePillarScrollAnimation';
@@ -24,7 +24,7 @@ const normalizeStats = (data) => ({
 
 const HOME_CACHE_KEY = 'uhf_home_cache_v1';
 const PERMANENT_HERO_KEY = 'uhf_permanent_hero_background_url';
-const REQUEST_TIMEOUT_MS = 4500;
+const REQUEST_TIMEOUT_MS = 15000;
 const HOME_CACHE_TTL_MS = 30 * 60 * 1000;
 
 const readCachedSiteAssets = () => {
@@ -382,14 +382,36 @@ const Home = () => {
     <div className="min-h-screen" style={{ background: 'var(--bg-deep)' }}>
       <Navbar />
 
-      {/* Hero Section - keeps dark overlay for image visibility */}
-      <section
+      {/* Initiatives strip - colorful circular icons (replaces navbar dropdown) */}
+      <section className="py-8 sm:py-10 px-6 bg-white" data-testid="focus-areas-strip">
+        <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-8">
+          {[
+            { label: 'Our Projects', color: '#F5822A', Icon: HandHeart, to: '/projects' },
+            { label: 'Events', color: '#D6472B', Icon: CalendarDays, to: '/events' },
+            { label: 'Track Impact', color: '#3E9B4F', Icon: TrendingUp, to: '/track-impact' },
+            { label: 'Press & Media', color: '#2779BD', Icon: Newspaper, to: '/press' }
+          ].map(({ label, color, Icon, to }) => (
+            <Link key={label} to={to} className="flex flex-col items-center gap-3 text-center group">
+              <span
+                className="flex items-center justify-center rounded-full transition-transform group-hover:scale-110"
+                style={{ width: 84, height: 84, background: color, boxShadow: `0 0 0 4px #fff, 0 0 0 6px ${color}33` }}
+              >
+                <Icon size={38} color="#FFFFFF" strokeWidth={1.8} />
+              </span>
+              <span className="text-sm font-semibold leading-tight" style={{ color: 'var(--accent-teal)' }}>{label}</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Hero Section - rounded media card */}
+      <section className="px-4 sm:px-8 pb-6 bg-white" data-testid="hero-section">
+      <div
         ref={heroRef}
-        className="relative min-h-screen flex items-center justify-center pt-16 px-6"
+        className="relative min-h-[78vh] flex items-center justify-center px-6 overflow-hidden rounded-[2rem]"
         style={{
-          background: 'linear-gradient(135deg, #0B1F3A 0%, #163455 100%)'
+          background: 'linear-gradient(135deg, #0A3D22 0%, #0E7A3E 100%)'
         }}
-        data-testid="hero-section"
       >
         {siteAssets.hero_background && (
           <img
@@ -408,49 +430,50 @@ const Home = () => {
           className="absolute inset-0"
           style={{
             background: siteAssets.hero_background
-              ? 'linear-gradient(180deg, rgba(10,25,47,0.35) 0%, rgba(10,25,47,0.45) 40%, rgba(10,25,47,0.55) 100%)'
-              : 'linear-gradient(135deg, rgba(11,31,58,0.95) 0%, rgba(22,52,85,0.95) 100%)'
+              ? 'linear-gradient(180deg, rgba(9, 38, 23,0.35) 0%, rgba(9, 38, 23,0.45) 40%, rgba(9, 38, 23,0.55) 100%)'
+              : 'linear-gradient(135deg, rgba(10, 61, 34,0.95) 0%, rgba(14, 122, 62,0.95) 100%)'
           }}
         />
 
-        <div className="max-w-5xl mx-auto text-center relative z-10">
+        <div className="max-w-5xl mx-auto text-center relative z-10 py-20">
           <h1
-            className="text-5xl sm:text-6xl lg:text-7xl font-medium tracking-tight leading-none mb-6 hero-title"
+            className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-none mb-6 hero-title"
             style={{
-              fontFamily: 'Cormorant Garamond, serif',
-              color: '#F6F3ED',
+              fontFamily: 'var(--font-heading)',
+              color: '#FFFFFF',
               textShadow: '0 2px 20px rgba(0,0,0,0.3)'
             }}
             data-testid="hero-title"
           >
             Hands United,<br />Hearts Connected
           </h1>
-          <p className="text-lg sm:text-xl leading-relaxed max-w-3xl mx-auto mb-12 tracking-wide" style={{ color: 'rgba(246,243,237,0.9)', textShadow: '0 1px 8px rgba(0,0,0,0.2)' }}>
+          <p className="text-lg sm:text-xl leading-relaxed max-w-3xl mx-auto mb-12 tracking-wide" style={{ color: 'rgba(255,255,255,0.9)', textShadow: '0 1px 8px rgba(0,0,0,0.2)' }}>
             Empowering communities through healthcare, education, disaster relief,
             and elderly care across Maharashtra. Every contribution builds dignity,
             hope, and a brighter future.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link to="/donate" data-testid="hero-donate-btn">
-              <button className="btn-gold">Support Our Cause</button>
+              <button className="btn-white">Support Our Cause</button>
             </Link>
             <a
               href="#impact"
-              className="px-8 py-4 border-2 text-sm font-medium tracking-[0.1em] uppercase transition-all rounded"
-              style={{ borderColor: 'rgba(246,243,237,0.6)', color: '#F6F3ED' }}
-              onMouseEnter={e => { e.target.style.background = 'rgba(246,243,237,0.15)'; }}
+              className="px-8 py-4 border-2 text-sm font-bold tracking-[0.1em] uppercase transition-all rounded-full"
+              style={{ borderColor: 'rgba(255,255,255,0.6)', color: '#FFFFFF' }}
+              onMouseEnter={e => { e.target.style.background = 'rgba(255,255,255,0.15)'; }}
               onMouseLeave={e => { e.target.style.background = 'transparent'; }}
             >
               See Our Impact
             </a>
           </div>
 
-          <div className="mt-12 inline-block px-6 py-3 rounded" style={{ background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(10px)' }}>
-            <p className="text-sm" style={{ color: '#F6F3ED' }}>
+          <div className="mt-12 inline-block px-6 py-3 rounded-full" style={{ background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(10px)' }}>
+            <p className="text-sm" style={{ color: '#FFFFFF' }}>
               Indian Donors Only (INR) | 80G Tax Exemption Available
             </p>
           </div>
         </div>
+      </div>
       </section>
 
       {/* Trust Bar - Districts */}
@@ -471,8 +494,8 @@ const Home = () => {
                 className="text-center district-pill card-elevated hover-lift rounded-xl p-5"
                 style={{
                   background: idx % 2 === 0
-                    ? 'linear-gradient(145deg, rgba(31,111,109,0.09), rgba(255,255,255,0.95))'
-                    : 'linear-gradient(145deg, rgba(198,161,91,0.14), rgba(255,255,255,0.95))'
+                    ? 'linear-gradient(145deg, rgba(14, 122, 62,0.09), rgba(255,255,255,0.95))'
+                    : 'linear-gradient(145deg, rgba(14, 122, 62,0.14), rgba(255,255,255,0.95))'
                 }}
               >
                 <MapPin className="mx-auto mb-2" style={{ color: 'var(--accent-teal)' }} size={20} />
@@ -505,100 +528,68 @@ const Home = () => {
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10">
+          <p className="text-center text-xs tracking-[0.25em] uppercase font-bold mb-3" style={{ color: '#F7C08A' }}>What We Have Achieved</p>
           <h2
-            className="text-4xl sm:text-5xl lg:text-6xl font-medium tracking-tight text-center mb-4"
-            style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}
+            className="text-4xl sm:text-5xl lg:text-6xl tracking-tight text-center mb-4"
+            style={{ fontFamily: 'var(--font-heading)', color: '#FFFFFF' }}
           >
-            Our <span className="text-gradient-blue">Impact</span>
+            Our Impact
           </h2>
-          <p className="text-center text-base sm:text-lg max-w-3xl mx-auto mb-14" style={{ color: 'var(--text-muted)' }}>Transforming lives across communities with healthcare, dignity, and sustained hope.</p>
+          <p className="text-center text-base sm:text-lg max-w-3xl mx-auto mb-14" style={{ color: 'rgba(255,255,255,0.85)' }}>Transforming lives across communities with healthcare, dignity, and sustained hope.</p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-            <div
-              className="impact-dashboard-card impact-stat-card"
-              data-testid="stat-patients"
-            >
-              <div className="impact-icon-badge impact-icon-teal"><Users style={{ color: 'var(--accent-teal)' }} size={30} /></div>
-              <div className="stat-number impact-stat-number" data-value={stats.patients_served} style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
-                0
+            {[
+              { id: 'stat-patients', Icon: Users, value: stats.patients_served, label: 'Lives Touched', color: '#F7C08A' },
+              { id: 'stat-districts', Icon: MapPin, value: stats.districts_covered, label: 'Districts Covered', color: '#9FE0B8' },
+              { id: 'stat-donations', Icon: Heart, value: stats.total_donations, label: 'Donations Received', color: '#FFD9D0' },
+              { id: 'stat-amount', Icon: TrendingUp, value: stats.total_amount, label: 'Total Raised (INR)', color: '#BBDEFB' }
+            ].map(({ id, Icon, value, label, color }) => (
+              <div key={id} className="impact-dashboard-card impact-stat-card" data-testid={id}>
+                <div className="impact-icon-badge impact-icon-teal"><Icon style={{ color }} size={30} /></div>
+                <div className="stat-number impact-stat-number" data-value={value} style={{ fontFamily: 'var(--font-heading)', color: '#FFFFFF' }}>
+                  0
+                </div>
+                <p className="impact-stat-label" style={{ color: 'rgba(255,255,255,0.85)' }}>{label}</p>
               </div>
-              <p className="impact-stat-label" style={{ color: 'var(--accent-teal)' }}>Lives Touched</p>
-            </div>
-
-            <div
-              className="impact-dashboard-card impact-stat-card"
-              data-testid="stat-districts"
-            >
-              <div className="impact-icon-badge impact-icon-gold"><MapPin style={{ color: 'var(--accent-gold)' }} size={30} /></div>
-              <div className="stat-number impact-stat-number" data-value={stats.districts_covered} style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
-                0
-              </div>
-              <p className="impact-stat-label" style={{ color: 'var(--accent-gold)' }}>Districts Covered</p>
-            </div>
-
-            <div
-              className="impact-dashboard-card impact-stat-card"
-              data-testid="stat-donations"
-            >
-              <div className="impact-icon-badge impact-icon-teal"><Heart style={{ color: 'var(--accent-teal)' }} size={30} /></div>
-              <div className="stat-number impact-stat-number" data-value={stats.total_donations} style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
-                0
-              </div>
-              <p className="impact-stat-label" style={{ color: 'var(--accent-teal)' }}>Donations Received</p>
-            </div>
-
-            <div
-              className="impact-dashboard-card impact-stat-card"
-              data-testid="stat-amount"
-            >
-              <div className="impact-icon-badge impact-icon-gold"><TrendingUp style={{ color: 'var(--accent-gold)' }} size={30} /></div>
-              <div className="stat-number impact-stat-number" data-value={stats.total_amount} style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
-                0
-              </div>
-              <p className="impact-stat-label" style={{ color: 'var(--accent-gold)' }}>Total Raised (INR)</p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Success Stories */}
-      <section
-        className="py-20 px-6 reveal-section"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(6, 20, 38, 0.22), rgba(6, 20, 38, 0.22)), url('https://res.cloudinary.com/datcgiuci/image/upload/v1779448651/ChatGPT_Image_May_22_2026_04_46_50_PM_bb7zbd.png')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        }}
-        data-testid="success-stories-section"
-      >
+      <section className="py-20 px-6 reveal-section" style={{ background: 'var(--bg-surface)' }} data-testid="success-stories-section">
           <div className="max-w-7xl mx-auto">
+            <p className="text-center text-xs tracking-[0.25em] uppercase font-bold mb-3" style={{ color: 'var(--accent-gold)' }}>Voices From The Field</p>
             <h2
-              className="text-4xl sm:text-5xl font-medium tracking-tight text-center mb-14"
-              style={{ fontFamily: 'Cormorant Garamond, serif', color: '#ffffff' }}
+              className="text-4xl sm:text-5xl tracking-tight text-center mb-14"
+              style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}
             >
-              Stories of <span style={{ color: '#ffffff' }}>Hope</span>
+              Stories of <span className="text-gradient-blue">Hope</span>
             </h2>
 
             {successStories.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {successStories.map((story) => (
-                  <div key={story.id} className="card-elevated p-8 rounded-lg hover-lift story-card" data-testid={`story-${story.id}`}>
-                    <div className="flex items-center gap-2 mb-4">
-                      <MapPin style={{ color: 'var(--accent-teal)' }} size={18} />
-                      <span className="text-sm font-semibold" style={{ color: 'var(--accent-teal)' }}>{story.location}</span>
-                    </div>
-                    <p className="leading-relaxed mb-6" style={{ color: 'var(--text-primary)' }}>{story.story_text}</p>
-                    <div className="flex justify-between items-center text-xs" style={{ color: 'var(--text-muted)' }}>
-                      <span>{story.patient_count} beneficiaries</span>
-                      <span>{new Date(story.date).toLocaleDateString()}</span>
+                {successStories.map((story, idx) => (
+                  <div
+                    key={story.id}
+                    className="card-elevated hover-lift story-card relative overflow-hidden flex flex-col p-8 pt-6"
+                    style={{ borderTop: `4px solid ${['#F5822A', '#3E9B4F', '#2779BD'][idx % 3]}` }}
+                    data-testid={`story-${story.id}`}
+                  >
+                    <span className="story-card-quote" aria-hidden="true">&ldquo;</span>
+                    <p className="leading-relaxed mb-6 flex-1 italic" style={{ color: 'var(--text-primary)' }}>{story.story_text}</p>
+                    <div className="flex flex-wrap justify-between items-center gap-3 pt-4" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+                      <span className="story-chip"><MapPin size={13} />{story.location}</span>
+                      <div className="text-right text-xs" style={{ color: 'var(--text-muted)' }}>
+                        <div className="font-bold" style={{ color: 'var(--accent-gold)' }}>{story.patient_count} beneficiaries</div>
+                        <div>{new Date(story.date).toLocaleDateString()}</div>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="card-elevated p-8 rounded-lg text-center max-w-3xl mx-auto">
+              <div className="card-elevated p-8 text-center max-w-3xl mx-auto">
                 <p className="text-sm" style={{ color: 'var(--text-primary)' }}>
                   Stories of Hope will appear here soon.
                 </p>
@@ -610,23 +601,24 @@ const Home = () => {
       {/* Team Section */}
       <section className="py-20 px-6 reveal-section" data-testid="home-team-section">
         <div className="max-w-7xl mx-auto">
+          <p className="text-center text-xs tracking-[0.25em] uppercase font-bold mb-3" style={{ color: 'var(--accent-gold)' }}>The People Behind The Mission</p>
           <h2
-            className="text-4xl sm:text-5xl font-medium tracking-tight text-center mb-14"
-            style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}
+            className="text-4xl sm:text-5xl tracking-tight text-center mb-14"
+            style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}
           >
             Our <span className="text-gradient-blue">Team</span>
           </h2>
 
           <div className="mt-16" data-testid="home-team-pillars-section">
-            <h3 className="text-2xl font-bold text-center mb-10" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+            <h3 className="text-2xl font-bold text-center mb-10" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>
               Our <span className="text-gradient-gold">Pillars</span>
             </h3>
             {teamPillarCards.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 team-pillars-drop-grid">
                 {teamPillarCards.map((pillar) => (
-                  <div key={pillar.id} className="card-elevated p-5 rounded-lg hover-lift text-center pop-card-lr pillar-card" data-testid={`home-pillar-${pillar.id}`}>
+                  <div key={pillar.id} className="card-elevated p-6 hover-lift text-center pop-card-lr pillar-card" data-testid={`home-pillar-${pillar.id}`}>
                     {pillar.image_url && (
-                      <div className="w-16 h-16 mx-auto mb-4 overflow-hidden rounded-full border blue-border">
+                      <div className="w-24 h-24 mx-auto mb-4 overflow-hidden rounded-full" style={{ boxShadow: '0 0 0 3px #fff, 0 0 0 5px rgba(14,122,62,0.35)' }}>
                         <img
                           src={pillar.image_url}
                           alt={pillar.name}
@@ -636,8 +628,8 @@ const Home = () => {
                         />
                       </div>
                     )}
-                    <h4 className="text-lg font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{pillar.name}</h4>
-                    <p className="text-xs tracking-[0.15em] uppercase font-medium mb-2" style={{ color: 'var(--accent-gold)' }}>{pillar.role}</p>
+                    <h4 className="text-xl mb-1" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>{pillar.name}</h4>
+                    <p className="text-xs tracking-[0.15em] uppercase font-bold mb-2" style={{ color: 'var(--accent-gold)' }}>{pillar.role}</p>
                     {pillar.specialty && <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{pillar.specialty}</p>}
                   </div>
                 ))}
@@ -652,15 +644,15 @@ const Home = () => {
           </div>
 
           <div className="mt-16" data-testid="home-partners-section">
-            <h3 className="text-2xl font-bold text-center mb-10" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+            <h3 className="text-2xl font-bold text-center mb-10" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>
               Our <span className="text-gradient-blue">Partners</span>
             </h3>
             {partnerCards.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 partners-animated-grid">
                 {partnerCards.map((partner) => (
-                  <div key={partner.id} className="card-elevated p-5 rounded-lg hover-lift text-center partner-card home-people-card" data-testid={`partner-${partner.id}`}>
+                  <div key={partner.id} className="card-elevated p-6 hover-lift text-center partner-card home-people-card" data-testid={`partner-${partner.id}`}>
                     {partner.image_url && (
-                      <div className="w-16 h-16 mx-auto mb-4 overflow-hidden rounded-full border blue-border">
+                      <div className="w-24 h-24 mx-auto mb-4 overflow-hidden rounded-full" style={{ boxShadow: '0 0 0 3px #fff, 0 0 0 5px rgba(245,130,42,0.4)' }}>
                         <img
                           src={partner.image_url}
                           alt={partner.name}
@@ -670,8 +662,8 @@ const Home = () => {
                         />
                       </div>
                     )}
-                    <h4 className="text-lg font-medium mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>{partner.name}</h4>
-                    <p className="text-xs tracking-[0.15em] uppercase font-medium mb-2" style={{ color: 'var(--accent-teal)' }}>{partner.role}</p>
+                    <h4 className="text-xl mb-1" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>{partner.name}</h4>
+                    <p className="text-xs tracking-[0.15em] uppercase font-bold mb-2" style={{ color: 'var(--accent-teal)' }}>{partner.role}</p>
                     {partner.specialty && <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{partner.specialty}</p>}
                   </div>
                 ))}
@@ -709,8 +701,8 @@ const Home = () => {
       <section className="py-20 px-6 reveal-section" data-testid="cta-section">
         <div className="max-w-4xl mx-auto text-center card-elevated p-16 rounded-lg cta-animated-card">
           <h2
-            className="text-4xl sm:text-5xl font-medium tracking-tight mb-6"
-            style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}
+            className="text-4xl sm:text-5xl font-bold tracking-tight mb-6"
+            style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}
           >
             Be the <span className="text-gradient-gold">Change</span>
           </h2>
@@ -720,6 +712,45 @@ const Home = () => {
           <Link to="/donate" data-testid="cta-donate-btn">
             <button className="btn-gold">Make a Difference Today</button>
           </Link>
+        </div>
+      </section>
+
+      {/* Contact */}
+      <section id="contact" className="pb-20 px-6 reveal-section" data-testid="contact-section">
+        <div
+          className="max-w-6xl mx-auto rounded-[2rem] overflow-hidden px-8 py-14 sm:px-14 text-center"
+          style={{ background: 'linear-gradient(135deg, #0A3D22 0%, #11813F 100%)' }}
+        >
+          <h2 className="text-4xl sm:text-5xl tracking-tight mb-4" style={{ fontFamily: 'var(--font-heading)', color: '#FFFFFF' }}>
+            Get in Touch
+          </h2>
+          <p className="text-base max-w-2xl mx-auto mb-12" style={{ color: 'rgba(255,255,255,0.85)' }}>
+            Questions, partnerships, or a helping hand — we're one message away.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-12">
+            {[
+              { Icon: Mail, label: 'Email Us', value: 'Uniteduhf@gmail.com', href: 'mailto:Uniteduhf@gmail.com' },
+              { Icon: Phone, label: 'Call Us', value: '+91 9730267630', href: 'tel:+919730267630' },
+              { Icon: MapPin, label: 'Visit Us', value: 'Bhoi Galli, Latur, Maharashtra', href: null }
+            ].map(({ Icon, label, value, href }) => (
+              <div key={label} className="flex flex-col items-center gap-3">
+                <span className="flex items-center justify-center rounded-full" style={{ width: 64, height: 64, background: 'rgba(255,255,255,0.14)' }}>
+                  <Icon size={26} color="#FFFFFF" />
+                </span>
+                <span className="text-xs tracking-[0.2em] uppercase font-bold" style={{ color: '#F7C08A' }}>{label}</span>
+                {href ? (
+                  <a href={href} className="text-sm font-semibold hover:underline" style={{ color: '#FFFFFF' }}>{value}</a>
+                ) : (
+                  <span className="text-sm font-semibold" style={{ color: '#FFFFFF' }}>{value}</span>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <a href="mailto:Uniteduhf@gmail.com">
+            <button className="btn-white">Write to Us</button>
+          </a>
         </div>
       </section>
 

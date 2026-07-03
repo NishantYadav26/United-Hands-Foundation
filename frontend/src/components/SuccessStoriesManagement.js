@@ -91,7 +91,7 @@ const SuccessStoriesManagement = () => {
       <div className="flex justify-between items-center mb-8">
         <div className="flex items-center gap-3">
           <BookOpen style={{color: 'var(--accent-gold)'}} size={28} />
-          <h2 className="text-3xl font-medium" style={{fontFamily: 'Cormorant Garamond, serif'}}>Success Stories</h2>
+          <h2 className="text-3xl font-medium" style={{fontFamily: 'var(--font-heading)'}}>Success Stories</h2>
         </div>
         <button onClick={() => { showForm ? resetForm() : setShowForm(true); }} className="btn-gold flex items-center gap-2" data-testid="add-story-btn">
           {showForm ? <X size={18} /> : <Plus size={18} />}

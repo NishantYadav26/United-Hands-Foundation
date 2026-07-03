@@ -3,6 +3,9 @@ import { getCached } from '@/lib/apiClient';
 
 const HOME_CACHE_KEY = 'uhf_home_cache_v1';
 const PERMANENT_LOGO_KEY = 'uhf_permanent_logo_url';
+// Stable fallback so the logo always renders even when the API is unreachable
+// (e.g. backend cold-start or down). Matches the seeded UHF logo asset.
+const DEFAULT_LOGO_URL = 'https://res.cloudinary.com/dvmb3mzcy/image/upload/v1774896421/uploads/ofvdyoaijp0zd7fvubw6.png';
 
 const readCachedLogo = () => {
   try {
@@ -10,11 +13,11 @@ const readCachedLogo = () => {
     if (permanentLogo) return permanentLogo;
 
     const cached = localStorage.getItem(HOME_CACHE_KEY);
-    if (!cached) return '';
+    if (!cached) return DEFAULT_LOGO_URL;
     const parsed = JSON.parse(cached);
-    return parsed?.siteAssets?.logo || '';
+    return parsed?.siteAssets?.logo || DEFAULT_LOGO_URL;
   } catch (error) {
-    return '';
+    return DEFAULT_LOGO_URL;
   }
 };
 

@@ -85,7 +85,7 @@ const MediaLibrary = () => {
   return (
     <div className="space-y-6">
       <div className="glass-morph p-6 rounded">
-        <h3 className="text-2xl font-medium mb-2" style={{fontFamily: 'Cormorant Garamond, serif'}}>
+        <h3 className="text-2xl font-medium mb-2" style={{fontFamily: 'var(--font-heading)'}}>
           Media <span className="text-gradient-blue">Library</span>
         </h3>
         <p className="text-[var(--text-muted)] text-sm mb-6">

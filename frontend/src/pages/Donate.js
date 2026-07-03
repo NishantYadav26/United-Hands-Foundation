@@ -154,7 +154,7 @@ const Donate = () => {
           email: formData.donor_email,
           contact: formData.donor_phone
         },
-        theme: { color: '#1F6F6D' }
+        theme: { color: '#0E7A3E' }
       };
 
       const rzp = new window.Razorpay(options);
@@ -210,8 +210,8 @@ const Donate = () => {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14 reveal-section">
             <h1
-              className="text-5xl sm:text-6xl font-medium tracking-tight mb-6"
-              style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}
+              className="text-5xl sm:text-6xl font-bold tracking-tight mb-6"
+              style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}
               data-testid="donate-page-title"
             >
               Make a <span className="text-gradient-gold">Difference</span>
@@ -226,14 +226,14 @@ const Donate = () => {
             <div className="card-elevated p-10 rounded-lg" data-testid="payment-section">
               {paymentMode === 'razorpay' ? (
                 <>
-                  <h2 className="text-3xl font-medium mb-6" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+                  <h2 className="text-3xl font-medium mb-6" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>
                     Secure <span className="text-gradient-blue">Payment</span>
                   </h2>
                   <div className="p-8 rounded-lg mb-6 text-center" style={{ background: 'var(--bg-surface)' }}>
                     <div className="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ background: 'var(--bg-deep)' }}>
                       <CheckCircle2 style={{ color: 'var(--accent-teal)' }} size={40} />
                     </div>
-                    <h3 className="text-xl font-medium mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>Razorpay Checkout</h3>
+                    <h3 className="text-xl font-medium mb-2" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>Razorpay Checkout</h3>
                     <p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>
                       Pay securely with UPI, Cards, Net Banking, or Wallets. Your 80G receipt will be emailed automatically.
                     </p>
@@ -254,7 +254,7 @@ const Donate = () => {
                 </>
               ) : (
                 <>
-                  <h2 className="text-3xl font-medium mb-6" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+                  <h2 className="text-3xl font-medium mb-6" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>
                     Scan & Pay
                   </h2>
                   <div className="bg-white p-8 rounded-lg mb-6 flex items-center justify-center">
@@ -311,14 +311,14 @@ const Donate = () => {
 
             {/* Donation Form */}
             <div className="card-elevated p-10 rounded-lg" data-testid="donation-form">
-              <h2 className="text-3xl font-medium mb-6" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+              <h2 className="text-3xl font-medium mb-6" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>
                 Donation Details
               </h2>
 
               {submitted ? (
                 <div className="text-center py-12" data-testid="success-message">
                   <CheckCircle2 style={{ color: 'var(--accent-teal)' }} className="mx-auto mb-6" size={64} />
-                  <h3 className="text-2xl font-medium mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+                  <h3 className="text-2xl font-medium mb-4" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>
                     Thank You!
                   </h3>
                   <p style={{ color: 'var(--text-muted)' }}>

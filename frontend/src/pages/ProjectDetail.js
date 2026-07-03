@@ -23,7 +23,7 @@ export default function ProjectDetail() {
     <Navbar />
     <main className="max-w-6xl mx-auto px-4 sm:px-6 py-14">
       <img src={optimizeCloudinaryUrl(project.hero_image, { width: 1200 })} alt={project.title} loading="eager" className="w-full h-[420px] object-cover rounded mb-8" />
-      <h1 className="text-4xl mb-4" style={{ color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, serif' }}>{project.title}</h1>
+      <h1 className="text-4xl mb-4" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-heading)' }}>{project.title}</h1>
       <p className="mb-6" style={{ color: 'var(--text-muted)' }}>{project.description}</p>
       <div className="mb-8">
         <div className="w-full bg-[var(--bg-surface)] rounded h-3 overflow-hidden"><div className="h-full bg-[var(--accent-teal)]" style={{ width: `${progress}%` }} /></div>

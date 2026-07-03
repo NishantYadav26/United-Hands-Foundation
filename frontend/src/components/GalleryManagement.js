@@ -144,7 +144,7 @@ const GalleryManagement = () => {
       {/* Header */}
       <div className="glass-morph p-6 rounded flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h3 className="text-2xl font-medium mb-2 flex items-center gap-3" style={{fontFamily: 'Cormorant Garamond, serif'}}>
+          <h3 className="text-2xl font-medium mb-2 flex items-center gap-3" style={{fontFamily: 'var(--font-heading)'}}>
             <Heart style={{color: 'var(--accent-warm)'}} size={32} fill="var(--accent-warm)" />
             <span>Heartiest <span className="text-gradient-orange">Moments</span></span>
           </h3>
@@ -164,7 +164,7 @@ const GalleryManagement = () => {
       {/* Form */}
       {showForm && (
         <div ref={formRef} className="glass-morph p-6 sm:p-8 rounded">
-          <h4 className="text-xl font-medium mb-6" style={{fontFamily: 'Cormorant Garamond, serif'}}>
+          <h4 className="text-xl font-medium mb-6" style={{fontFamily: 'var(--font-heading)'}}>
             {editingImage ? 'Edit' : 'Add'} Heartiest Moment
           </h4>
           
