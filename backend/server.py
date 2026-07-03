@@ -1124,7 +1124,7 @@ async def delete_press_media(media_id: str, admin_email: str = Depends(verify_to
     return {"status": "success", "message": "Press clipping deleted"}
 
 @api_router.post("/projects", response_model=Project)
-async def create_project(project: ProjectCreate):
+async def create_project(project: ProjectCreate, admin_email: str = Depends(verify_token)):
     project_obj = Project(**project.model_dump())
     doc = project_obj.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()

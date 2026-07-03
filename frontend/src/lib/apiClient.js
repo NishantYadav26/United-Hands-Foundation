@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
+const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-foundation.onrender.com';
 export const API_BASE = `${BACKEND_URL}/api`;
 
 const inMemoryCache = new Map();

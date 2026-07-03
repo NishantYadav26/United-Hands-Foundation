@@ -33,7 +33,7 @@ const SuccessStoriesManagement = lazy(() => import('@/components/SuccessStoriesM
 const LocationsManagement = lazy(() => import('@/components/LocationsManagement'));
 const EventsManagement = lazy(() => import('@/components/EventsManagement'));
 
-const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
+const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-foundation.onrender.com';
 const API = `${BACKEND_URL}/api`;
 
 const AdminDashboard = () => {
@@ -49,6 +49,26 @@ const AdminDashboard = () => {
     fetchDonations();
     fetchSettings();
   }, []);
+
+  // Expired/invalid admin sessions previously failed silently on every write.
+  // Catch 401s from any admin API call, clear the stale token, and send the
+  // admin back to the login page with a clear message.
+  useEffect(() => {
+    const interceptorId = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        const status = error.response?.status;
+        const url = error.config?.url || '';
+        if (status === 401 && url.startsWith(API)) {
+          localStorage.removeItem('uhf_admin_token');
+          toast.error('Session expired — please log in again');
+          navigate('/uhf-admin');
+        }
+        return Promise.reject(error);
+      }
+    );
+    return () => axios.interceptors.response.eject(interceptorId);
+  }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem('uhf_admin_token');
