@@ -19,7 +19,7 @@ const getTtl = (config = {}) => {
 
 export const apiClient = axios.create({
   baseURL: API_BASE,
-  timeout: 7000
+  timeout: 20000
 });
 
 

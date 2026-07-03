@@ -192,7 +192,7 @@ const ProjectsManagement = () => {
       {/* Header */}
       <div className="glass-morph p-6 rounded flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h3 className="text-2xl font-medium mb-2" style={{fontFamily: 'Cormorant Garamond, serif'}}>
+          <h3 className="text-2xl font-medium mb-2" style={{fontFamily: 'var(--font-heading)'}}>
             Projects <span className="text-gradient-blue">Management</span>
           </h3>
           <p className="text-[var(--text-muted)] text-sm">
@@ -211,7 +211,7 @@ const ProjectsManagement = () => {
       {/* Form */}
       {showForm && (
         <div ref={formRef} className="glass-morph p-6 sm:p-8 rounded">
-          <h4 className="text-xl font-medium mb-6" style={{fontFamily: 'Cormorant Garamond, serif'}}>
+          <h4 className="text-xl font-medium mb-6" style={{fontFamily: 'var(--font-heading)'}}>
             {editingProject ? 'Edit' : 'Create'} Project
           </h4>
           

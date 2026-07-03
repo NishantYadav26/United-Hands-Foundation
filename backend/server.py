@@ -866,23 +866,42 @@ async def download_receipt(donation_id: str):
         headers={"Content-Disposition": f"attachment; filename=Receipt_{donation['receipt_number']}.pdf"}
     )
 
-@api_router.get("/admin/settings", response_model=AdminSettings)
+# Fields safe to return over the public (unauthenticated) settings endpoint.
+# razorpay_key_secret is intentionally excluded — it must never be exposed publicly.
+PUBLIC_SETTINGS_FIELDS = (
+    "id", "payment_mode", "qr_code_url", "upi_id",
+    "razorpay_key_id", "razorpay_enabled",
+    "facebook_url", "instagram_url", "youtube_url",
+)
+
+@api_router.get("/admin/settings")
 async def get_admin_settings():
     settings = await db.admin_settings.find_one({"id": "settings"}, {"_id": 0})
-    
+
     if not settings:
-        default_settings = AdminSettings()
-        doc = default_settings.model_dump()
-        await db.admin_settings.insert_one(doc)
-        return default_settings
-    
-    return AdminSettings(**settings)
+        settings = AdminSettings().model_dump()
+        await db.admin_settings.insert_one(dict(settings))
+
+    # Never expose the Razorpay secret through this public endpoint.
+    return {key: settings.get(key, "") for key in PUBLIC_SETTINGS_FIELDS}
 
 @api_router.put("/admin/settings")
 async def update_admin_settings(settings: AdminSettings, admin_email: str = Depends(verify_token)):
+    update_doc = settings.model_dump()
+
+    # Write-only secret: the public GET never returns razorpay_key_secret, so the
+    # admin form submits it blank unless it was re-typed. Preserve the stored value
+    # in that case instead of wiping it.
+    if not update_doc.get("razorpay_key_secret"):
+        existing = await db.admin_settings.find_one(
+            {"id": "settings"}, {"_id": 0, "razorpay_key_secret": 1}
+        )
+        if existing and existing.get("razorpay_key_secret"):
+            update_doc["razorpay_key_secret"] = existing["razorpay_key_secret"]
+
     await db.admin_settings.update_one(
         {"id": "settings"},
-        {"$set": settings.model_dump()},
+        {"$set": update_doc},
         upsert=True
     )
     return {"status": "success", "message": "Settings updated"}

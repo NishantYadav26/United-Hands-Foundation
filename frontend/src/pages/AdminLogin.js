@@ -47,7 +47,7 @@ const AdminLogin = () => {
           <Shield className="mx-auto mb-4" size={64} style={{color: 'var(--accent-teal)'}} />
           <h1 
             className="text-4xl font-medium mb-2"
-            style={{fontFamily: 'Cormorant Garamond, serif'}}
+            style={{fontFamily: 'var(--font-heading)'}}
           >
             Admin <span className="text-gradient-blue">Portal</span>
           </h1>

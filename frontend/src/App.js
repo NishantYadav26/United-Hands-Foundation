@@ -1,5 +1,6 @@
 import { Suspense, lazy, useEffect } from "react";
 import FloatingEventsButton from "@/components/FloatingEventsButton";
+import CursorTrail from "@/components/CursorTrail";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import usePillarScrollAnimation from "@/hooks/usePillarScrollAnimation";
 import "@/App.css";
@@ -109,6 +110,7 @@ const AppRoutes = () => {
 function App() {
   return (
     <div className="App">
+      <CursorTrail />
       <BrowserRouter>
         <AppRoutes />
       </BrowserRouter>

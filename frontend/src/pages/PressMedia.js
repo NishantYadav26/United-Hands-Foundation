@@ -109,8 +109,8 @@ const PressMedia = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-14 reveal-section">
             <h1
-              className="text-5xl sm:text-6xl font-medium tracking-tight mb-6"
-              style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}
+              className="text-5xl sm:text-6xl font-bold tracking-tight mb-6"
+              style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}
               data-testid="press-page-title"
             >
               Press & <span className="text-gradient-gold">Media</span>

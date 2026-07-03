@@ -143,8 +143,8 @@ const PillarsOfImpact = () => {
       <section className="py-20 px-6 reveal-section" data-testid="pillars-section">
         <div className="max-w-7xl mx-auto">
           <h2
-            className="text-4xl sm:text-5xl font-medium tracking-tight text-center mb-4"
-            style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}
+            className="text-4xl sm:text-5xl font-bold tracking-tight text-center mb-4"
+            style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}
           >
             Our Pillars of <span className="text-gradient-gold">Impact</span>
           </h2>
@@ -171,8 +171,8 @@ const PillarsOfImpact = () => {
                   >
                     <div className="absolute inset-0 bg-gradient-to-t from-[#1F2933] to-transparent opacity-70"></div>
                     <div className="absolute bottom-5 left-5">
-                      <Icon className="mb-2" style={{ color: '#C6A15B' }} size={28} />
-                      <span className="text-xs tracking-[0.2em] uppercase font-bold" style={{ color: '#C6A15B' }}>
+                      <Icon className="mb-2" style={{ color: '#0E7A3E' }} size={28} />
+                      <span className="text-xs tracking-[0.2em] uppercase font-bold" style={{ color: '#0E7A3E' }}>
                         {project.category}
                       </span>
                     </div>
@@ -181,7 +181,7 @@ const PillarsOfImpact = () => {
                   <div className="p-7">
                     <h3
                       className="text-xl font-medium mb-3"
-                      style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}
+                      style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}
                     >
                       {project.title}
                     </h3>

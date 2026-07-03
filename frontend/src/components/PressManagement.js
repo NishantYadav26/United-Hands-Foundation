@@ -142,7 +142,7 @@ const PressManagement = () => {
   return (
     <div className="space-y-6">
       <div className="glass-morph p-6 rounded">
-        <h3 className="text-2xl font-medium mb-2 flex items-center gap-3" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+        <h3 className="text-2xl font-medium mb-2 flex items-center gap-3" style={{ fontFamily: 'var(--font-heading)' }}>
           <Newspaper style={{ color: 'var(--accent-gold)' }} size={30} />
           Press <span className="text-gradient-gold">Management</span>
         </h3>

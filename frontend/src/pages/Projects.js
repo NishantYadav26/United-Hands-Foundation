@@ -17,7 +17,7 @@ export default function Projects() {
   return <div className="min-h-screen" style={{ background: 'var(--bg-deep)' }}>
     <Navbar />
     <main className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
-      <h1 className="text-4xl mb-8" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>Our Projects</h1>
+      <h1 className="text-4xl mb-8" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>Our Projects</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {projects.map((project) => (
           <article key={project.id} className="glass-morph rounded overflow-hidden">

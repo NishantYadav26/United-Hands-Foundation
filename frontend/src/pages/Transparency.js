@@ -14,8 +14,8 @@ const Transparency = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16 reveal-section">
             <h1
-              className="text-5xl sm:text-6xl font-medium tracking-tight mb-6"
-              style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}
+              className="text-5xl sm:text-6xl font-bold tracking-tight mb-6"
+              style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}
               data-testid="transparency-title"
             >
               Transparency & <span className="text-gradient-gold">Governance</span>
@@ -28,7 +28,7 @@ const Transparency = () => {
           {/* Legal Status Banner */}
           <div className="card-elevated p-8 rounded-lg mb-12 text-center reveal-section" data-testid="legal-status">
             <Shield style={{ color: 'var(--accent-teal)' }} className="mx-auto mb-4" size={48} />
-            <h2 className="text-2xl font-medium mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+            <h2 className="text-2xl font-medium mb-4" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>
               Legally Registered NGO
             </h2>
             <p style={{ color: 'var(--text-muted)' }} className="max-w-3xl mx-auto mb-6">
@@ -57,7 +57,7 @@ const Transparency = () => {
 
           {/* FCRA Notice */}
           <div className="card-elevated p-8 rounded-lg mb-12 reveal-section" style={{ borderLeft: '4px solid var(--accent-gold)' }} data-testid="fcra-notice">
-            <h3 className="text-2xl font-medium mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--accent-teal)' }}>
+            <h3 className="text-2xl font-medium mb-4" style={{ fontFamily: 'var(--font-heading)', color: 'var(--accent-teal)' }}>
               FCRA Compliance Notice
             </h3>
             <p className="leading-relaxed mb-4" style={{ color: 'var(--text-primary)' }}>
@@ -71,7 +71,7 @@ const Transparency = () => {
 
           {/* Contact for Queries */}
           <div className="text-center card-elevated p-8 rounded-lg reveal-section">
-            <h3 className="text-2xl font-medium mb-4" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+            <h3 className="text-2xl font-medium mb-4" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>
               Questions or Queries?
             </h3>
             <p style={{ color: 'var(--text-muted)' }} className="mb-6">
