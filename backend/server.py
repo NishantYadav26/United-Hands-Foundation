@@ -1,6 +1,7 @@
 from fastapi import FastAPI, APIRouter, HTTPException, Body, Depends, status, UploadFile, File, Form, Request
 from fastapi.responses import FileResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import Response
@@ -8,7 +9,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict, EmailStr
+from pydantic import BaseModel, Field, ConfigDict, EmailStr, field_validator
 from typing import List, Optional
 import uuid
 from datetime import datetime, timezone, timedelta
@@ -26,6 +27,8 @@ import razorpay
 import jwt
 import bcrypt
 import hashlib
+import hmac
+import re
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -65,6 +68,31 @@ SENDER_EMAIL = REQUIRED_SENDER_EMAIL
 
 # Security
 security = HTTPBearer()
+optional_security = HTTPBearer(auto_error=False)
+
+MIN_PASSWORD_LENGTH = int(os.getenv('MIN_PASSWORD_LENGTH', '10'))
+MAX_UPLOAD_BYTES = int(os.getenv('MAX_UPLOAD_BYTES', str(5 * 1024 * 1024)))
+JWT_ISSUER = os.getenv('JWT_ISSUER', 'united-hands-foundation-api')
+JWT_AUDIENCE = os.getenv('JWT_AUDIENCE', 'united-hands-foundation')
+DEFAULT_JWT_SECRET = 'uhf-secret-key-2026-change-in-production'
+
+def normalize_email(email: str) -> str:
+    return email.strip().lower()
+
+def validate_password_strength(password: str) -> str:
+    if len(password) < MIN_PASSWORD_LENGTH:
+        raise ValueError(f'Password must be at least {MIN_PASSWORD_LENGTH} characters long')
+    if len(password) > 128:
+        raise ValueError('Password must be 128 characters or fewer')
+    if not re.search(r'[A-Za-z]', password) or not re.search(r'\d', password):
+        raise ValueError('Password must include at least one letter and one number')
+    return password
+
+def verify_password(password: str, hashed_password: str) -> bool:
+    try:
+        return bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8'))
+    except (TypeError, ValueError):
+        return False
 
 def delete_cloudinary_image(image_url: str):
     """Delete an image from Cloudinary given its URL."""
@@ -99,36 +127,69 @@ logger = logging.getLogger(__name__)
 
 class AdminLogin(BaseModel):
     email: EmailStr
-    password: str
+    password: str = Field(min_length=1, max_length=128)
+
+    @field_validator('email')
+    @classmethod
+    def normalize_login_email(cls, value: EmailStr) -> str:
+        return normalize_email(str(value))
 
 class Token(BaseModel):
     access_token: str
     token_type: str
 
 class UserRegister(BaseModel):
-    name: str
+    name: str = Field(min_length=1, max_length=120)
     email: EmailStr
-    password: str
-    phone: Optional[str] = None
-    pan: Optional[str] = None
+    password: str = Field(min_length=MIN_PASSWORD_LENGTH, max_length=128)
+    phone: Optional[str] = Field(default=None, max_length=20)
+    pan: Optional[str] = Field(default=None, max_length=10)
+
+    @field_validator('email')
+    @classmethod
+    def normalize_register_email(cls, value: EmailStr) -> str:
+        return normalize_email(str(value))
+
+    @field_validator('password')
+    @classmethod
+    def strong_register_password(cls, value: str) -> str:
+        return validate_password_strength(value)
 
 class UserLogin(BaseModel):
     email: EmailStr
-    password: str
+    password: str = Field(min_length=1, max_length=128)
+
+    @field_validator('email')
+    @classmethod
+    def normalize_user_login_email(cls, value: EmailStr) -> str:
+        return normalize_email(str(value))
 
 class DonorTrackRequest(BaseModel):
     email: EmailStr
-    pan: str
+    pan: str = Field(min_length=10, max_length=10)
+
+    @field_validator('email')
+    @classmethod
+    def normalize_donor_email(cls, value: EmailStr) -> str:
+        return normalize_email(str(value))
+
+    @field_validator('pan')
+    @classmethod
+    def normalize_pan(cls, value: str) -> str:
+        pan = value.strip().upper()
+        if not re.fullmatch(r'[A-Z]{5}[0-9]{4}[A-Z]', pan):
+            raise ValueError('Invalid PAN format')
+        return pan
 
 def create_access_token(data: dict):
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire})
+    to_encode.update({"exp": expire, "iat": datetime.now(timezone.utc), "iss": JWT_ISSUER, "aud": JWT_AUDIENCE})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
     try:
-        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM], issuer=JWT_ISSUER, audience=JWT_AUDIENCE)
         email: str = payload.get("sub")
         if email != ADMIN_EMAIL:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")
@@ -140,7 +201,7 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
 
 def verify_user_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
     try:
-        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM], issuer=JWT_ISSUER, audience=JWT_AUDIENCE)
         email: str = payload.get("sub")
         role: str = payload.get("role", "user")
         if not email:
@@ -563,7 +624,7 @@ async def send_receipt_email(donor_email: str, donor_name: str, receipt_number: 
 
 @api_router.post("/auth/admin-login", response_model=Token)
 async def admin_login(login: AdminLogin):
-    if login.email != ADMIN_EMAIL:
+    if not hmac.compare_digest(login.email, ADMIN_EMAIL):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
     
     admin = await db.admin_users.find_one({"email": ADMIN_EMAIL}, {"_id": 0})
@@ -579,7 +640,7 @@ async def admin_login(login: AdminLogin):
         access_token = create_access_token(data={"sub": ADMIN_EMAIL})
         return {"access_token": access_token, "token_type": "bearer"}
     
-    if not bcrypt.checkpw(login.password.encode('utf-8'), admin.get('password', '').encode('utf-8')):
+    if not verify_password(login.password, admin.get('password', '')):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
     
     access_token = create_access_token(data={"sub": ADMIN_EMAIL})
@@ -629,7 +690,7 @@ async def user_register(user: UserRegister):
 @api_router.post("/auth/login")
 async def user_login(login: UserLogin):
     # Check if this is an admin login
-    if login.email == ADMIN_EMAIL:
+    if hmac.compare_digest(login.email, ADMIN_EMAIL):
         admin = await db.admin_users.find_one({"email": ADMIN_EMAIL}, {"_id": 0})
         if not admin:
             # First admin login - create admin record
@@ -643,7 +704,7 @@ async def user_login(login: UserLogin):
             access_token = create_access_token(data={"sub": ADMIN_EMAIL, "role": "admin", "name": ADMIN_NAME})
             return {"access_token": access_token, "token_type": "bearer", "user": {"name": ADMIN_NAME, "email": ADMIN_EMAIL, "role": "admin"}}
         
-        if not bcrypt.checkpw(login.password.encode('utf-8'), admin.get('password', '').encode('utf-8')):
+        if not verify_password(login.password, admin.get('password', '')):
             raise HTTPException(status_code=401, detail="Invalid email or password")
         
         access_token = create_access_token(data={"sub": ADMIN_EMAIL, "role": "admin", "name": ADMIN_NAME})
@@ -654,7 +715,7 @@ async def user_login(login: UserLogin):
     if not user:
         raise HTTPException(status_code=401, detail="Invalid email or password")
     
-    if not bcrypt.checkpw(login.password.encode('utf-8'), user['password'].encode('utf-8')):
+    if not verify_password(login.password, user.get('password', '')):
         raise HTTPException(status_code=401, detail="Invalid email or password")
     
     access_token = create_access_token(data={"sub": user['email'], "role": "user", "name": user['name']})
@@ -689,7 +750,7 @@ async def root():
     return {"message": "United Hands Foundation API"}
 
 @api_router.get("/cloudinary/signature")
-async def generate_cloudinary_signature(resource_type: str = "image", folder: str = "uploads"):
+async def generate_cloudinary_signature(resource_type: str = "image", folder: str = "uploads", admin_email: str = Depends(verify_token)):
     ALLOWED_FOLDERS = ("donations", "press", "uploads", "success_stories", "qr_codes", "videos", "projects", "gallery", "site_assets", "team_pillars")
     folder_base = folder.rstrip("/")
     if folder_base not in ALLOWED_FOLDERS:
@@ -726,6 +787,8 @@ async def upload_image(
         raise HTTPException(status_code=400, detail="Only image files are allowed")
 
     file_bytes = await image_file.read()
+    if len(file_bytes) > MAX_UPLOAD_BYTES:
+        raise HTTPException(status_code=413, detail="Uploaded image is too large")
     if not file_bytes:
         raise HTTPException(status_code=400, detail="Empty file upload is not allowed")
 
@@ -848,12 +911,19 @@ async def approve_donation(approval: DonationApproval, admin_email: str = Depend
         return {"status": "success", "message": f"Donation marked as {target_status}"}
 
 @api_router.get("/donations/{donation_id}/receipt")
-async def download_receipt(donation_id: str):
+async def download_receipt(donation_id: str, credentials: Optional[HTTPAuthorizationCredentials] = Depends(optional_security)):
     donation = await db.donations.find_one({"id": donation_id}, {"_id": 0})
     
     if not donation:
         raise HTTPException(status_code=404, detail="Donation not found")
     
+    if credentials:
+        token_data = verify_user_token(credentials)
+        if token_data.get("role") != "admin" and token_data.get("email") != donation.get("donor_email"):
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")
+    else:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required")
+
     if donation['status'] != 'approved' or not donation.get('receipt_number'):
         raise HTTPException(status_code=400, detail="Receipt not available")
     
@@ -1303,7 +1373,7 @@ async def update_site_asset(asset: SiteAssetUpdate, admin_email: str = Depends(v
     return asset_obj
 
 @api_router.post("/seed/site-assets")
-async def seed_site_assets():
+async def seed_site_assets(admin_email: str = Depends(verify_token)):
     """Seed default site assets"""
     default_assets = [
         {
@@ -1403,7 +1473,7 @@ async def delete_pillar(pillar_id: str, admin_email: str = Depends(verify_token)
     return {"status": "success", "message": "Pillar deleted"}
 
 @api_router.post("/seed/pillars")
-async def seed_pillars():
+async def seed_pillars(admin_email: str = Depends(verify_token)):
     """Seed default team pillars"""
     default_pillars = [
         {
@@ -1522,7 +1592,7 @@ async def delete_location(location_id: str, admin_email: str = Depends(verify_to
     return {"status": "success", "message": "Location deleted"}
 
 @api_router.post("/seed/locations")
-async def seed_locations():
+async def seed_locations(admin_email: str = Depends(verify_token)):
     """Seed default work locations"""
     default_locations = [
         {"name": "Dharashiv", "description": "Medical camps & elderly care", "display_priority": 1},
@@ -1611,7 +1681,7 @@ async def get_stats():
     }
 
 @api_router.post("/seed/projects")
-async def seed_projects():
+async def seed_projects(admin_email: str = Depends(verify_token)):
     default_projects = [
         {
             "title": "Vayorang Elderly Care",
@@ -1673,6 +1743,52 @@ async def seed_projects():
 app.include_router(api_router)
 
 
+RATE_LIMIT_BUCKETS = {}
+RATE_LIMIT_RULES = (
+    ("/api/auth/admin-login", 5, 15 * 60),
+    ("/api/auth/login", 10, 15 * 60),
+    ("/api/auth/register", 5, 60 * 60),
+    ("/api/donor/track", 5, 15 * 60),
+    ("/api/razorpay/create-order", 20, 60),
+    ("/api/razorpay/verify", 20, 60),
+)
+
+def client_ip(request: Request) -> str:
+    forwarded_for = request.headers.get("x-forwarded-for")
+    if forwarded_for:
+        return forwarded_for.split(",", 1)[0].strip()
+    return request.client.host if request.client else "unknown"
+
+def rate_limit_for(path: str):
+    for prefix, limit, window in RATE_LIMIT_RULES:
+        if path.startswith(prefix):
+            return limit, window
+    return None
+
+@app.middleware("http")
+async def security_hardening_middleware(request: Request, call_next):
+    rule = rate_limit_for(request.url.path)
+    if rule and request.method in {"POST", "PUT", "PATCH", "DELETE"}:
+        limit, window = rule
+        now = time.time()
+        key = (client_ip(request), request.url.path)
+        attempts = [ts for ts in RATE_LIMIT_BUCKETS.get(key, []) if now - ts < window]
+        if len(attempts) >= limit:
+            return Response("Too many requests", status_code=429, headers={"Retry-After": str(window)})
+        attempts.append(now)
+        RATE_LIMIT_BUCKETS[key] = attempts
+
+    response: Response = await call_next(request)
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    response.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+    response.headers.setdefault("Content-Security-Policy", "default-src 'self'; frame-ancestors 'none'; base-uri 'self'")
+    if request.url.scheme == "https":
+        response.headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
+    return response
+
+
 PUBLIC_CACHE_ROUTES = (
     "/api/stats",
     "/api/locations",
@@ -1700,12 +1816,18 @@ async def set_cache_headers(request: Request, call_next):
 
     return response
 
+cors_origins = [origin.strip() for origin in os.environ.get('CORS_ORIGINS', '').split(',') if origin.strip()]
+if not cors_origins:
+    cors_origins = ['http://localhost:3000', 'http://127.0.0.1:3000']
+
+trusted_hosts = [host.strip() for host in os.environ.get('TRUSTED_HOSTS', '').split(',') if host.strip()] or ['*']
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=trusted_hosts)
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=cors_origins,
+    allow_methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allow_headers=['Authorization', 'Content-Type'],
 )
 
 @app.on_event("startup")
