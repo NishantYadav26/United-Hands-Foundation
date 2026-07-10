@@ -45,14 +45,12 @@ const AdminDashboard = () => {
 
   usePageRevealAnimation(`${activeTab}-${donations.length}-${loading}`);
 
-  useEffect(() => {
-    fetchDonations();
-    fetchSettings();
-  }, []);
-
   // Expired/invalid admin sessions previously failed silently on every write.
-  // Catch 401s from any admin API call, clear the stale token, and send the
-  // admin back to the login page with a clear message.
+  // Register a 401 interceptor that clears the stale token and returns the admin
+  // to the login page — BEFORE firing the initial fetches, so even the first
+  // request (e.g. an expired-token GET /donations on mount) is caught. Axios
+  // snapshots response interceptors when the request is dispatched, so ordering
+  // matters here.
   useEffect(() => {
     const interceptorId = axios.interceptors.response.use(
       (response) => response,
@@ -67,6 +65,10 @@ const AdminDashboard = () => {
         return Promise.reject(error);
       }
     );
+
+    fetchDonations();
+    fetchSettings();
+
     return () => axios.interceptors.response.eject(interceptorId);
   }, [navigate]);
 
