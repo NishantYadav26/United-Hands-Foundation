@@ -1059,7 +1059,7 @@ async def verify_razorpay_payment(data: dict = Body(...)):
     }
 
 @api_router.post("/press-media", response_model=PressMedia)
-async def create_press_media(media: PressMediaCreate):
+async def create_press_media(media: PressMediaCreate, admin_email: str = Depends(verify_token)):
     media_obj = PressMedia(**media.model_dump())
     doc = media_obj.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
@@ -1111,7 +1111,7 @@ async def delete_press_media(media_id: str, admin_email: str = Depends(verify_to
     return {"status": "success", "message": "Press clipping deleted"}
 
 @api_router.post("/projects", response_model=Project)
-async def create_project(project: ProjectCreate):
+async def create_project(project: ProjectCreate, admin_email: str = Depends(verify_token)):
     project_obj = Project(**project.model_dump())
     doc = project_obj.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
@@ -1159,12 +1159,16 @@ async def get_project_images(project_id: str):
 @api_router.put("/projects/{project_id}")
 async def update_project(project_id: str, project: ProjectCreate, admin_email: str = Depends(verify_token)):
     old = await db.projects.find_one({"id": project_id}, {"_id": 0})
-    if old and old.get('hero_image') and old['hero_image'] != project.hero_image:
+    if not old:
+        raise HTTPException(status_code=404, detail="Project not found")
+    if old.get('hero_image') and old['hero_image'] != project.hero_image:
         delete_cloudinary_image(old['hero_image'])
-    await db.projects.update_one(
+    result = await db.projects.update_one(
         {"id": project_id},
         {"$set": project.model_dump()}
     )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Project not found")
     return {"status": "success", "message": "Project updated"}
 
 @api_router.delete("/projects/{project_id}")

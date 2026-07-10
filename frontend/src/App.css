@@ -246,10 +246,22 @@ h2 {
   border-bottom: 1px solid var(--border-subtle);
 }
 
-.logo-see-through {
-  opacity: 0.95;
-  filter: brightness(1.05) contrast(1.05);
+.logo-container {
+  flex: 0 0 auto;
+  isolation: isolate;
 }
+
+.logo-see-through {
+  opacity: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.18)) brightness(1.08) contrast(1.08);
+  position: relative;
+  z-index: 1;
+}
+
+[data-sonner-toaster] {
+  z-index: 9999 !important;
+}
+
 
 /* Card styles for light theme */
 .card-elevated {

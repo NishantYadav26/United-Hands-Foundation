@@ -28,11 +28,11 @@
       ]
     },
     {
-      "source": "/api/(stats|locations|pillars|gallery|videos|press-media|site-assets)(.*)",
+      "source": "/api/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, s-maxage=300, stale-while-revalidate=600"
+          "value": "no-store, no-cache, must-revalidate, proxy-revalidate"
         }
       ]
     }

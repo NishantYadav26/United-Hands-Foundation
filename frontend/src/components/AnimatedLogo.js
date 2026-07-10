@@ -24,6 +24,7 @@ const readCachedLogo = () => {
 const AnimatedLogo = ({ size = 'md', visualScale = 1, className = '' }) => {
   const [logoUrl, setLogoUrl] = useState(() => readCachedLogo());
   const [isHovered, setIsHovered] = useState(false);
+  const [imageFailed, setImageFailed] = useState(false);
 
   useEffect(() => {
     const fetchLogo = async () => {
@@ -33,6 +34,7 @@ const AnimatedLogo = ({ size = 'md', visualScale = 1, className = '' }) => {
         if (nextLogo) {
           localStorage.setItem(PERMANENT_LOGO_KEY, nextLogo);
           setLogoUrl(nextLogo);
+          setImageFailed(false);
         }
       } catch (error) {
         console.error('Failed to fetch logo:', error);
@@ -52,7 +54,9 @@ const AnimatedLogo = ({ size = 'md', visualScale = 1, className = '' }) => {
     return isHovered ? visualScale * 1.08 : visualScale;
   }, [isHovered, visualScale]);
 
-  if (!logoUrl) return null;
+  const visibleLogoUrl = imageFailed ? DEFAULT_LOGO_URL : logoUrl;
+
+  if (!visibleLogoUrl) return null;
 
   return (
     <div
@@ -60,12 +64,17 @@ const AnimatedLogo = ({ size = 'md', visualScale = 1, className = '' }) => {
       data-testid="animated-logo"
     >
       <img
-        src={logoUrl}
+        src={visibleLogoUrl}
         alt="United Hands Foundation"
         className="w-full h-full object-contain logo-see-through"
         style={{ transform: `scale(${logoScale})`, transition: 'transform 0.3s ease' }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        onError={() => {
+          if (visibleLogoUrl !== DEFAULT_LOGO_URL) {
+            setImageFailed(true);
+          }
+        }}
         loading="eager"
         fetchPriority="high"
         decoding="sync"
