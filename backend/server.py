@@ -949,11 +949,18 @@ async def get_admin_settings():
     settings = await db.admin_settings.find_one({"id": "settings"}, {"_id": 0})
 
     if not settings:
-        settings = AdminSettings().model_dump()
-        await db.admin_settings.insert_one(dict(settings))
+        default_settings = AdminSettings()
+        await db.admin_settings.insert_one(default_settings.model_dump())
+        settings = default_settings
+    else:
+        # Hydrate through the model so older documents missing newer fields keep
+        # their intended defaults (e.g. default facebook_url, razorpay_enabled bool)
+        # instead of collapsing to blanks.
+        settings = AdminSettings(**settings)
 
+    settings = settings.model_dump()
     # Never expose the Razorpay secret through this public endpoint.
-    return {key: settings.get(key, "") for key in PUBLIC_SETTINGS_FIELDS}
+    return {key: settings[key] for key in PUBLIC_SETTINGS_FIELDS}
 
 @api_router.put("/admin/settings")
 async def update_admin_settings(settings: AdminSettings, admin_email: str = Depends(verify_token)):
@@ -961,12 +968,18 @@ async def update_admin_settings(settings: AdminSettings, admin_email: str = Depe
 
     # Write-only secret: the public GET never returns razorpay_key_secret, so the
     # admin form submits it blank unless it was re-typed. Preserve the stored value
-    # in that case instead of wiping it.
+    # only when the key ID is unchanged — if the key ID changed, keeping the old
+    # secret would pair a new key with a stale secret and break Razorpay auth, so
+    # the admin must re-enter the secret alongside the new key ID.
     if not update_doc.get("razorpay_key_secret"):
         existing = await db.admin_settings.find_one(
-            {"id": "settings"}, {"_id": 0, "razorpay_key_secret": 1}
+            {"id": "settings"}, {"_id": 0, "razorpay_key_id": 1, "razorpay_key_secret": 1}
         )
-        if existing and existing.get("razorpay_key_secret"):
+        if (
+            existing
+            and existing.get("razorpay_key_secret")
+            and existing.get("razorpay_key_id") == update_doc.get("razorpay_key_id")
+        ):
             update_doc["razorpay_key_secret"] = existing["razorpay_key_secret"]
 
     await db.admin_settings.update_one(

@@ -4,7 +4,7 @@ import { Heart, GraduationCap, Stethoscope, AlertTriangle, HandHeart, Loader2 } 
 import axios from 'axios';
 import ProjectGalleryLightbox from './ProjectGalleryLightbox';
 
-const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
+const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-foundation.onrender.com';
 const API = `${BACKEND_URL}/api`;
 
 const categoryIcons = {

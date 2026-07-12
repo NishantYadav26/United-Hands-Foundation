@@ -33,7 +33,7 @@ const SuccessStoriesManagement = lazy(() => import('@/components/SuccessStoriesM
 const LocationsManagement = lazy(() => import('@/components/LocationsManagement'));
 const EventsManagement = lazy(() => import('@/components/EventsManagement'));
 
-const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
+const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-foundation.onrender.com';
 const API = `${BACKEND_URL}/api`;
 
 const AdminDashboard = () => {
@@ -45,10 +45,32 @@ const AdminDashboard = () => {
 
   usePageRevealAnimation(`${activeTab}-${donations.length}-${loading}`);
 
+  // Expired/invalid admin sessions previously failed silently on every write.
+  // Register a 401 interceptor that clears the stale token and returns the admin
+  // to the login page — BEFORE firing the initial fetches, so even the first
+  // request (e.g. an expired-token GET /donations on mount) is caught. Axios
+  // snapshots response interceptors when the request is dispatched, so ordering
+  // matters here.
   useEffect(() => {
+    const interceptorId = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        const status = error.response?.status;
+        const url = error.config?.url || '';
+        if (status === 401 && url.startsWith(API)) {
+          localStorage.removeItem('uhf_admin_token');
+          toast.error('Session expired — please log in again');
+          navigate('/uhf-admin');
+        }
+        return Promise.reject(error);
+      }
+    );
+
     fetchDonations();
     fetchSettings();
-  }, []);
+
+    return () => axios.interceptors.response.eject(interceptorId);
+  }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem('uhf_admin_token');

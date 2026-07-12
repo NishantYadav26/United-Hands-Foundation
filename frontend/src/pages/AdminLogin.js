@@ -5,7 +5,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import usePageRevealAnimation from '@/hooks/usePageRevealAnimation';
 
-const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-backend.onrender.com';
+const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-foundation.onrender.com';
 const API = `${BACKEND_URL}/api`;
 
 const AdminLogin = () => {
