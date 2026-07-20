@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { getCached } from '@/lib/apiClient';
+import { apiClient } from '@/lib/apiClient';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
 export default function ProjectDetail() {
@@ -10,10 +10,9 @@ export default function ProjectDetail() {
   const [project, setProject] = useState(null);
 
   useEffect(() => {
-    getCached('/projects').then((res) => {
-      const found = (res.data || []).find((p) => (p.slug || p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')) === slug);
-      setProject(found || null);
-    });
+    apiClient.get(`/projects/${slug}`).then((res) => {
+      setProject(res.data || null);
+    }).catch(() => setProject(null));
   }, [slug]);
 
   if (!project) return <div><Navbar /><main className='pt-32 text-center'>Project not found</main><Footer /></div>;

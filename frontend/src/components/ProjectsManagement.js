@@ -1,11 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { Plus, Edit, Trash2, Upload, X, Loader2 } from 'lucide-react';
 import axios from 'axios';
+import { invalidateCachedGet } from '@/lib/apiClient';
 import { toast } from 'sonner';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-foundation.onrender.com';
 const API = `${BACKEND_URL}/api`;
+
+const slugify = (value = '') => value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
 const ProjectsManagement = () => {
   const [projects, setProjects] = useState([]);
@@ -46,20 +49,28 @@ const ProjectsManagement = () => {
 
     try {
       const token = localStorage.getItem('uhf_admin_token');
-      
+      const payload = {
+        ...formData,
+        title: formData.title.trim(),
+        category: formData.category.trim(),
+        slug: (formData.slug || slugify(formData.title)).trim(),
+        images: formData.images.filter(Boolean)
+      };
+
       if (editingProject) {
-        await axios.put(`${API}/projects/${editingProject.id}`, formData, {
+        await axios.put(`${API}/projects/${editingProject.id}`, payload, {
           headers: { Authorization: `Bearer ${token}` }
         });
         toast.success('Project updated successfully!');
       } else {
-        await axios.post(`${API}/projects`, formData, {
+        await axios.post(`${API}/projects`, payload, {
           headers: { Authorization: `Bearer ${token}` }
         });
         toast.success('Project created successfully!');
       }
-      
-      fetchProjects();
+
+      invalidateCachedGet('/projects');
+      await fetchProjects();
       resetForm();
     } catch (error) {
       console.error('Failed to save project:', error);
@@ -102,7 +113,7 @@ const ProjectsManagement = () => {
       maxFileSize: 10000000
     }, (error, result) => {
       setUploading(false);
-      
+
       if (error) {
         toast.error('Upload failed: ' + (error?.message || JSON.stringify(error)));
         return;
@@ -199,7 +210,7 @@ const ProjectsManagement = () => {
             Manage your 5 Pillars of Impact and donation causes
           </p>
         </div>
-        <button 
+        <button
           onClick={() => setShowForm(!showForm)}
           className="btn-orange flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-3"
         >
@@ -214,42 +225,42 @@ const ProjectsManagement = () => {
           <h4 className="text-xl font-medium mb-6" style={{fontFamily: 'var(--font-heading)'}}>
             {editingProject ? 'Edit' : 'Create'} Project
           </h4>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input 
-              placeholder="Project Title *" 
-              value={formData.title} 
-              onChange={e => setFormData({...formData, title: e.target.value})} 
-              className="bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)]" 
+            <input
+              placeholder="Project Title *"
+              value={formData.title}
+              onChange={e => setFormData((prev) => ({...prev, title: e.target.value, slug: slugify(e.target.value)}))}
+              className="bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)]"
             />
-            
-            <input 
-              placeholder="Category *" 
-              value={formData.category} 
-              onChange={e => setFormData({...formData, category: e.target.value})} 
-              className="bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)]" 
+
+            <input
+              placeholder="Category *"
+              value={formData.category}
+              onChange={e => setFormData({...formData, category: e.target.value})}
+              className="bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)]"
             />
-            
-            <input placeholder="Slug (project-url)" value={formData.slug} onChange={e => setFormData({...formData, slug: e.target.value})} className="bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)]" />
-            <textarea 
-              placeholder="Description" 
-              value={formData.description} 
-              onChange={e => setFormData({...formData, description: e.target.value})} 
-              className="bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)] md:col-span-2" 
-              rows="3" 
+
+            <input placeholder="Slug (project-url)" value={formData.slug} onChange={e => setFormData({...formData, slug: slugify(e.target.value)})} className="bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)]" />
+            <textarea
+              placeholder="Description"
+              value={formData.description}
+              onChange={e => setFormData({...formData, description: e.target.value})}
+              className="bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)] md:col-span-2"
+              rows="3"
             />
-            
-            <input 
-              type="number" 
-              placeholder="Target Amount (₹)" 
-              value={formData.target_amount} 
-              onChange={e => setFormData({...formData, target_amount: parseInt(e.target.value) || 0})} 
-              className="bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)]" 
+
+            <input
+              type="number"
+              placeholder="Target Amount (₹)"
+              value={formData.target_amount}
+              onChange={e => setFormData({...formData, target_amount: parseInt(e.target.value) || 0})}
+              className="bg-[var(--bg-surface)] border blue-border rounded px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-teal)]"
             />
 
             <div className="flex items-center gap-3 bg-[var(--bg-surface)] border blue-border rounded px-4 py-3">
-              <input 
-                type="checkbox" 
+              <input
+                type="checkbox"
                 checked={formData.is_active}
                 onChange={e => setFormData({...formData, is_active: e.target.checked})}
                 className="w-4 h-4"
@@ -262,28 +273,37 @@ const ProjectsManagement = () => {
           <div className="mt-6 p-6 bg-[var(--bg-surface)] border blue-border rounded">
             {formData.hero_image ? (
               <div className="flex flex-col sm:flex-row items-center gap-4">
-                <img 
-                  src={optimizeCloudinaryUrl(formData.hero_image,{width:600})} 
-                  alt="Preview" 
+                <img
+                  src={optimizeCloudinaryUrl(formData.hero_image,{width:600})}
+                  alt="Preview"
                   className="w-32 h-32 object-cover rounded"
                 />
                 <div className="flex-1 text-center sm:text-left">
                   <p className="text-[var(--text-primary)] text-sm mb-2">Hero image uploaded ✓</p>
-                  <button 
-                    onClick={uploadImage} 
-                    disabled={uploading}
-                    className="btn-primary px-4 py-2 text-sm"
-                  >
-                    Change Image
-                  </button>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <button
+                      onClick={uploadImage}
+                      disabled={uploading}
+                      className="btn-primary px-4 py-2 text-sm"
+                    >
+                      Change Image
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData((prev) => ({ ...prev, hero_image: '' }))}
+                      className="btn-orange px-4 py-2 text-sm"
+                    >
+                      Remove Image
+                    </button>
+                  </div>
                 </div>
               </div>
             ) : (
               <div className="text-center">
                 <Upload className="mx-auto mb-4" style={{color: 'var(--accent-teal)'}} size={48} />
                 <p className="mb-4" style={{color: 'var(--text-muted)'}}>No hero image uploaded</p>
-                <button 
-                  onClick={uploadImage} 
+                <button
+                  onClick={uploadImage}
                   disabled={uploading}
                   className="btn-primary flex items-center gap-2 mx-auto px-4 py-2"
                 >
@@ -320,10 +340,13 @@ const ProjectsManagement = () => {
                     <img src={optimizeCloudinaryUrl(image,{width:600})} alt={`Gallery ${index + 1}`} className="w-full h-24 object-cover rounded" />
                     <button
                       type="button"
-                      onClick={() => setFormData((prev) => ({
-                        ...prev,
-                        images: prev.images.filter((_, imageIndex) => imageIndex !== index)
-                      }))}
+                      onClick={() => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          images: prev.images.filter((_, imageIndex) => imageIndex !== index)
+                        }));
+                        toast.info('Gallery image removed. Click Update Project to save.');
+                      }}
                       className="absolute top-1 right-1 bg-black/70 text-white p-1 rounded"
                     >
                       <X size={12} />
@@ -336,14 +359,14 @@ const ProjectsManagement = () => {
 
           {/* Action Buttons */}
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
-            <button 
-              onClick={handleSave} 
+            <button
+              onClick={handleSave}
               className="btn-orange flex-1"
             >
               {editingProject ? 'Update' : 'Create'} Project
             </button>
-            <button 
-              onClick={resetForm} 
+            <button
+              onClick={resetForm}
               className="btn-primary flex-1"
             >
               Cancel
@@ -366,9 +389,9 @@ const ProjectsManagement = () => {
               <div key={project.id} className="glass-morph p-6 rounded hover-lift">
                 <div className="h-48 bg-[var(--bg-surface)] rounded mb-4 overflow-hidden">
                   {project.hero_image ? (
-                    <img 
-                      src={optimizeCloudinaryUrl(project.hero_image,{width:600})} 
-                      alt={project.title} 
+                    <img
+                      src={optimizeCloudinaryUrl(project.hero_image,{width:600})}
+                      alt={project.title}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -377,7 +400,7 @@ const ProjectsManagement = () => {
                     </div>
                   )}
                 </div>
-                
+
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
                     <h3 className="text-[var(--text-primary)] font-semibold text-lg mb-1">{project.title}</h3>
@@ -407,7 +430,7 @@ const ProjectsManagement = () => {
                     </span>
                   </div>
                   <div className="w-full bg-[var(--bg-deep)] rounded-full h-2 overflow-hidden">
-                    <div 
+                    <div
                       className="bg-gradient-to-r from-[var(--accent-teal)] to-[var(--accent-teal-light)] h-full"
                       style={{width: `${progress}%`}}
                     ></div>
@@ -418,15 +441,15 @@ const ProjectsManagement = () => {
                 </div>
 
                 <div className="flex gap-2">
-                  <button 
-                    onClick={() => openEditForm(project)} 
+                  <button
+                    onClick={() => openEditForm(project)}
                     className="btn-primary flex-1 py-2 flex items-center justify-center gap-1 text-sm"
                   >
                     <Edit size={16} />
                     Edit
                   </button>
-                  <button 
-                    onClick={() => handleDelete(project.id, project.title)} 
+                  <button
+                    onClick={() => handleDelete(project.id, project.title)}
                     className="btn-orange flex-1 py-2 flex items-center justify-center gap-1 text-sm"
                   >
                     <Trash2 size={16} />
