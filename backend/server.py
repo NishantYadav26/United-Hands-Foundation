@@ -415,6 +415,19 @@ class ProjectCreate(BaseModel):
     target_amount: int
     is_active: bool = True
 
+def slugify_project_title(value: str) -> str:
+    slug = re.sub(r'[^a-z0-9]+', '-', value.lower()).strip('-')
+    return slug or str(uuid.uuid4())
+
+def normalize_project_payload(project: ProjectCreate) -> dict:
+    doc = project.model_dump()
+    doc["title"] = doc["title"].strip()
+    doc["category"] = doc["category"].strip()
+    doc["slug"] = (doc.get("slug") or slugify_project_title(doc["title"])).strip().lower()
+    doc["slug"] = re.sub(r'[^a-z0-9]+', '-', doc["slug"]).strip('-') or slugify_project_title(doc["title"])
+    doc["images"] = [image for image in doc.get("images", []) if image]
+    return doc
+
 class VideoContent(BaseModel):
     model_config = ConfigDict(extra="ignore")
     
@@ -1286,10 +1299,10 @@ async def delete_press_media(media_id: str, admin_email: str = Depends(verify_to
 
 @api_router.post("/projects", response_model=Project)
 async def create_project(project: ProjectCreate, admin_email: str = Depends(verify_token)):
-    project_obj = Project(**project.model_dump())
+    project_obj = Project(**normalize_project_payload(project))
     doc = project_obj.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
-    
+
     await db.projects.insert_one(doc)
     return project_obj
 
@@ -1309,8 +1322,8 @@ async def get_projects(active_only: bool = False):
 
 @api_router.get("/projects/{project_id}", response_model=Project)
 async def get_project(project_id: str):
-    project = await db.projects.find_one({"id": project_id}, {"_id": 0})
-    
+    project = await db.projects.find_one({"$or": [{"id": project_id}, {"slug": project_id}]}, {"_id": 0})
+
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
     
@@ -1321,7 +1334,7 @@ async def get_project(project_id: str):
 
 @api_router.get("/projects/{project_id}/images", response_model=List[str])
 async def get_project_images(project_id: str):
-    project = await db.projects.find_one({"id": project_id}, {"_id": 0, "images": 1, "hero_image": 1})
+    project = await db.projects.find_one({"$or": [{"id": project_id}, {"slug": project_id}]}, {"_id": 0, "images": 1, "hero_image": 1})
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
 
@@ -1335,11 +1348,18 @@ async def update_project(project_id: str, project: ProjectCreate, admin_email: s
     old = await db.projects.find_one({"id": project_id}, {"_id": 0})
     if not old:
         raise HTTPException(status_code=404, detail="Project not found")
-    if old.get('hero_image') and old['hero_image'] != project.hero_image:
+
+    next_doc = normalize_project_payload(project)
+    if old.get('hero_image') and old['hero_image'] != next_doc.get('hero_image'):
         delete_cloudinary_image(old['hero_image'])
+
+    removed_images = set(old.get('images') or []) - set(next_doc.get('images') or [])
+    for image_url in removed_images:
+        delete_cloudinary_image(image_url)
+
     result = await db.projects.update_one(
         {"id": project_id},
-        {"$set": project.model_dump()}
+        {"$set": next_doc}
     )
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Project not found")
@@ -1350,6 +1370,8 @@ async def delete_project(project_id: str, admin_email: str = Depends(verify_toke
     old = await db.projects.find_one({"id": project_id}, {"_id": 0})
     if old:
         delete_cloudinary_image(old.get('hero_image', ''))
+        for image_url in old.get('images') or []:
+            delete_cloudinary_image(image_url)
     result = await db.projects.delete_one({"id": project_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Project not found")
