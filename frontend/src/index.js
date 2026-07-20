@@ -8,7 +8,7 @@ import * as serviceWorkerRegistration from "@/serviceWorkerRegistration";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <Toaster position="top-right" theme="dark" richColors offset="88px" toastOptions={{ style: { zIndex: 9999 } }} />
+    <Toaster position="top-center" theme="dark" richColors offset="16px" toastOptions={{ style: { zIndex: 2147483647 } }} />
     <App />
   </React.StrictMode>,
 );
