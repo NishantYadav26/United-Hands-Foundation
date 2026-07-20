@@ -259,7 +259,16 @@ h2 {
 }
 
 [data-sonner-toaster] {
-  z-index: 9999 !important;
+  z-index: 2147483647 !important;
+}
+
+@media (max-width: 640px) {
+  [data-sonner-toaster] {
+    left: max(12px, env(safe-area-inset-left)) !important;
+    right: max(12px, env(safe-area-inset-right)) !important;
+    top: max(12px, env(safe-area-inset-top)) !important;
+    width: auto !important;
+  }
 }
 
 

@@ -13,6 +13,7 @@ const Transparency = lazy(() => import("@/pages/Transparency"));
 const AboutUs = lazy(() => import("@/pages/AboutUs"));
 const TrackMyImpact = lazy(() => import("@/pages/TrackMyImpact"));
 const UserAuth = lazy(() => import("@/pages/UserAuth"));
+const AdminLogin = lazy(() => import("@/pages/AdminLogin"));
 const Projects = lazy(() => import("@/pages/Projects"));
 const ProjectDetail = lazy(() => import("@/pages/ProjectDetail"));
 const Events = lazy(() => import("@/pages/Events"));
@@ -91,7 +92,7 @@ const AppRoutes = () => {
         <Route path="/events" element={<Events />} />
         <Route path="/events/:slug" element={<EventDetail />} />
         <Route path="/login" element={<UserAuth />} />
-        <Route path="/uhf-admin" element={<UserAuth />} />
+        <Route path="/uhf-admin" element={<AdminLogin />} />
         <Route
           path="/uhf-admin/dashboard"
           element={
