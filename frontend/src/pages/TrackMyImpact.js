@@ -40,7 +40,9 @@ const TrackMyImpact = () => {
 
   const downloadReceipt = async (donationId) => {
     try {
-      const response = await axios.get(`${API}/donations/${donationId}/receipt`, { responseType: 'blob' });
+      const donation = donations.find((item) => item.id === donationId);
+      const params = donation?.receipt_access_token ? { access_token: donation.receipt_access_token } : undefined;
+      const response = await axios.get(`${API}/donations/${donationId}/receipt`, { responseType: 'blob', params });
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;

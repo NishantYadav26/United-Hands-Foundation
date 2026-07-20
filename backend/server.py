@@ -10,7 +10,7 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict, EmailStr, field_validator
-from typing import List, Optional
+from typing import List, Optional, Literal
 import uuid
 from datetime import datetime, timezone, timedelta
 import time
@@ -215,15 +215,86 @@ def verify_user_token(credentials: HTTPAuthorizationCredentials = Depends(securi
 # ===== MODELS =====
 
 class DonationCreate(BaseModel):
-    donor_name: str
+    donor_name: str = Field(min_length=1, max_length=120)
     donor_email: EmailStr
-    donor_phone: str
-    donor_pan: str
-    amount: int
-    utr_number: str
-    screenshot_url: str
-    payment_mode: str = "manual_qr"
-    project_id: Optional[str] = None
+    donor_phone: str = Field(min_length=7, max_length=20)
+    donor_pan: str = Field(min_length=10, max_length=10)
+    amount: int = Field(ge=1, le=10_000_000)
+    utr_number: str = Field(min_length=4, max_length=80)
+    screenshot_url: str = Field(min_length=1, max_length=7_000_000)
+    payment_mode: Literal["manual_qr"] = "manual_qr"
+    project_id: Optional[str] = Field(default=None, max_length=80)
+
+    @field_validator('donor_email')
+    @classmethod
+    def normalize_donor_email(cls, value: EmailStr) -> str:
+        return normalize_email(str(value))
+
+    @field_validator('donor_pan')
+    @classmethod
+    def normalize_donor_pan(cls, value: str) -> str:
+        pan = value.strip().upper()
+        if not re.fullmatch(r'[A-Z]{5}[0-9]{4}[A-Z]', pan):
+            raise ValueError('Invalid PAN format')
+        return pan
+
+    @field_validator('donor_phone')
+    @classmethod
+    def validate_donor_phone(cls, value: str) -> str:
+        phone = value.strip()
+        if not re.fullmatch(r'[+0-9][0-9 ()-]{6,19}', phone):
+            raise ValueError('Invalid phone number')
+        return phone
+
+    @field_validator('screenshot_url')
+    @classmethod
+    def validate_screenshot_url(cls, value: str) -> str:
+        if not (value.startswith('data:image/') or value.startswith('https://')):
+            raise ValueError('Screenshot must be an image data URL or HTTPS URL')
+        return value
+
+class RazorpayOrderCreate(BaseModel):
+    amount: int = Field(ge=1, le=10_000_000)
+    donor_name: str = Field(min_length=1, max_length=120)
+    donor_email: EmailStr
+    project_id: Optional[str] = Field(default=None, max_length=80)
+
+    @field_validator('donor_email')
+    @classmethod
+    def normalize_order_email(cls, value: EmailStr) -> str:
+        return normalize_email(str(value))
+
+class RazorpayVerifyRequest(BaseModel):
+    razorpay_order_id: str = Field(min_length=1, max_length=120)
+    razorpay_payment_id: str = Field(min_length=1, max_length=120)
+    razorpay_signature: str = Field(min_length=1, max_length=256)
+    donor_name: str = Field(min_length=1, max_length=120)
+    donor_email: EmailStr
+    donor_phone: str = Field(default="", max_length=20)
+    donor_pan: str = Field(default="", max_length=10)
+    amount: int = Field(ge=1, le=10_000_000)
+    project_id: Optional[str] = Field(default=None, max_length=80)
+
+    @field_validator('donor_email')
+    @classmethod
+    def normalize_verify_email(cls, value: EmailStr) -> str:
+        return normalize_email(str(value))
+
+    @field_validator('donor_pan')
+    @classmethod
+    def validate_optional_pan(cls, value: str) -> str:
+        pan = value.strip().upper()
+        if pan and not re.fullmatch(r'[A-Z]{5}[0-9]{4}[A-Z]', pan):
+            raise ValueError('Invalid PAN format')
+        return pan
+
+    @field_validator('donor_phone')
+    @classmethod
+    def validate_optional_phone(cls, value: str) -> str:
+        phone = value.strip()
+        if phone and not re.fullmatch(r'[+0-9][0-9 ()-]{6,19}', phone):
+            raise ValueError('Invalid phone number')
+        return phone
 
 class Donation(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -521,6 +592,17 @@ async def generate_receipt_number():
     year = datetime.now().year
     return f"UHF-80G-{year}-{count + 1:04d}"
 
+
+def create_receipt_access_token(donation: dict) -> str:
+    message = f"{donation.get('id', '')}:{donation.get('donor_email', '')}:{donation.get('donor_pan', '')}:{donation.get('receipt_number', '')}"
+    return hmac.new(SECRET_KEY.encode('utf-8'), message.encode('utf-8'), hashlib.sha256).hexdigest()
+
+def receipt_access_token_is_valid(donation: dict, token: Optional[str]) -> bool:
+    if not token:
+        return False
+    expected = create_receipt_access_token(donation)
+    return hmac.compare_digest(token, expected)
+
 def create_80g_receipt_pdf(donation: dict, receipt_number: str) -> BytesIO:
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=letter)
@@ -660,7 +742,9 @@ async def track_donations(request: DonorTrackRequest):
     for donation in donations:
         if isinstance(donation['created_at'], str):
             donation['created_at'] = datetime.fromisoformat(donation['created_at'])
-    
+        if donation.get('receipt_number'):
+            donation['receipt_access_token'] = create_receipt_access_token(donation)
+
     return {"donations": donations}
 
 # ===== USER AUTH ROUTES =====
@@ -911,7 +995,7 @@ async def approve_donation(approval: DonationApproval, admin_email: str = Depend
         return {"status": "success", "message": f"Donation marked as {target_status}"}
 
 @api_router.get("/donations/{donation_id}/receipt")
-async def download_receipt(donation_id: str, credentials: Optional[HTTPAuthorizationCredentials] = Depends(optional_security)):
+async def download_receipt(donation_id: str, access_token: Optional[str] = None, credentials: Optional[HTTPAuthorizationCredentials] = Depends(optional_security)):
     donation = await db.donations.find_one({"id": donation_id}, {"_id": 0})
     
     if not donation:
@@ -921,7 +1005,7 @@ async def download_receipt(donation_id: str, credentials: Optional[HTTPAuthoriza
         token_data = verify_user_token(credentials)
         if token_data.get("role") != "admin" and token_data.get("email") != donation.get("donor_email"):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")
-    else:
+    elif not receipt_access_token_is_valid(donation, access_token):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required")
 
     if donation['status'] != 'approved' or not donation.get('receipt_number'):
@@ -1023,7 +1107,7 @@ async def delete_success_story(story_id: str, admin_email: str = Depends(verify_
 # ===== RAZORPAY PAYMENT =====
 
 @api_router.post("/razorpay/create-order")
-async def create_razorpay_order(data: dict = Body(...)):
+async def create_razorpay_order(data: RazorpayOrderCreate):
     settings = await db.admin_settings.find_one({"id": "settings"}, {"_id": 0})
     if not settings or not settings.get("razorpay_key_id") or not settings.get("razorpay_key_secret"):
         raise HTTPException(status_code=400, detail="Razorpay not configured")
@@ -1034,9 +1118,7 @@ async def create_razorpay_order(data: dict = Body(...)):
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid Razorpay credentials")
     
-    amount_paise = int(data.get("amount", 0)) * 100
-    if amount_paise < 100:
-        raise HTTPException(status_code=400, detail="Minimum amount is ₹1")
+    amount_paise = data.amount * 100
     
     try:
         order = client.order.create({
@@ -1044,9 +1126,9 @@ async def create_razorpay_order(data: dict = Body(...)):
             "currency": "INR",
             "payment_capture": 1,
             "notes": {
-                "donor_name": data.get("donor_name", ""),
-                "donor_email": data.get("donor_email", ""),
-                "project_id": data.get("project_id", "")
+                "donor_name": data.donor_name,
+                "donor_email": data.donor_email,
+                "project_id": data.project_id or ""
             }
         })
     except Exception as e:
@@ -1060,7 +1142,7 @@ async def create_razorpay_order(data: dict = Body(...)):
     }
 
 @api_router.post("/razorpay/verify")
-async def verify_razorpay_payment(data: dict = Body(...)):
+async def verify_razorpay_payment(data: RazorpayVerifyRequest):
     settings = await db.admin_settings.find_one({"id": "settings"}, {"_id": 0})
     if not settings or not settings.get("razorpay_key_id") or not settings.get("razorpay_key_secret"):
         raise HTTPException(status_code=400, detail="Razorpay not configured")
@@ -1070,14 +1152,23 @@ async def verify_razorpay_payment(data: dict = Body(...)):
     
     try:
         client.utility.verify_payment_signature({
-            "razorpay_order_id": data.get("razorpay_order_id"),
-            "razorpay_payment_id": data.get("razorpay_payment_id"),
-            "razorpay_signature": data.get("razorpay_signature")
+            "razorpay_order_id": data.razorpay_order_id,
+            "razorpay_payment_id": data.razorpay_payment_id,
+            "razorpay_signature": data.razorpay_signature
         })
     except Exception:
         raise HTTPException(status_code=400, detail="Payment verification failed")
     
-    project_id = data.get("project_id", "")
+    existing_payment = await db.donations.find_one({"razorpay_payment_id": data.razorpay_payment_id}, {"_id": 0})
+    if existing_payment:
+        return {
+            "status": "success",
+            "message": "Payment already verified",
+            "donation_id": existing_payment["id"],
+            "receipt_number": existing_payment.get("receipt_number")
+        }
+
+    project_id = data.project_id or ""
     project_title = ""
     if project_id:
         project = await db.projects.find_one({"id": project_id}, {"_id": 0, "title": 1})
@@ -1089,19 +1180,19 @@ async def verify_razorpay_payment(data: dict = Body(...)):
     # Auto-create and approve donation
     donation_doc = {
         "id": str(uuid.uuid4()),
-        "donor_name": data.get("donor_name", ""),
-        "donor_email": data.get("donor_email", ""),
-        "donor_phone": data.get("donor_phone", ""),
-        "donor_pan": data.get("donor_pan", ""),
-        "amount": data.get("amount", 0),
-        "utr_number": data.get("razorpay_payment_id"),
+        "donor_name": data.donor_name,
+        "donor_email": data.donor_email,
+        "donor_phone": data.donor_phone,
+        "donor_pan": data.donor_pan,
+        "amount": data.amount,
+        "utr_number": data.razorpay_payment_id,
         "project_id": project_id,
         "project_title": project_title,
         "status": "approved",
         "receipt_number": receipt_number,
         "payment_method": "razorpay",
-        "razorpay_order_id": data.get("razorpay_order_id"),
-        "razorpay_payment_id": data.get("razorpay_payment_id"),
+        "razorpay_order_id": data.razorpay_order_id,
+        "razorpay_payment_id": data.razorpay_payment_id,
         "screenshot_url": "",
         "created_at": datetime.now(timezone.utc).isoformat()
     }
