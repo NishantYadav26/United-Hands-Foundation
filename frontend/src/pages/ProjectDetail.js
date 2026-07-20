@@ -2,20 +2,58 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { getCached } from '@/lib/apiClient';
+import { apiClient } from '@/lib/apiClient';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
+
+const slugify = (value = '') => value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+const matchesProjectRoute = (project, routeValue) => {
+  if (!project || !routeValue) return false;
+  return project.id === routeValue || project.slug === routeValue || slugify(project.title) === routeValue;
+};
 
 export default function ProjectDetail() {
   const { slug } = useParams();
   const [project, setProject] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getCached('/projects').then((res) => {
-      const found = (res.data || []).find((p) => (p.slug || p.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')) === slug);
-      setProject(found || null);
-    });
+    let isMounted = true;
+
+    const loadProject = async () => {
+      setLoading(true);
+
+      try {
+        const directResponse = await apiClient.get(`/projects/${slug}`);
+        if (isMounted) {
+          setProject(directResponse.data || null);
+          setLoading(false);
+        }
+        return;
+      } catch (error) {
+        // Older API deployments and older project records may not resolve by a renamed slug.
+        // Fall back to the project list and match by id, stored slug, or generated title slug.
+      }
+
+      try {
+        const listResponse = await apiClient.get('/projects');
+        const found = (listResponse.data || []).find((item) => matchesProjectRoute(item, slug));
+        if (isMounted) setProject(found || null);
+      } catch (error) {
+        if (isMounted) setProject(null);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    loadProject();
+
+    return () => {
+      isMounted = false;
+    };
   }, [slug]);
 
+  if (loading) return <div><Navbar /><main className='pt-32 text-center'>Loading project...</main><Footer /></div>;
   if (!project) return <div><Navbar /><main className='pt-32 text-center'>Project not found</main><Footer /></div>;
   const progress = Math.min((project.raised_amount / Math.max(project.target_amount, 1)) * 100, 100);
 

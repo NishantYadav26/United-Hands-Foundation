@@ -25,7 +25,7 @@ export default function Projects() {
             <div className="p-5">
               <h2 className="text-xl mb-2" style={{ color: 'var(--text-primary)' }}>{project.title}</h2>
               <p className="text-sm mb-4 line-clamp-3" style={{ color: 'var(--text-muted)' }}>{project.description}</p>
-              <Link className="btn-primary px-4 py-2 inline-block" to={`/projects/${project.slug || slugify(project.title)}`}>Read More</Link>
+              <Link className="btn-primary px-4 py-2 inline-block" to={`/projects/${project.id || project.slug || slugify(project.title)}`}>Read More</Link>
             </div>
           </article>
         ))}
