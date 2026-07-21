@@ -51,6 +51,10 @@ const Donate = () => {
     fetchPaymentMode();
   }, []);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, []);
+
   const fetchQrCode = async () => {
     try {
       const response = await getCached(`/site-assets/qr_code`, { cacheTtlMs: 3600000 });
