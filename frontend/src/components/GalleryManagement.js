@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+﻿import { useState, useEffect, useRef } from 'react';
 import { Plus, Edit, Trash2, Upload, X, Loader2, Heart } from 'lucide-react';
 import axios from 'axios';
+import { cacheBust } from '@/lib/apiClient';
 import { toast } from 'sonner';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-foundation.onrender.com';
@@ -26,7 +27,7 @@ const GalleryManagement = () => {
 
   const fetchImages = async () => {
     try {
-      const response = await axios.get(`${API}/gallery`);
+      const response = await axios.get(`${API}/gallery`, { params: cacheBust() });
       setImages(response.data);
     } catch (error) {
       console.error('Failed to fetch gallery:', error);
@@ -213,7 +214,7 @@ const GalleryManagement = () => {
                   className="w-32 h-32 object-cover rounded"
                 />
                 <div className="flex-1 text-center sm:text-left">
-                  <p className="text-[var(--text-primary)] text-sm mb-2">Photo uploaded ✓</p>
+                  <p className="text-[var(--text-primary)] text-sm mb-2">Photo uploaded âœ“</p>
                   <button 
                     onClick={uploadImage} 
                     disabled={uploading}

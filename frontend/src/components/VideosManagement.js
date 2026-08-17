@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Video, Trash2, Plus, Loader2, X } from 'lucide-react';
 import axios from 'axios';
+import { cacheBust } from '@/lib/apiClient';
 import { toast } from 'sonner';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-foundation.onrender.com';
@@ -24,7 +25,7 @@ const VideosManagement = () => {
 
   const fetchVideos = async () => {
     try {
-      const response = await axios.get(`${API}/videos`);
+      const response = await axios.get(`${API}/videos`, { params: cacheBust() });
       setVideos(response.data);
     } catch (error) {
       console.error('Failed to fetch videos:', error);

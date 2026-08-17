@@ -74,6 +74,15 @@ export const getCached = async (url, config = {}) => {
   return requestPromise;
 };
 
+// The API marks its list endpoints `public, max-age=300`, which is correct for
+// visitors but wrong for the admin panel: a refetch issued straight after a save
+// is answered from the browser's own HTTP cache with the pre-save copy, so the
+// edit appears to have been lost until those five minutes elapse. Clearing the
+// in-memory cache above cannot help — that cache lives in this module, while
+// this copy lives in the browser. Giving each admin read a unique query
+// parameter puts it on its own cache key so it always reaches the server.
+export const cacheBust = () => ({ _: Date.now() });
+
 export const invalidateCachedGet = (prefix = '') => {
   if (!prefix) {
     inMemoryCache.clear();

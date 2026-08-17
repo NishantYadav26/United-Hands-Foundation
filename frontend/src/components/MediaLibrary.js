@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Upload, Image as ImageIcon, Loader2 } from 'lucide-react';
 import axios from 'axios';
+import { cacheBust } from '@/lib/apiClient';
 import { toast } from 'sonner';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-foundation.onrender.com';
@@ -16,7 +17,7 @@ const MediaLibrary = () => {
 
   const fetchAssets = async () => {
     try {
-      const response = await axios.get(`${API}/site-assets`);
+      const response = await axios.get(`${API}/site-assets`, { params: cacheBust() });
       setAssets(response.data.assets);
     } catch (error) {
       console.error('Failed to fetch assets:', error);
