@@ -23,13 +23,23 @@ export const apiClient = axios.create({
 });
 
 
-apiClient.interceptors.request.use((config) => {
+const clearCacheOnMutation = (config) => {
   const method = (config.method || 'get').toLowerCase();
   if (MUTATING_METHODS.has(method)) {
     inMemoryCache.clear();
   }
   return config;
-});
+};
+
+apiClient.interceptors.request.use(clearCacheOnMutation);
+
+// The admin management components post/put/delete through the bare `axios`
+// default instance rather than this one, so the interceptor above never saw
+// their writes. The read cache then kept serving the old list for its full TTL
+// (2-5 minutes), which made a successful save look like it had silently failed.
+// Registering on the default instance covers those call sites, and any future
+// ones, without each component having to remember to invalidate by hand.
+axios.interceptors.request.use(clearCacheOnMutation);
 
 export const getCached = async (url, config = {}) => {
   const ttlMs = getTtl(config);

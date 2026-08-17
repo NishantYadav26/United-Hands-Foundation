@@ -1,9 +1,14 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { invalidateCachedGet } from '@/lib/apiClient';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-foundation.onrender.com';
 const API = `${BACKEND_URL}/api`;
+
+// Must stay in step with EVENT_MIN_IMAGES / EVENT_MAX_IMAGES in backend/server.py.
+const MIN_IMAGES = 1;
+const MAX_IMAGES = 5;
 
 export default function EventsManagement() {
   const [events, setEvents] = useState([]);
@@ -15,9 +20,9 @@ export default function EventsManagement() {
   useEffect(() => { load(); }, []);
 
   const upload = () => {
-    window.cloudinary.openUploadWidget({ cloudName: 'dvmb3mzcy', uploadPreset: 'uhf_unsigned', multiple: true, maxFiles: 2, folder: 'events' }, (error, result) => {
+    window.cloudinary.openUploadWidget({ cloudName: 'dvmb3mzcy', uploadPreset: 'uhf_unsigned', multiple: true, maxFiles: MAX_IMAGES, folder: 'events' }, (error, result) => {
       if (error) return;
-      if (result.event === 'success') setForm((prev) => ({ ...prev, images: [...prev.images, result.info.secure_url].slice(0, 2) }));
+      if (result.event === 'success') setForm((prev) => ({ ...prev, images: [...prev.images, result.info.secure_url].slice(0, MAX_IMAGES) }));
     });
   };
 
@@ -27,7 +32,9 @@ export default function EventsManagement() {
   };
 
   const save = async () => {
-    if (form.images.length !== 2) return toast.error('Please upload exactly 2 images');
+    if (form.images.length < MIN_IMAGES || form.images.length > MAX_IMAGES) {
+      return toast.error(`Please upload between ${MIN_IMAGES} and ${MAX_IMAGES} images`);
+    }
     const token = localStorage.getItem('uhf_admin_token');
     setSaving(true);
     try {
@@ -38,6 +45,10 @@ export default function EventsManagement() {
         await axios.post(`${API}/events`, form, { headers: { Authorization: `Bearer ${token}` } });
         toast.success('Event added');
       }
+      // These requests go through raw axios, so apiClient's mutation interceptor
+      // never fires. Without this the public pages keep serving the cached list
+      // for minutes and the edit looks like it silently failed.
+      invalidateCachedGet('/events');
       resetForm();
       load();
     } catch (error) {
@@ -63,6 +74,7 @@ export default function EventsManagement() {
     try {
       await axios.delete(`${API}/events/${eventId}`, { headers: { Authorization: `Bearer ${token}` } });
       toast.success('Event deleted');
+      invalidateCachedGet('/events');
       if (editingId === eventId) resetForm();
       load();
     } catch (error) {

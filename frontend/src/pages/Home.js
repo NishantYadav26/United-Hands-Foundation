@@ -24,8 +24,38 @@ const normalizeStats = (data) => ({
 
 const HOME_CACHE_KEY = 'uhf_home_cache_v1';
 const PERMANENT_HERO_KEY = 'uhf_permanent_hero_background_url';
-const REQUEST_TIMEOUT_MS = 15000;
+const STATS_CACHE_KEY = 'uhf_stats_cache_v1';
+// The API is hosted on a tier that sleeps when idle; waking it measures ~45s.
+// A 15s timeout aborted that request and left the impact stats at zero, so the
+// first visitor after an idle period saw "0 Lives Touched".
+const REQUEST_TIMEOUT_MS = 60000;
 const HOME_CACHE_TTL_MS = 30 * 60 * 1000;
+// Stats are kept for a day: showing yesterday's real numbers is far better than
+// showing zeros while the backend wakes up.
+const STATS_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+
+const readCachedStats = () => {
+  try {
+    const cached = localStorage.getItem(STATS_CACHE_KEY);
+    if (!cached) return null;
+
+    const parsed = JSON.parse(cached);
+    const isFresh = parsed?.timestamp && (Date.now() - parsed.timestamp) < STATS_CACHE_TTL_MS;
+    if (!isFresh || !parsed?.stats) return null;
+
+    return parsed.stats;
+  } catch (error) {
+    return null;
+  }
+};
+
+const writeCachedStats = (stats) => {
+  try {
+    localStorage.setItem(STATS_CACHE_KEY, JSON.stringify({ timestamp: Date.now(), stats }));
+  } catch (error) {
+    // no-op if storage is unavailable
+  }
+};
 
 const readCachedSiteAssets = () => {
   try {
@@ -45,12 +75,16 @@ const readCachedSiteAssets = () => {
 };
 
 const Home = () => {
-  const [stats, setStats] = useState({
+  // null means "not known yet" so the UI can show a placeholder rather than
+  // zeros, which read as "this charity has achieved nothing".
+  const [stats, setStats] = useState(() => readCachedStats());
+  const hasStats = stats !== null;
+  const displayStats = stats || {
     patients_served: 0,
     districts_covered: 0,
     total_donations: 0,
     total_amount: 0
-  });
+  };
   const [successStories, setSuccessStories] = useState([]);
   const [siteAssets, setSiteAssets] = useState(() => readCachedSiteAssets());
   const [pillars, setPillars] = useState([]);
@@ -124,8 +158,11 @@ const Home = () => {
       const [statsRes, locationsRes] = criticalRequests;
 
       if (statsRes.status === 'fulfilled') {
-        setStats(normalizeStats(statsRes.value.data));
+        const freshStats = normalizeStats(statsRes.value.data);
+        setStats(freshStats);
+        writeCachedStats(freshStats);
       } else {
+        // Keep whatever was restored from cache rather than falling back to zeros.
         console.error('Failed to fetch stats:', statsRes.reason);
       }
 
@@ -195,25 +232,36 @@ const Home = () => {
         { opacity: 1, y: 0, duration: isSmallScreen ? 0.8 : 1.1, ease: 'power2.out' }
       );
 
-    if (statsRef.current && stats.patients_served > 0) {
+    // Read `stats` directly rather than the derived hasStats/displayStats: those
+    // are recomputed every render, and naming them here would put a new object
+    // in this effect's dependency list on each pass.
+    if (statsRef.current && stats && stats.patients_served > 0) {
       const statElements = statsRef.current.querySelectorAll('.stat-number');
 
       statElements.forEach((element) => {
         const finalValue = parseInt(element.dataset.value);
+        if (!Number.isFinite(finalValue)) return;
 
         ScrollTrigger.create({
           trigger: statsRef.current,
           start: 'top 70%',
           onEnter: () => {
-            gsap.to(element, {
-              innerText: finalValue,
-              duration: 2,
-              snap: { innerText: 1 },
-              ease: 'power2.out',
-              onUpdate: function () {
-                element.innerText = Math.ceil(this.targets()[0].innerText).toLocaleString();
+            // fromTo, not to: the markup now renders the real figure, so the
+            // tween has to reset to zero before counting up. With gsap.to the
+            // start and end values would be identical and nothing would move.
+            gsap.fromTo(
+              element,
+              { innerText: 0 },
+              {
+                innerText: finalValue,
+                duration: 2,
+                snap: { innerText: 1 },
+                ease: 'power2.out',
+                onUpdate: function () {
+                  element.innerText = Math.ceil(this.targets()[0].innerText).toLocaleString('en-IN');
+                }
               }
-            });
+            );
           },
           once: true
         });
@@ -539,16 +587,42 @@ const Home = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
             {[
-              { id: 'stat-patients', Icon: Users, value: stats.patients_served, label: 'Lives Touched', color: '#F7C08A' },
-              { id: 'stat-districts', Icon: MapPin, value: stats.districts_covered, label: 'Districts Covered', color: '#9FE0B8' },
-              { id: 'stat-donations', Icon: Heart, value: stats.total_donations, label: 'Donations Received', color: '#FFD9D0' },
-              { id: 'stat-amount', Icon: TrendingUp, value: stats.total_amount, label: 'Total Raised (INR)', color: '#BBDEFB' }
+              { id: 'stat-patients', Icon: Users, value: displayStats.patients_served, label: 'Lives Touched', color: '#F7C08A' },
+              { id: 'stat-districts', Icon: MapPin, value: displayStats.districts_covered, label: 'Districts Covered', color: '#9FE0B8' },
+              { id: 'stat-donations', Icon: Heart, value: displayStats.total_donations, label: 'Donations Received', color: '#FFD9D0' },
+              { id: 'stat-amount', Icon: TrendingUp, value: displayStats.total_amount, label: 'Total Raised (INR)', color: '#BBDEFB' }
             ].map(({ id, Icon, value, label, color }) => (
               <div key={id} className="impact-dashboard-card impact-stat-card" data-testid={id}>
                 <div className="impact-icon-badge impact-icon-teal"><Icon style={{ color }} size={30} /></div>
-                <div className="stat-number impact-stat-number" data-value={value} style={{ fontFamily: 'var(--font-heading)', color: '#FFFFFF' }}>
-                  0
-                </div>
+                {hasStats ? (
+                  // Render the real figure rather than a hardcoded 0. The count-up
+                  // tween resets this to zero itself when it runs, so a visitor
+                  // with reduced-motion enabled — or a browser where GSAP never
+                  // fires — still sees the correct number instead of "0".
+                  <div
+                    className="stat-number impact-stat-number"
+                    data-value={value}
+                    style={{ fontFamily: 'var(--font-heading)', color: '#FFFFFF' }}
+                  >
+                    {value.toLocaleString('en-IN')}
+                  </div>
+                ) : (
+                  <div
+                    className="impact-stat-number animate-pulse"
+                    aria-label={`Loading ${label}`}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  >
+                    <span
+                      style={{
+                        display: 'block',
+                        width: '6.5rem',
+                        height: '0.75em',
+                        borderRadius: '0.375rem',
+                        background: 'rgba(255,255,255,0.25)'
+                      }}
+                    />
+                  </div>
+                )}
                 <p className="impact-stat-label" style={{ color: 'rgba(255,255,255,0.85)' }}>{label}</p>
               </div>
             ))}
