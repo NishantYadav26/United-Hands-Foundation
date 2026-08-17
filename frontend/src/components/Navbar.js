@@ -81,12 +81,15 @@ transition-all duration-300
           <div className="flex items-center gap-2 sm:gap-3 cursor-pointer overflow-visible" onClick={() => navigate('/')} data-testid="logo-link">
             <AnimatedLogo size="md" visualScale={1.45} />
             <div className="hidden sm:block">
-              <h1
-                className="text-lg sm:text-xl font-semibold tracking-tight transition-all duration-300"
+              {/* A span, not an h1: this is the masthead, and every page already
+                  has its own h1. Two h1 elements left screen-reader users with
+                  the site name competing with the actual page heading. */}
+              <span
+                className="block text-lg sm:text-xl font-semibold tracking-tight transition-all duration-300"
                 style={{ fontFamily: 'var(--font-heading)', color: 'var(--accent-teal)' }}
               >
                 United Hands
-              </h1>
+              </span>
               <p className="text-[10px] sm:text-xs tracking-[0.2em]" style={{ fontFamily: 'var(--font-heading)', color: 'var(--accent-teal)' }}>Foundation</p>
             </div>
           </div>
