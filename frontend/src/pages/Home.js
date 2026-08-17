@@ -2,11 +2,13 @@
 import { Link } from 'react-router-dom';
 import {
   Users, MapPin, HandCoins, FolderCheck, ArrowRight, Heart,
-  Stethoscope, BookOpen, PackageOpen, HandHeart, Mail, Phone
+  Stethoscope, BookOpen, PackageOpen, HandHeart, Mail, Phone,
+  ShieldCheck, ReceiptText, ScrollText, FileCheck2
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import MaharashtraMap from '@/components/MaharashtraMap';
+import HeroSlideshow from '@/components/HeroSlideshow';
 import { getCached } from '@/lib/apiClient';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import '@/styles/home.css';
@@ -115,6 +117,7 @@ const Home = () => {
   const [siteAssets, setSiteAssets] = useState(() => readCachedSiteAssets());
   const [pillars, setPillars] = useState([]);
   const [locations, setLocations] = useState([]);
+  const [gallery, setGallery] = useState([]);
 
   const hasStats = stats !== null;
   const displayStats = stats || {
@@ -188,12 +191,21 @@ const Home = () => {
       const criticalRequests = await Promise.allSettled([
         getCached(`/stats`, { timeout: REQUEST_TIMEOUT_MS, cacheTtlMs: 120000 }),
         getCached(`/locations`, { timeout: REQUEST_TIMEOUT_MS, cacheTtlMs: 300000 }),
-        getCached(`/projects?active_only=true`, { timeout: REQUEST_TIMEOUT_MS, cacheTtlMs: 300000 })
+        getCached(`/projects?active_only=true`, { timeout: REQUEST_TIMEOUT_MS, cacheTtlMs: 300000 }),
+        // The hero slideshow is above the fold, so the gallery is fetched with
+        // the critical set rather than deferred.
+        getCached(`/gallery`, { timeout: REQUEST_TIMEOUT_MS, cacheTtlMs: 300000 })
       ]);
 
       if (!isMounted) return;
 
-      const [statsRes, locationsRes, projectsRes] = criticalRequests;
+      const [statsRes, locationsRes, projectsRes, galleryRes] = criticalRequests;
+
+      if (galleryRes.status === 'fulfilled') {
+        setGallery(ensureArray(galleryRes.value.data));
+      } else {
+        console.error('Failed to fetch gallery:', galleryRes.reason);
+      }
 
       if (statsRes.status === 'fulfilled') {
         const freshStats = normalizeStats(statsRes.value.data);
@@ -429,12 +441,10 @@ const Home = () => {
           </div>
 
           <div className="home-hero-media">
-            <img
-              src={optimizeCloudinaryUrl(heroImage, { width: 1200 })}
-              alt="A United Hands Foundation volunteer handing supplies to children in a Maharashtra village"
-              width="1200"
-              height="900"
-              decoding="async"
+            <HeroSlideshow
+              slides={gallery}
+              fallbackImage={heroImage}
+              fallbackAlt="A United Hands Foundation volunteer handing supplies to children in a Maharashtra village"
             />
           </div>
         </div>
@@ -498,6 +508,55 @@ const Home = () => {
           ) : (
             <p className="home-empty">Our current projects will be listed here shortly.</p>
           )}
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------ About Us */}
+      <section className="home-section home-section-alt reveal-section" data-testid="about-section">
+        <div className="home-container home-about">
+          <div className="home-about-media">
+            <img
+              src={optimizeCloudinaryUrl(heroImage, { width: 900 })}
+              alt="United Hands Foundation volunteers working with a community in Maharashtra"
+              width="900"
+              height="700"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+
+          <div className="home-about-copy">
+            <p className="home-eyebrow">About Us</p>
+            <h2 className="home-section-title">
+              Who We <span className="home-title-accent">Are</span>
+            </h2>
+            <p className="home-about-lede">
+              United Hands Foundation is a registered charitable society working alongside
+              communities across Maharashtra since 2020. We work in healthcare, education,
+              disaster relief and elderly care &mdash; not as one-off charity, but as sustained
+              presence in the districts we serve.
+            </p>
+            <p className="home-about-text">
+              Every rupee is accounted for and every programme is run with the people it
+              serves, not merely for them. Our registration details and governance documents
+              are published openly.
+            </p>
+
+            <ul className="home-about-points">
+              <li><ShieldCheck size={18} aria-hidden="true" /> Registered charitable society since 2020</li>
+              <li><ReceiptText size={18} aria-hidden="true" /> 80G tax exemption for Indian donors</li>
+              <li><ScrollText size={18} aria-hidden="true" /> Governance documents published publicly</li>
+            </ul>
+
+            <div className="home-about-actions">
+              <Link to="/about" className="btn-primary-green" data-testid="about-learn-more">
+                Learn More About Us <ArrowRight size={16} aria-hidden="true" />
+              </Link>
+              <Link to="/transparency" className="btn-ghost-green" data-testid="about-transparency">
+                View Transparency <ArrowRight size={16} aria-hidden="true" />
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -621,18 +680,6 @@ const Home = () => {
             </div>
           </div>
 
-          <div className="home-split-card">
-            <h2 className="home-split-title">
-              Who We <span className="home-title-accent">Are</span>
-            </h2>
-            <p className="home-split-text">
-              United Hands Foundation works with communities to create meaningful change
-              through healthcare, education, disaster relief, and social support.
-            </p>
-            <Link to="/about" className="btn-ghost-green" data-testid="learn-more-about">
-              Learn More About Us <ArrowRight size={16} aria-hidden="true" />
-            </Link>
-          </div>
         </div>
       </section>
 
@@ -739,24 +786,44 @@ const Home = () => {
         </section>
       )}
 
-      {/* --------------------------------------------------- Authority Ticker */}
-      <section className="py-10 bg-section-alt overflow-hidden" data-testid="authority-ticker">
-        <div className="flex whitespace-nowrap">
-          <div className="flex items-center gap-16 marquee">
-            {[...Array(2)].map((_, idx) => (
-              <div key={idx} className="flex items-center gap-16" aria-hidden={idx === 1}>
-                <span className="text-sm tracking-[0.2em] uppercase" style={{ color: 'var(--text-muted)' }}>Featured In</span>
-                {['Sakal', 'Lokmat', 'Maharashtra Times', 'The Hindu', 'Indian Express'].map((outlet) => (
-                  <span
-                    key={`${idx}-${outlet}`}
-                    className="text-lg"
-                    style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}
-                  >
-                    {outlet}
-                  </span>
-                ))}
+      {/* -------------------------------------------------------- Credentials */}
+      {/* Replaces the scrolling masthead strip. A row of outlet names carries no
+          evidence and reads as decoration; registration numbers are checkable
+          facts, which is what actually reassures someone about to donate. */}
+      <section className="home-trust reveal-section" data-testid="credentials-section">
+        <div className="home-container">
+          <p className="home-eyebrow home-eyebrow-center">Registered &amp; Accountable</p>
+          <h2 className="home-section-title home-section-title-center">
+            Your Donation Is <span className="home-title-accent">Protected</span>
+          </h2>
+          <p className="home-section-sub home-section-sub-center">
+            United Hands Foundation is a registered charitable society. Every credential below
+            can be verified with the issuing authority.
+          </p>
+
+          <div className="home-trust-grid">
+            {[
+              { Icon: ScrollText, label: 'Societies Registration', value: 'Latur/171/2020', note: 'Registered 04 Aug 2020' },
+              { Icon: ReceiptText, label: '80G Tax Exemption', value: 'AABTU0797KF20231', note: 'Donations are tax deductible' },
+              { Icon: FileCheck2, label: '12A Registration', value: 'AABTU0797KE20231', note: 'Recognised charitable trust' },
+              { Icon: ShieldCheck, label: 'PAN', value: 'AABTU0797K', note: 'Verified entity' }
+            ].map(({ Icon, label, value, note }) => (
+              <div key={label} className="trust-card" data-testid={`trust-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>
+                <span className="trust-card-icon"><Icon size={22} aria-hidden="true" /></span>
+                <p className="trust-card-label">{label}</p>
+                <p className="trust-card-value">{value}</p>
+                <p className="trust-card-note">{note}</p>
               </div>
             ))}
+          </div>
+
+          <div className="home-trust-actions">
+            <Link to="/transparency" className="btn-ghost-green" data-testid="trust-transparency">
+              See Our Governance Documents <ArrowRight size={16} aria-hidden="true" />
+            </Link>
+            <Link to="/press" className="btn-ghost-green" data-testid="trust-press">
+              Read Press Coverage <ArrowRight size={16} aria-hidden="true" />
+            </Link>
           </div>
         </div>
       </section>
