@@ -372,6 +372,12 @@ class PressMediaCreate(BaseModel):
     image_url: str
     category: Optional[str] = None
 
+# Events were previously locked to exactly 2 images, which meant any event that
+# ended up with a different number could never be saved again — every edit came
+# back as a 400.
+EVENT_MIN_IMAGES = 1
+EVENT_MAX_IMAGES = 5
+
 class Event(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
@@ -1350,12 +1356,13 @@ async def update_project(project_id: str, project: ProjectCreate, admin_email: s
         raise HTTPException(status_code=404, detail="Project not found")
 
     next_doc = normalize_project_payload(project)
-    if old.get('hero_image') and old['hero_image'] != next_doc.get('hero_image'):
-        delete_cloudinary_image(old['hero_image'])
 
-    removed_images = set(old.get('images') or []) - set(next_doc.get('images') or [])
-    for image_url in removed_images:
-        delete_cloudinary_image(image_url)
+    # Work out which images the update orphans, but do not remove anything yet.
+    # Deleting first meant a failed or non-matching update left the project
+    # pointing at images that had already been destroyed in Cloudinary.
+    orphaned_images = set(old.get('images') or []) - set(next_doc.get('images') or [])
+    if old.get('hero_image') and old['hero_image'] != next_doc.get('hero_image'):
+        orphaned_images.add(old['hero_image'])
 
     result = await db.projects.update_one(
         {"id": project_id},
@@ -1363,6 +1370,11 @@ async def update_project(project_id: str, project: ProjectCreate, admin_email: s
     )
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Project not found")
+
+    # The database now holds the new image list, so the old files are safe to drop.
+    for image_url in orphaned_images:
+        delete_cloudinary_image(image_url)
+
     return {"status": "success", "message": "Project updated"}
 
 @api_router.delete("/projects/{project_id}")
@@ -1380,8 +1392,11 @@ async def delete_project(project_id: str, admin_email: str = Depends(verify_toke
 
 @api_router.post("/events", response_model=Event)
 async def create_event(event: EventCreate, admin_email: str = Depends(verify_token)):
-    if len(event.images) != 2:
-        raise HTTPException(status_code=400, detail="Exactly 2 images are required")
+    if not EVENT_MIN_IMAGES <= len(event.images) <= EVENT_MAX_IMAGES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Between {EVENT_MIN_IMAGES} and {EVENT_MAX_IMAGES} images are required"
+        )
     event_obj = Event(**event.model_dump())
     doc = event_obj.model_dump()
     doc["created_at"] = doc["created_at"].isoformat()
@@ -1414,8 +1429,11 @@ async def delete_event(event_id: str, admin_email: str = Depends(verify_token)):
 
 @api_router.put("/events/{event_id}")
 async def update_event(event_id: str, event: EventCreate, admin_email: str = Depends(verify_token)):
-    if len(event.images) != 2:
-        raise HTTPException(status_code=400, detail="Exactly 2 images are required")
+    if not EVENT_MIN_IMAGES <= len(event.images) <= EVENT_MAX_IMAGES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Between {EVENT_MIN_IMAGES} and {EVENT_MAX_IMAGES} images are required"
+        )
 
     existing = await db.events.find_one({"id": event_id}, {"_id": 0})
     if not existing:
@@ -1785,19 +1803,38 @@ async def delete_gallery_image(image_id: str, admin_email: str = Depends(verify_
 
 @api_router.get("/stats")
 async def get_stats():
-    total_donations = await db.donations.count_documents({"status": "approved"})
-    total_amount = 0
+    # Counted and summed inside MongoDB rather than pulling every approved
+    # donation over the wire to add up in Python. The previous version also
+    # capped both queries at 1000 documents, so the totals would have silently
+    # frozen once the charity passed a thousand approved donations or stories.
+    donation_totals = await db.donations.aggregate([
+        {"$match": {"status": "approved"}},
+        {"$group": {
+            "_id": None,
+            "count": {"$sum": 1},
+            "amount": {"$sum": {"$ifNull": ["$amount", 0]}}
+        }}
+    ]).to_list(1)
 
-    approved_donations = await db.donations.find({"status": "approved"}, {"_id": 0}).to_list(1000)
-    for donation in approved_donations:
-        total_amount += donation.get('amount', 0)
+    donation_summary = donation_totals[0] if donation_totals else {}
+    total_donations = donation_summary.get("count", 0)
+    total_amount = donation_summary.get("amount", 0)
 
-    stories = await db.success_stories.find({}, {"_id": 0, "patient_count": 1, "location": 1}).to_list(1000)
-    story_beneficiaries = sum(max(0, story.get("patient_count", 0)) for story in stories)
+    story_totals = await db.success_stories.aggregate([
+        {"$group": {
+            "_id": None,
+            "beneficiaries": {"$sum": {"$max": [0, {"$ifNull": ["$patient_count", 0]}]}},
+            "locations": {"$addToSet": "$location"}
+        }}
+    ]).to_list(1)
+
+    story_summary = story_totals[0] if story_totals else {}
+    story_beneficiaries = story_summary.get("beneficiaries", 0)
+    story_locations = [location for location in story_summary.get("locations", []) if location]
 
     # Maintains existing baseline impact while allowing admin-managed stories to raise the count.
     patients_served = 2000 + story_beneficiaries
-    districts_covered = len({story.get("location") for story in stories if story.get("location")}) or 5
+    districts_covered = len(story_locations) or 5
 
     return {
         "patients_served": patients_served,
