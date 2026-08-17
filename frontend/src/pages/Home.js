@@ -232,7 +232,10 @@ const Home = () => {
         { opacity: 1, y: 0, duration: isSmallScreen ? 0.8 : 1.1, ease: 'power2.out' }
       );
 
-    if (statsRef.current && hasStats && displayStats.patients_served > 0) {
+    // Read `stats` directly rather than the derived hasStats/displayStats: those
+    // are recomputed every render, and naming them here would put a new object
+    // in this effect's dependency list on each pass.
+    if (statsRef.current && stats && stats.patients_served > 0) {
       const statElements = statsRef.current.querySelectorAll('.stat-number');
 
       statElements.forEach((element) => {
