@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react';
+﻿import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Users, MapPin, HandCoins, FolderCheck, ArrowRight, Heart,
@@ -121,6 +121,15 @@ const Home = () => {
   // Which project card is currently hovered or focused. Its photograph expands
   // to fill the section behind the grid; null means no card is engaged.
   const [activeProject, setActiveProject] = useState(null);
+  // The hero mirrors whichever photograph the slideshow is showing, expanding it
+  // across the whole section while the visitor is engaged with it.
+  const [heroSlide, setHeroSlide] = useState(null);
+  const [heroEngaged, setHeroEngaged] = useState(false);
+
+  // Stable identities: HeroSlideshow reports upward from an effect, and a fresh
+  // function each render would restart that effect on every state change.
+  const handleHeroSlideChange = useCallback((slide) => setHeroSlide(slide || null), []);
+  const handleHeroHoverChange = useCallback((engaged) => setHeroEngaged(engaged), []);
 
   const hasStats = stats !== null;
   const displayStats = stats || {
@@ -403,7 +412,27 @@ const Home = () => {
       <Navbar />
 
       {/* ---------------------------------------------------------------- Hero */}
-      <section className="home-hero" data-testid="hero-section">
+      <section
+        className={`home-hero${heroEngaged && heroSlide?.image_url ? ' is-immersive' : ''}`}
+        data-testid="hero-section"
+      >
+        {/* A single element rather than one per photograph: it points at the
+            same URL the slideshow is already displaying, so the browser serves
+            it from cache and the expansion starts instantly. Mounting all
+            eleven gallery images a second time would double the hero's bytes
+            for no visual gain. */}
+        <div className="hero-backdrop" aria-hidden="true">
+          {heroSlide?.image_url && (
+            <img
+              src={optimizeCloudinaryUrl(heroSlide.image_url, { width: 1200 })}
+              alt=""
+              decoding="async"
+              className="hero-backdrop-image"
+            />
+          )}
+          <div className="hero-backdrop-scrim" />
+        </div>
+
         <div className="home-hero-inner" ref={heroRef}>
           <div className="home-hero-copy">
             <p className="home-eyebrow">Together, We Create Change</p>
@@ -448,6 +477,8 @@ const Home = () => {
               slides={gallery}
               fallbackImage={heroImage}
               fallbackAlt="A United Hands Foundation volunteer handing supplies to children in a Maharashtra village"
+              onActiveChange={handleHeroSlideChange}
+              onHoverChange={handleHeroHoverChange}
             />
           </div>
         </div>

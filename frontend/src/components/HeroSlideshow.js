@@ -17,7 +17,13 @@ const FADE_MS = 900;
  * — a touch user has no way to hold a slide. The reduced-motion path remains
  * the complete escape hatch.
  */
-const HeroSlideshow = ({ slides = [], fallbackImage, fallbackAlt = '' }) => {
+const HeroSlideshow = ({
+  slides = [],
+  fallbackImage,
+  fallbackAlt = '',
+  onActiveChange,
+  onHoverChange
+}) => {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -61,6 +67,12 @@ const HeroSlideshow = ({ slides = [], fallbackImage, fallbackAlt = '' }) => {
     return () => clearTimeout(timerRef.current);
   }, [index, canRotate, goTo]);
 
+  // Report the visible photograph upward so the hero can mirror it as a
+  // full-bleed backdrop. onActiveChange must be stable or this loops.
+  useEffect(() => {
+    if (onActiveChange) onActiveChange(items[index]);
+  }, [index, items, onActiveChange]);
+
   // Fetch the next photograph ahead of time so the crossfade never reveals a
   // half-loaded image.
   useEffect(() => {
@@ -77,10 +89,10 @@ const HeroSlideshow = ({ slides = [], fallbackImage, fallbackAlt = '' }) => {
   return (
     <div
       className="hero-slideshow"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocusCapture={() => setPaused(true)}
-      onBlurCapture={() => setPaused(false)}
+      onMouseEnter={() => { setPaused(true); if (onHoverChange) onHoverChange(true); }}
+      onMouseLeave={() => { setPaused(false); if (onHoverChange) onHoverChange(false); }}
+      onFocusCapture={() => { setPaused(true); if (onHoverChange) onHoverChange(true); }}
+      onBlurCapture={() => { setPaused(false); if (onHoverChange) onHoverChange(false); }}
       role="region"
       aria-label="Photographs from our work"
       data-testid="hero-slideshow"

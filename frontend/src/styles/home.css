@@ -9,6 +9,11 @@
      label at 4.79:1 and to sit on white as text at the same ratio. */
   --cta-clay: #BC5318;
   --cta-clay-hover: #9E4413;
+  /* Clay legible on the dark scrim. --accent-gold-light (#D9762E) measures only
+     3.0:1 there, and the labels using it are 12px bold — below the size WCAG
+     counts as large text, so 4.5:1 applies. This tint reaches 4.83:1 against the
+     worst case, a fully white photograph behind an 0.84 scrim. */
+  --clay-on-dark: #EFA96F;
   --home-ink: #14313A;
   --home-line: rgba(14, 92, 107, 0.14);
 
@@ -1460,7 +1465,7 @@ a.contact-card:hover .contact-card-icon {
 }
 
 .home-work-section.is-immersive .work-card-link:hover {
-  color: var(--accent-gold-light);
+  color: var(--clay-on-dark);
 }
 
 .home-work-section.is-immersive .work-card-badge {
@@ -1521,5 +1526,157 @@ a.contact-card:hover .contact-card-icon {
   .home-work-section .home-section-title,
   .home-work-section .home-section-sub {
     transition: none;
+  }
+}
+
+/* =============================================== hero: immersive backdrop */
+
+.home-hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.hero-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-backdrop-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(1.12);
+  transition:
+    opacity 620ms var(--ease-out-soft),
+    transform 900ms var(--ease-out-soft);
+  will-change: opacity, transform;
+}
+
+.home-hero.is-immersive .hero-backdrop-image {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.hero-backdrop-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(8, 38, 46, 0.9) 0%, rgba(8, 38, 46, 0.84) 45%, rgba(8, 38, 46, 0.92) 100%);
+  opacity: 0;
+  transition: opacity 620ms var(--ease-out-soft);
+}
+
+.home-hero.is-immersive .hero-backdrop-scrim {
+  opacity: 1;
+}
+
+.home-hero-inner {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- copy inverts while the photograph is expanded ---- */
+
+.home-hero-title,
+.home-hero-lede,
+.home-hero-proof-item,
+.home-hero-proof-item strong,
+.home-eyebrow {
+  transition: color var(--dur-slow) var(--ease-out-soft);
+}
+
+.home-hero.is-immersive .home-hero-title,
+.home-hero.is-immersive .home-hero-title-accent,
+.home-hero.is-immersive .home-hero-proof-item strong {
+  color: #FFFFFF;
+}
+
+.home-hero.is-immersive .home-hero-lede,
+.home-hero.is-immersive .home-hero-proof-item {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.home-hero.is-immersive .home-eyebrow {
+  color: var(--clay-on-dark);
+}
+
+.home-hero.is-immersive .home-hero-proof-item svg {
+  color: #FFFFFF !important;
+}
+
+/* The framed slideshow lifts slightly and loses its shadow against the now-dark
+   surround, so the frame reads as part of the backdrop rather than a card
+   floating on top of it. */
+.home-hero-media {
+  transition:
+    transform var(--dur-slow) var(--ease-out-soft),
+    box-shadow var(--dur-slow) var(--ease-out-soft);
+}
+
+.home-hero.is-immersive .home-hero-media {
+  transform: scale(1.015);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+}
+
+.home-hero.is-immersive .btn-ghost-green {
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+/* Touch reports no hover, so the reveal never fires and the copy must stay dark
+   on the white hero rather than being stranded in its inverted state. */
+@media (hover: none) {
+  .home-hero.is-immersive .hero-backdrop-image,
+  .home-hero.is-immersive .hero-backdrop-scrim {
+    opacity: 0;
+  }
+
+  .home-hero.is-immersive .home-hero-title,
+  .home-hero.is-immersive .home-hero-proof-item strong {
+    color: var(--home-ink);
+  }
+
+  .home-hero.is-immersive .home-hero-title-accent {
+    color: var(--accent-teal);
+  }
+
+  .home-hero.is-immersive .home-hero-lede,
+  .home-hero.is-immersive .home-hero-proof-item {
+    color: var(--text-muted);
+  }
+
+  .home-hero.is-immersive .home-eyebrow {
+    color: var(--cta-clay);
+  }
+
+  .home-hero.is-immersive .home-hero-media {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-backdrop-image {
+    transform: none;
+    transition: opacity 200ms linear;
+  }
+
+  .home-hero.is-immersive .hero-backdrop-image {
+    transform: none;
+  }
+
+  .hero-backdrop-scrim,
+  .home-hero-media,
+  .home-hero-title,
+  .home-hero-lede {
+    transition: none;
+  }
+
+  .home-hero.is-immersive .home-hero-media {
+    transform: none;
   }
 }
