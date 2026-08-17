@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Pause, Play } from 'lucide-react';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
 const SLIDE_MS = 5000;
@@ -8,16 +7,19 @@ const FADE_MS = 900;
 /**
  * Cross-fading slideshow of gallery photographs for the hero.
  *
- * Auto-rotation is content that moves for more than five seconds, so WCAG 2.2.2
- * requires a way to stop it: there is an explicit pause control, and rotation
- * also halts on hover, on keyboard focus, and whenever the tab is hidden. When
- * the visitor prefers reduced motion it never starts at all and the dots become
- * the only way to move between photographs.
+ * Rotation halts on hover, on keyboard focus, and whenever the tab is hidden.
+ * When the visitor prefers reduced motion it never starts at all and the dots
+ * become the only way to move between photographs.
+ *
+ * Note: the explicit pause control was removed at the client's request. WCAG
+ * 2.2.2 asks for a mechanism to stop content that moves automatically for more
+ * than five seconds, and hover/focus pausing does not fully substitute for one
+ * — a touch user has no way to hold a slide. The reduced-motion path remains
+ * the complete escape hatch.
  */
 const HeroSlideshow = ({ slides = [], fallbackImage, fallbackAlt = '' }) => {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
-  const [userPaused, setUserPaused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const timerRef = useRef(null);
 
@@ -31,7 +33,7 @@ const HeroSlideshow = ({ slides = [], fallbackImage, fallbackAlt = '' }) => {
     [slides, fallbackImage, fallbackAlt]
   );
 
-  const canRotate = items.length > 1 && !reducedMotion && !paused && !userPaused;
+  const canRotate = items.length > 1 && !reducedMotion && !paused;
 
   useEffect(() => {
     const query = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -106,23 +108,16 @@ const HeroSlideshow = ({ slides = [], fallbackImage, fallbackAlt = '' }) => {
 
       {items.length > 1 && (
         <div className="hero-slide-controls">
-          <button
-            type="button"
-            className="hero-slide-toggle"
-            onClick={() => setUserPaused((value) => !value)}
-            aria-label={userPaused ? 'Resume slideshow' : 'Pause slideshow'}
-            data-testid="hero-slide-toggle"
-          >
-            {userPaused ? <Play size={14} aria-hidden="true" /> : <Pause size={14} aria-hidden="true" />}
-          </button>
-
           <div className="hero-slide-dots">
             {items.map((item, i) => (
               <button
                 key={item.id || i}
                 type="button"
                 className={`hero-slide-dot${i === index ? ' is-active' : ''}`}
-                onClick={() => { setUserPaused(true); goTo(i); }}
+                // Selecting a dot only jumps to that photograph. With the pause
+                // control gone, latching a permanent pause here would leave the
+                // visitor no way to start the rotation again.
+                onClick={() => goTo(i)}
                 aria-label={`Show photograph ${i + 1} of ${items.length}`}
                 aria-current={i === index}
               />
