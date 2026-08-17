@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { invalidateCachedGet } from '@/lib/apiClient';
+import { cacheBust, invalidateCachedGet } from '@/lib/apiClient';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-foundation.onrender.com';
 const API = `${BACKEND_URL}/api`;
@@ -16,7 +16,11 @@ export default function EventsManagement() {
   const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  const load = () => axios.get(`${API}/events`).then((r) => setEvents(r.data || [])).catch(() => setEvents([]));
+  // Cache-busted for the same reason as every other admin list: /api/events is
+  // not in the API's public-cache list today, but nothing stops it being added,
+  // and a post-save refetch answered from the browser cache makes a successful
+  // edit look like it was lost.
+  const load = () => axios.get(`${API}/events`, { params: cacheBust() }).then((r) => setEvents(r.data || [])).catch(() => setEvents([]));
   useEffect(() => { load(); }, []);
 
   const upload = () => {

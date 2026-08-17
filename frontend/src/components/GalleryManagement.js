@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Plus, Edit, Trash2, Upload, X, Loader2, Heart } from 'lucide-react';
 import axios from 'axios';
 import { cacheBust } from '@/lib/apiClient';
@@ -214,7 +214,7 @@ const GalleryManagement = () => {
                   className="w-32 h-32 object-cover rounded"
                 />
                 <div className="flex-1 text-center sm:text-left">
-                  <p className="text-[var(--text-primary)] text-sm mb-2">Photo uploaded âœ“</p>
+                  <p className="text-[var(--text-primary)] text-sm mb-2">Photo uploaded ✓</p>
                   <button 
                     onClick={uploadImage} 
                     disabled={uploading}

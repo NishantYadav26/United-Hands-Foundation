@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Users, MapPin, HandCoins, FolderCheck, ArrowRight, Heart,
@@ -240,7 +240,14 @@ const Home = () => {
         console.error('Failed to fetch projects:', projectsRes.reason);
       }
 
-      const schedule = window.requestIdleCallback || ((cb) => setTimeout(cb, 120));
+      // The `timeout` option is not optional in practice: a bare
+      // requestIdleCallback never fires while the tab is hidden, so a visitor who
+      // opens the site in a background tab — or switches away before the page
+      // settles — would never see the team, partners, stories or events sections
+      // at all. With a deadline the browser must run the callback regardless.
+      const schedule = window.requestIdleCallback
+        ? (cb) => window.requestIdleCallback(cb, { timeout: 2000 })
+        : (cb) => setTimeout(cb, 120);
       schedule(() => {
         Promise.allSettled([
           getCached(`/pillars`, { timeout: REQUEST_TIMEOUT_MS, cacheTtlMs: 300000 }),
@@ -398,7 +405,7 @@ const Home = () => {
       id: 'stat-amount',
       Icon: HandCoins,
       value: displayStats.total_amount,
-      display: `â‚¹${formatIndianCompact(displayStats.total_amount)}`,
+      display: `₹${formatIndianCompact(displayStats.total_amount)}`,
       suffix: '+',
       label: 'Funds Utilized',
       // Lakh/crore shorthand cannot be produced by a numeric tween, so this one

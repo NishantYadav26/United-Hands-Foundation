@@ -17,9 +17,15 @@ const getTtl = (config = {}) => {
   return Number.isFinite(ttl) && ttl > 0 ? ttl : 0;
 };
 
+// The API sleeps on Render's free tier and takes roughly 45s to wake. A 20s
+// default meant every caller that did not override it — the navbar logo, the
+// footer's social links, the events list — reliably failed on the first request
+// after a sleep, logging `timeout of 20000ms exceeded` while the homepage (which
+// asks for 60s explicitly) loaded fine. 60s clears the observed cold start.
+// Callers that would rather fall back fast than wait still pass their own value.
 export const apiClient = axios.create({
   baseURL: API_BASE,
-  timeout: 20000
+  timeout: 60000
 });
 
 

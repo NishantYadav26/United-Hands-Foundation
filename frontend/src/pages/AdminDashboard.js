@@ -22,6 +22,7 @@ import Navbar from '@/components/Navbar';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { Switch } from '@/components/ui/switch';
+import { cacheBust } from '@/lib/apiClient';
 
 const MediaLibrary = lazy(() => import('@/components/MediaLibrary'));
 const TeamPillars = lazy(() => import('@/components/TeamPillars'));
@@ -97,7 +98,7 @@ const AdminDashboard = () => {
 
   const fetchSettings = async () => {
     try {
-      const response = await axios.get(`${API}/admin/settings`);
+      const response = await axios.get(`${API}/admin/settings`, { params: cacheBust() });
       setSettings(response.data);
     } catch (error) {
       console.error('Failed to fetch settings:', error);
