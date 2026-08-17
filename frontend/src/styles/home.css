@@ -1333,3 +1333,193 @@ a.contact-card:hover .contact-card-icon {
     transform: none;
   }
 }
+
+/* ============================================ our work: immersive backdrop */
+
+.home-work-section {
+  position: relative;
+  overflow: hidden;
+  /* Keeps the backdrop's stacking context local so it can never paint over the
+     navbar or the sections either side. */
+  isolation: isolate;
+  transition: background-color var(--dur-slow) var(--ease-out-soft);
+}
+
+.work-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.work-backdrop-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  /* Starts slightly enlarged and settles to rest, so the photograph reads as
+     coming forward out of the page rather than simply appearing. */
+  transform: scale(1.12);
+  transition:
+    opacity 620ms var(--ease-out-soft),
+    transform 900ms var(--ease-out-soft);
+  will-change: opacity, transform;
+}
+
+.work-backdrop-image.is-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Holds the copy legible over whatever photograph appears. At 0.86 the image
+   contributes only 14% of the composite, so white text clears 10:1 even against
+   a fully white photograph. */
+.work-backdrop-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(8, 38, 46, 0.9) 0%, rgba(8, 38, 46, 0.84) 45%, rgba(8, 38, 46, 0.92) 100%);
+  opacity: 0;
+  transition: opacity 620ms var(--ease-out-soft);
+}
+
+.home-work-section.is-immersive .work-backdrop-scrim {
+  opacity: 1;
+}
+
+.home-work-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- text and cards invert while a photograph is showing ---- */
+
+.home-work-section .home-section-title,
+.home-work-section .home-section-sub,
+.home-work-section .work-card-title,
+.home-work-section .work-card-text,
+.home-work-section .work-card-meta,
+.home-work-section .home-empty {
+  transition: color var(--dur-slow) var(--ease-out-soft);
+}
+
+.home-work-section.is-immersive .home-section-title,
+.home-work-section.is-immersive .home-section-title .home-title-accent {
+  color: #FFFFFF;
+}
+
+.home-work-section.is-immersive .home-section-sub {
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.home-work-section.is-immersive .btn-ghost-green {
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+.home-work-section.is-immersive .btn-ghost-green:hover {
+  background: #FFFFFF;
+  color: var(--home-ink);
+}
+
+.home-work-section .work-card {
+  transition:
+    transform var(--dur-slow) var(--ease-out-soft),
+    box-shadow var(--dur-slow) var(--ease-out-soft),
+    border-color var(--dur-slow) var(--ease-out-soft),
+    background-color var(--dur-slow) var(--ease-out-soft),
+    opacity var(--dur-slow) var(--ease-out-soft);
+}
+
+/* Cards that are not the one being pointed at recede, so attention lands on the
+   photograph and its card rather than on four competing tiles. */
+.home-work-section.is-immersive .work-card {
+  background: rgba(8, 38, 46, 0.55);
+  border-color: rgba(255, 255, 255, 0.18);
+  opacity: 0.55;
+}
+
+.home-work-section.is-immersive .work-card.is-active {
+  background: rgba(8, 38, 46, 0.72);
+  border-color: rgba(255, 255, 255, 0.45);
+  opacity: 1;
+}
+
+.home-work-section.is-immersive .work-card-title {
+  color: #FFFFFF;
+}
+
+.home-work-section.is-immersive .work-card-text {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.home-work-section.is-immersive .work-card-meta,
+.home-work-section.is-immersive .work-card-link {
+  color: #FFFFFF;
+}
+
+.home-work-section.is-immersive .work-card-link:hover {
+  color: var(--accent-gold-light);
+}
+
+.home-work-section.is-immersive .work-card-badge {
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Touch devices report no hover, so the reveal never fires there and the cards
+   must keep their normal light styling. */
+@media (hover: none) {
+  .home-work-section.is-immersive .work-card,
+  .home-work-section.is-immersive .work-card.is-active {
+    background: var(--bg-card);
+    border-color: var(--home-line);
+    opacity: 1;
+  }
+
+  .home-work-section.is-immersive .work-card-title {
+    color: var(--home-ink);
+  }
+
+  .home-work-section.is-immersive .work-card-text {
+    color: var(--text-muted);
+  }
+
+  .home-work-section.is-immersive .work-card-meta,
+  .home-work-section.is-immersive .work-card-link {
+    color: var(--accent-teal);
+  }
+
+  .home-work-section.is-immersive .home-section-title,
+  .home-work-section.is-immersive .home-section-title .home-title-accent {
+    color: var(--home-ink);
+  }
+
+  .home-work-section.is-immersive .home-section-sub {
+    color: var(--text-muted);
+  }
+
+  .home-work-section.is-immersive .work-backdrop-scrim,
+  .work-backdrop-image.is-active {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .work-backdrop-image {
+    /* The photograph still appears, it simply does not travel to get there. */
+    transform: none;
+    transition: opacity 200ms linear;
+  }
+
+  .work-backdrop-image.is-active {
+    transform: none;
+  }
+
+  .work-backdrop-scrim,
+  .home-work-section .work-card,
+  .home-work-section .home-section-title,
+  .home-work-section .home-section-sub {
+    transition: none;
+  }
+}

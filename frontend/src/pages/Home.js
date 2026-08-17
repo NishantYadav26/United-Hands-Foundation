@@ -118,6 +118,9 @@ const Home = () => {
   const [pillars, setPillars] = useState([]);
   const [locations, setLocations] = useState([]);
   const [gallery, setGallery] = useState([]);
+  // Which project card is currently hovered or focused. Its photograph expands
+  // to fill the section behind the grid; null means no card is engaged.
+  const [activeProject, setActiveProject] = useState(null);
 
   const hasStats = stats !== null;
   const displayStats = stats || {
@@ -451,8 +454,30 @@ const Home = () => {
       </section>
 
       {/* ------------------------------------------------------------ Our Work */}
-      <section className="home-section reveal-section" data-testid="our-work-section">
-        <div className="home-container">
+      <section
+        className={`home-section home-work-section reveal-section${activeProject ? ' is-immersive' : ''}`}
+        data-testid="our-work-section"
+      >
+        {/* Every featured photograph is mounted up front and cross-faded by
+            opacity. Swapping a single src on hover would show a blank frame
+            while the larger image downloaded. */}
+        <div className="work-backdrop" aria-hidden="true">
+          {featuredProjects.map((project) => (
+            project.hero_image ? (
+              <img
+                key={`backdrop-${project.id}`}
+                src={optimizeCloudinaryUrl(project.hero_image, { width: 1600 })}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                className={`work-backdrop-image${activeProject === project.id ? ' is-active' : ''}`}
+              />
+            ) : null
+          ))}
+          <div className="work-backdrop-scrim" />
+        </div>
+
+        <div className="home-container home-work-content">
           <div className="home-section-head">
             <div>
               <h2 className="home-section-title">
@@ -471,7 +496,16 @@ const Home = () => {
                 const Icon = iconForCategory(project.category);
                 const tint = CATEGORY_TINTS[index % CATEGORY_TINTS.length];
                 return (
-                  <article key={project.id} className="work-card" data-testid={`work-card-${project.id}`}>
+                  <article
+                    key={project.id}
+                    className={`work-card${activeProject === project.id ? ' is-active' : ''}`}
+                    data-testid={`work-card-${project.id}`}
+                    onMouseEnter={() => setActiveProject(project.id)}
+                    onMouseLeave={() => setActiveProject((current) => (current === project.id ? null : current))}
+                    // Focus mirrors hover so the effect is reachable by keyboard.
+                    onFocus={() => setActiveProject(project.id)}
+                    onBlur={() => setActiveProject((current) => (current === project.id ? null : current))}
+                  >
                     <div className="work-card-media">
                       {project.hero_image ? (
                         <img
