@@ -1,0 +1,1682 @@
+﻿/* ==========================================================================
+   Homepage v2
+   Layout and components for the redesigned homepage. Scoped to classes used
+   only by src/pages/Home.js so the rest of the site is unaffected.
+   ========================================================================== */
+
+:root {
+  /* Warm clay, the counterweight to the teal. Deep enough to carry a white
+     label at 4.79:1 and to sit on white as text at the same ratio. */
+  --cta-clay: #BC5318;
+  --cta-clay-hover: #9E4413;
+  /* Clay legible on the dark scrim. --accent-gold-light (#D9762E) measures only
+     3.0:1 there, and the labels using it are 12px bold — below the size WCAG
+     counts as large text, so 4.5:1 applies. This tint reaches 4.83:1 against the
+     worst case, a fully white photograph behind an 0.84 scrim. */
+  --clay-on-dark: #EFA96F;
+  --home-ink: #14313A;
+  --home-line: rgba(14, 92, 107, 0.14);
+
+  /* One easing curve and two durations across the whole page, so every hover
+     feels like it belongs to the same interface rather than each component
+     inventing its own timing. */
+  --ease-out-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur-fast: 180ms;
+  --dur-slow: 320ms;
+}
+
+.home-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.home-section {
+  padding: 4.5rem 0;
+}
+
+.home-section-alt {
+  background: var(--bg-surface);
+}
+
+.home-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2.5rem;
+}
+
+.home-section-title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.9rem, 4vw, 2.75rem);
+  line-height: 1.15;
+  color: var(--home-ink);
+  margin: 0;
+}
+
+.home-section-title-center {
+  text-align: center;
+}
+
+.home-title-accent {
+  color: var(--accent-teal);
+}
+
+.home-section-sub {
+  margin: 0.5rem 0 0;
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+.home-section-sub-center {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.home-eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--cta-clay);
+  margin: 0 0 0.75rem;
+}
+
+.home-eyebrow-center {
+  text-align: center;
+}
+
+.home-empty {
+  text-align: center;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  border: 1px solid var(--home-line);
+  border-radius: var(--radius);
+  padding: 2rem;
+  margin: 0;
+}
+
+/* ------------------------------------------------------------------ buttons */
+
+.btn-primary-green,
+.btn-primary-clay,
+.btn-ghost-green {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  transition:
+    background-color var(--dur-fast) var(--ease-out-soft),
+    color var(--dur-fast) var(--ease-out-soft),
+    transform var(--dur-fast) var(--ease-out-soft),
+    box-shadow var(--dur-fast) var(--ease-out-soft);
+}
+
+/* Icons inside buttons pick up the same forward nudge as the card links. */
+.btn-primary-green svg,
+.btn-primary-clay svg,
+.btn-ghost-green svg {
+  transition: transform var(--dur-fast) var(--ease-out-soft);
+}
+
+.btn-primary-green:hover svg,
+.btn-ghost-green:hover svg {
+  transform: translateX(3px);
+}
+
+/* The donate heart pulses rather than slides -- it is not a "go there" arrow. */
+.btn-primary-clay:hover svg {
+  transform: scale(1.18);
+}
+
+.btn-primary-green {
+  background: var(--accent-teal);
+  color: #FFFFFF;
+}
+
+.btn-primary-green:hover {
+  background: #08404E;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(14, 92, 107, 0.3);
+}
+
+.btn-primary-clay {
+  background: var(--cta-clay);
+  color: #FFFFFF;
+}
+
+.btn-primary-clay:hover {
+  background: var(--cta-clay-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(188, 83, 24, 0.32);
+}
+
+.btn-ghost-green {
+  background: transparent;
+  color: var(--accent-teal);
+  border-color: var(--accent-teal);
+}
+
+.btn-ghost-green:hover {
+  background: var(--accent-teal);
+  color: #FFFFFF;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(14, 92, 107, 0.24);
+}
+
+/* Pressing returns the button to rest, so a click feels like it lands. */
+.btn-primary-green:active,
+.btn-primary-clay:active,
+.btn-ghost-green:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.btn-primary-green:focus-visible,
+.btn-primary-clay:focus-visible,
+.btn-ghost-green:focus-visible,
+.work-card-link:focus-visible,
+.contact-card:focus-visible {
+  outline: 3px solid var(--accent-teal);
+  outline-offset: 3px;
+}
+
+/* --------------------------------------------------------------------- hero */
+
+.home-hero {
+  background: #FFFFFF;
+  padding-bottom: 1rem;
+}
+
+.home-hero-inner {
+  display: grid;
+  /* The photography carries the message here, so on desktop the media column
+     takes the larger share and the copy sits in a comfortable measure rather
+     than stretching to fill half the viewport. */
+  grid-template-columns: 0.85fr 1.15fr;
+  align-items: center;
+  gap: 2.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+.home-hero-title {
+  font-family: var(--font-heading);
+  font-size: clamp(2.4rem, 5.4vw, 4rem);
+  line-height: 1.08;
+  color: var(--home-ink);
+  margin: 0 0 1.1rem;
+  letter-spacing: -0.02em;
+}
+
+.home-hero-title-accent {
+  color: var(--accent-teal);
+}
+
+.home-hero-lede {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+  max-width: 34rem;
+  margin: 0 0 1.75rem;
+}
+
+.home-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-bottom: 2rem;
+}
+
+.home-hero-proof {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2rem;
+}
+
+.home-hero-proof-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  line-height: 1.35;
+  color: var(--text-muted);
+}
+
+.home-hero-proof-item strong {
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  color: var(--home-ink);
+}
+
+.home-hero-media {
+  border-radius: 1.25rem;
+  overflow: hidden;
+  box-shadow: 0 18px 50px rgba(14, 92, 107, 0.16);
+}
+
+/* No max-height here: the slides are absolutely positioned inside
+   .hero-slideshow, so capping them would fight the height set there. */
+.home-hero-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ----------------------------------------------------------------- our work */
+
+.home-work-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.work-card {
+  background: var(--bg-card);
+  border: 1px solid var(--home-line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition:
+    transform var(--dur-slow) var(--ease-out-soft),
+    box-shadow var(--dur-slow) var(--ease-out-soft),
+    border-color var(--dur-slow) var(--ease-out-soft);
+}
+
+.work-card:hover,
+.work-card:focus-within {
+  transform: translateY(-6px);
+  border-color: rgba(14, 92, 107, 0.28);
+  box-shadow: 0 18px 40px rgba(14, 92, 107, 0.16);
+}
+
+.work-card-media {
+  position: relative;
+  aspect-ratio: 3 / 2;
+  background: var(--bg-surface);
+  /* Clips the image as it scales so the zoom stays inside the card. */
+  overflow: hidden;
+}
+
+.work-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  /* Scale only -- animating width/height would force layout on every frame. */
+  transition: transform var(--dur-slow) var(--ease-out-soft);
+}
+
+.work-card:hover .work-card-media img,
+.work-card:focus-within .work-card-media img {
+  transform: scale(1.06);
+}
+
+/* The badge rises slightly ahead of the card so the two reads as depth rather
+   than one flat plane moving. */
+.work-card-badge {
+  transition: transform var(--dur-slow) var(--ease-out-soft);
+}
+
+.work-card:hover .work-card-badge,
+.work-card:focus-within .work-card-badge {
+  transform: translateY(-3px) scale(1.06);
+}
+
+.work-card-media-empty {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--bg-surface), #DDECEF);
+}
+
+.work-card-badge {
+  position: absolute;
+  left: 1rem;
+  bottom: -1.25rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #FFFFFF;
+  border: 3px solid var(--bg-card);
+}
+
+.work-card-body {
+  padding: 2rem 1.25rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.work-card-title {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  color: var(--home-ink);
+  margin: 0 0 0.35rem;
+}
+
+.work-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  color: var(--accent-teal);
+  margin: 0 0 0.6rem;
+}
+
+.work-card-text {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+  margin: 0 0 1rem;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.work-card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--accent-teal);
+  text-decoration: none;
+  transition: gap var(--dur-fast) var(--ease-out-soft), color var(--dur-fast) var(--ease-out-soft);
+}
+
+/* The arrow travels forward on hover -- the widening gap says "this goes
+   somewhere" more clearly than an underline does. */
+.work-card-link svg {
+  transition: transform var(--dur-fast) var(--ease-out-soft);
+}
+
+.work-card:hover .work-card-link,
+.work-card-link:hover,
+.work-card-link:focus-visible {
+  color: var(--cta-clay);
+}
+
+.work-card:hover .work-card-link svg,
+.work-card-link:hover svg,
+.work-card-link:focus-visible svg {
+  transform: translateX(4px);
+}
+
+/* --------------------------------------------------------------- our impact */
+
+.home-impact {
+  background: linear-gradient(140deg, #0E5C6B 0%, #08404E 100%);
+  padding: 3.5rem 0;
+  color: #FFFFFF;
+}
+
+.home-impact-title {
+  color: #FFFFFF;
+  text-align: center;
+}
+
+.home-impact-sub {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.86);
+  margin: 0.5rem 0 2.5rem;
+}
+
+.home-impact-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.impact-item {
+  text-align: center;
+  padding: 0 1rem;
+  position: relative;
+}
+
+.impact-item + .impact-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 12%;
+  height: 76%;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.impact-item-icon {
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  margin: 0 auto 0.9rem;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #FFFFFF;
+}
+
+.impact-item-value {
+  font-family: var(--font-heading);
+  font-size: clamp(1.85rem, 3.6vw, 2.6rem);
+  line-height: 1.1;
+  color: #FFFFFF;
+  min-height: 1.1em;
+}
+
+.impact-skeleton {
+  display: block;
+  width: 6rem;
+  height: 0.75em;
+  margin: 0 auto;
+  border-radius: 0.375rem;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.impact-item-label {
+  margin: 0.4rem 0 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+/* ------------------------------------------------------------ latest / news */
+
+.home-updates-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.update-card {
+  background: var(--bg-card);
+  border: 1px solid var(--home-line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition:
+    transform var(--dur-slow) var(--ease-out-soft),
+    box-shadow var(--dur-slow) var(--ease-out-soft),
+    border-color var(--dur-slow) var(--ease-out-soft);
+}
+
+.update-card:hover,
+.update-card:focus-within {
+  transform: translateY(-6px);
+  border-color: rgba(14, 92, 107, 0.28);
+  box-shadow: 0 18px 40px rgba(14, 92, 107, 0.16);
+}
+
+.update-card-media {
+  position: relative;
+  aspect-ratio: 3 / 2;
+  background: var(--bg-surface);
+  overflow: hidden;
+}
+
+.update-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform var(--dur-slow) var(--ease-out-soft);
+}
+
+.update-card:hover .update-card-media img,
+.update-card:focus-within .update-card-media img {
+  transform: scale(1.06);
+}
+
+.update-card-date {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0.5rem 0.7rem;
+  color: #FFFFFF;
+  text-align: center;
+  border-bottom-right-radius: var(--radius);
+  line-height: 1.1;
+}
+
+.update-card-date strong {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+}
+
+.update-card-date em {
+  display: block;
+  font-style: normal;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.update-card .work-card-body {
+  padding: 1.25rem;
+}
+
+/* --------------------------------------------- where we work / who we are */
+
+.home-split {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+.home-split-card {
+  background: var(--bg-card);
+  border: 1px solid var(--home-line);
+  border-radius: var(--radius);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.home-split-title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  color: var(--home-ink);
+  margin: 0 0 1.25rem;
+}
+
+.home-split-text {
+  color: var(--text-muted);
+  line-height: 1.65;
+  margin: 0 0 1.5rem;
+}
+
+.home-map-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.home-map {
+  width: 15rem;
+  max-width: 100%;
+  height: auto;
+  flex-shrink: 0;
+}
+
+.home-district-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem 1.25rem;
+  flex: 1;
+  min-width: 12rem;
+}
+
+.home-district-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  color: var(--accent-teal);
+}
+
+.home-district-list strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--home-ink);
+  font-weight: 600;
+}
+
+.home-district-list em {
+  display: block;
+  font-style: normal;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ---------------------------------------------------------------- stories */
+
+.home-stories-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+}
+
+.story-card-v2 {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--home-line);
+  border-top: 4px solid var(--accent-teal);
+  border-radius: var(--radius);
+  padding: 2rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.story-card-text {
+  font-style: italic;
+  line-height: 1.7;
+  color: var(--text-primary);
+  margin: 0 0 1.5rem;
+  flex: 1;
+}
+
+.story-card-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--home-line);
+}
+
+.story-card-meta {
+  text-align: right;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.story-card-meta strong {
+  display: block;
+  color: var(--cta-clay);
+}
+
+/* ------------------------------------------------------------ team/partners */
+
+.home-people-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1.25rem;
+  margin-top: 2.5rem;
+}
+
+.home-partners-block {
+  margin-top: 3.5rem;
+}
+
+.person-card {
+  background: var(--bg-card);
+  border: 1px solid var(--home-line);
+  border-radius: var(--radius);
+  padding: 1.75rem 1.25rem;
+  text-align: center;
+}
+
+.person-card-photo {
+  width: 6rem;
+  height: 6rem;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 0 0 3px #fff, 0 0 0 5px rgba(14, 92, 107, 0.35);
+}
+
+.person-card-photo-partner {
+  box-shadow: 0 0 0 3px #fff, 0 0 0 5px rgba(188, 83, 24, 0.4);
+}
+
+.person-card-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.person-card-name {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  color: var(--home-ink);
+  margin: 0 0 0.25rem;
+}
+
+.person-card-role {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--accent-teal);
+  margin: 0 0 0.35rem;
+}
+
+.person-card-role-partner {
+  color: var(--cta-clay);
+}
+
+.person-card-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* -------------------------------------------------------------------- CTA */
+
+.home-cta {
+  background: linear-gradient(140deg, #0E5C6B 0%, #08404E 100%);
+  padding: 2.5rem 0;
+}
+
+.home-cta-inner {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.home-cta-icon {
+  color: rgba(255, 255, 255, 0.9);
+  flex-shrink: 0;
+}
+
+.home-cta-copy {
+  flex: 1;
+  min-width: 15rem;
+}
+
+.home-cta-title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  color: #FFFFFF;
+  margin: 0 0 0.35rem;
+}
+
+.home-cta-text {
+  color: rgba(255, 255, 255, 0.88);
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* ---------------------------------------------------------------- contact */
+
+.home-contact-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.contact-card {
+  background: var(--bg-card);
+  border: 1px solid var(--home-line);
+  border-radius: var(--radius);
+  padding: 1.75rem 1.25rem;
+  text-align: center;
+  text-decoration: none;
+  display: block;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+a.contact-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(14, 92, 107, 0.12);
+}
+
+.contact-card-icon {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin: 0 auto 0.85rem;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  color: var(--accent-teal);
+}
+
+.contact-card strong {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-teal);
+  margin-bottom: 0.35rem;
+}
+
+.contact-card span {
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+/* ------------------------------------------------------------- responsive */
+
+@media (max-width: 1024px) {
+  .home-hero-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .home-hero-media {
+    order: -1;
+  }
+
+  .home-work-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .home-updates-grid,
+  .home-stories-grid,
+  .home-contact-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .home-split {
+    grid-template-columns: 1fr;
+  }
+
+  .home-impact-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem 1rem;
+  }
+
+  /* With two columns the divider only belongs before the right-hand item. */
+  .impact-item + .impact-item::before {
+    display: none;
+  }
+
+  .impact-item:nth-child(even)::before {
+    display: block;
+  }
+}
+
+@media (max-width: 640px) {
+  .home-section {
+    padding: 3rem 0;
+  }
+
+  .home-hero-inner {
+    padding: 2rem 1.25rem;
+  }
+
+  .home-work-grid,
+  .home-updates-grid,
+  .home-stories-grid,
+  .home-contact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-hero-actions .btn-primary-green,
+  .home-hero-actions .btn-primary-clay {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .home-district-list {
+    grid-template-columns: 1fr;
+  }
+
+  .home-section-head {
+    align-items: flex-start;
+  }
+
+  .home-cta-inner {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* --------------------------------------------------- remaining hover states */
+
+.person-card,
+.story-card-v2 {
+  transition:
+    transform var(--dur-slow) var(--ease-out-soft),
+    box-shadow var(--dur-slow) var(--ease-out-soft),
+    border-color var(--dur-slow) var(--ease-out-soft);
+}
+
+.person-card:hover,
+.story-card-v2:hover {
+  transform: translateY(-4px);
+  border-color: rgba(14, 92, 107, 0.26);
+  box-shadow: 0 16px 34px rgba(14, 92, 107, 0.14);
+}
+
+.person-card-photo {
+  transition: box-shadow var(--dur-slow) var(--ease-out-soft);
+}
+
+.person-card:hover .person-card-photo {
+  box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--accent-teal);
+}
+
+.person-card-photo img {
+  transition: transform var(--dur-slow) var(--ease-out-soft);
+}
+
+.person-card:hover .person-card-photo img {
+  transform: scale(1.07);
+}
+
+/* Impact figures brighten their ring on hover; the numbers themselves stay put
+   so a reader is never chasing a moving value. */
+.impact-item-icon {
+  transition:
+    border-color var(--dur-slow) var(--ease-out-soft),
+    background-color var(--dur-slow) var(--ease-out-soft),
+    transform var(--dur-slow) var(--ease-out-soft);
+}
+
+.impact-item:hover .impact-item-icon {
+  border-color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-3px);
+}
+
+.home-district-list li {
+  transition: transform var(--dur-fast) var(--ease-out-soft);
+}
+
+.home-district-list li:hover {
+  transform: translateX(3px);
+}
+
+.contact-card {
+  transition:
+    transform var(--dur-slow) var(--ease-out-soft),
+    box-shadow var(--dur-slow) var(--ease-out-soft),
+    border-color var(--dur-slow) var(--ease-out-soft);
+}
+
+.contact-card-icon {
+  transition:
+    background-color var(--dur-fast) var(--ease-out-soft),
+    color var(--dur-fast) var(--ease-out-soft),
+    transform var(--dur-fast) var(--ease-out-soft);
+}
+
+a.contact-card:hover .contact-card-icon {
+  background: var(--accent-teal);
+  color: #FFFFFF;
+  transform: scale(1.08);
+}
+
+/* Every motion above is decoration on top of a state that already reads without
+   it -- colour, shadow and focus outline all remain when motion is switched
+   off, so nothing becomes unusable here. */
+@media (prefers-reduced-motion: reduce) {
+  .work-card,
+  .update-card,
+  .contact-card,
+  .person-card,
+  .story-card-v2,
+  .person-card-photo,
+  .person-card-photo img,
+  .impact-item-icon,
+  .contact-card-icon,
+  .home-district-list li,
+  .work-card-media img,
+  .update-card-media img,
+  .work-card-badge,
+  .work-card-link,
+  .work-card-link svg,
+  .btn-primary-green,
+  .btn-primary-clay,
+  .btn-ghost-green,
+  .btn-primary-green svg,
+  .btn-primary-clay svg,
+  .btn-ghost-green svg {
+    transition: none;
+  }
+
+  .work-card:hover,
+  .work-card:focus-within,
+  .update-card:hover,
+  .update-card:focus-within,
+  .person-card:hover,
+  .story-card-v2:hover,
+  a.contact-card:hover,
+  .btn-primary-green:hover,
+  .btn-primary-clay:hover,
+  .btn-ghost-green:hover,
+  .home-district-list li:hover,
+  .impact-item:hover .impact-item-icon {
+    transform: none;
+  }
+
+  .work-card:hover .work-card-media img,
+  .work-card:focus-within .work-card-media img,
+  .update-card:hover .update-card-media img,
+  .update-card:focus-within .update-card-media img,
+  .person-card:hover .person-card-photo img,
+  .work-card:hover .work-card-badge,
+  .work-card:hover .work-card-link svg,
+  .btn-primary-green:hover svg,
+  .btn-primary-clay:hover svg,
+  .btn-ghost-green:hover svg,
+  a.contact-card:hover .contact-card-icon {
+    transform: none;
+  }
+}
+
+/* ========================================================== hero slideshow */
+
+.hero-slideshow {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 22rem;
+  background: var(--bg-surface);
+}
+
+/* Larger on desktop, where there is room for the photographs to carry weight.
+   Capped against viewport height so the hero never pushes the rest of the page
+   off-screen on a short laptop display. */
+@media (min-width: 1025px) {
+  .hero-slideshow {
+    min-height: min(38rem, 68vh);
+  }
+}
+
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Opacity only. Cross-fading via filter or width would repaint the whole
+     hero on every frame of a rotation that runs the entire time the page is
+     open. */
+  transition-property: opacity;
+  transition-timing-function: var(--ease-out-soft);
+}
+
+.hero-slide-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 2.5rem 1.25rem 1rem;
+  color: #FFFFFF;
+  font-size: 0.9rem;
+  font-weight: 600;
+  /* The gradient guarantees the caption stays legible whatever photograph sits
+     behind it, rather than hoping every image happens to be dark at the base. */
+  background: linear-gradient(to top, rgba(6, 33, 40, 0.85), rgba(6, 33, 40, 0));
+  pointer-events: none;
+}
+
+.hero-slide-controls {
+  position: absolute;
+  right: 0.9rem;
+  bottom: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.hero-slide-dots {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.hero-slide-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out-soft), transform var(--dur-fast) var(--ease-out-soft);
+}
+
+.hero-slide-dot.is-active {
+  background: #FFFFFF;
+  transform: scale(1.25);
+}
+
+.hero-slide-dot:focus-visible {
+  outline: 3px solid #FFFFFF;
+  outline-offset: 2px;
+}
+
+/* =============================================================== about us */
+
+.home-about {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 2.5rem;
+  align-items: center;
+}
+
+.home-about-media {
+  border-radius: 1.25rem;
+  overflow: hidden;
+  box-shadow: 0 18px 44px rgba(14, 92, 107, 0.16);
+}
+
+.home-about-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: 26rem;
+  object-fit: cover;
+  transition: transform var(--dur-slow) var(--ease-out-soft);
+}
+
+.home-about-media:hover img {
+  transform: scale(1.04);
+}
+
+.home-about-lede {
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: var(--text-primary);
+  margin: 1rem 0 1rem;
+}
+
+.home-about-text {
+  line-height: 1.7;
+  color: var(--text-muted);
+  margin: 0 0 1.5rem;
+}
+
+.home-about-points {
+  list-style: none;
+  margin: 0 0 1.75rem;
+  padding: 0;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.home-about-points li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.home-about-points svg {
+  color: var(--accent-teal);
+  flex-shrink: 0;
+}
+
+.home-about-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+
+/* ============================================================ credentials */
+
+.home-trust {
+  padding: 4.5rem 0;
+  background: var(--bg-deep);
+}
+
+.home-trust-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.25rem;
+  margin-top: 2.5rem;
+}
+
+.trust-card {
+  background: var(--bg-card);
+  border: 1px solid var(--home-line);
+  border-radius: var(--radius);
+  padding: 1.75rem 1.25rem;
+  text-align: center;
+  transition:
+    transform var(--dur-slow) var(--ease-out-soft),
+    box-shadow var(--dur-slow) var(--ease-out-soft),
+    border-color var(--dur-slow) var(--ease-out-soft);
+}
+
+.trust-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(14, 92, 107, 0.28);
+  box-shadow: 0 16px 34px rgba(14, 92, 107, 0.14);
+}
+
+.trust-card-icon {
+  display: grid;
+  place-items: center;
+  width: 2.9rem;
+  height: 2.9rem;
+  margin: 0 auto 0.9rem;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  color: var(--accent-teal);
+  transition: background-color var(--dur-fast) var(--ease-out-soft), color var(--dur-fast) var(--ease-out-soft);
+}
+
+.trust-card:hover .trust-card-icon {
+  background: var(--accent-teal);
+  color: #FFFFFF;
+}
+
+.trust-card-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin: 0 0 0.4rem;
+}
+
+.trust-card-value {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  color: var(--home-ink);
+  margin: 0 0 0.35rem;
+  word-break: break-word;
+}
+
+.trust-card-note {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.home-trust-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.85rem;
+  margin-top: 2.25rem;
+}
+
+/* Where We Work stands alone now that Who We Are has its own section. */
+.home-split {
+  grid-template-columns: 1fr;
+}
+
+@media (max-width: 1024px) {
+  .home-about {
+    grid-template-columns: 1fr;
+  }
+
+  .home-trust-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .home-trust-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-about-actions .btn-primary-green,
+  .home-about-actions .btn-ghost-green,
+  .home-trust-actions .btn-ghost-green {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .hero-slideshow {
+    min-height: 16rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-slide,
+  .home-about-media img,
+  .trust-card,
+  .trust-card-icon,
+  .hero-slide-dot {
+    transition: none;
+  }
+
+  .home-about-media:hover img,
+  .trust-card:hover {
+    transform: none;
+  }
+}
+
+/* ============================================ our work: immersive backdrop */
+
+.home-work-section {
+  position: relative;
+  overflow: hidden;
+  /* Keeps the backdrop's stacking context local so it can never paint over the
+     navbar or the sections either side. */
+  isolation: isolate;
+  transition: background-color var(--dur-slow) var(--ease-out-soft);
+}
+
+.work-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.work-backdrop-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  /* Starts slightly enlarged and settles to rest, so the photograph reads as
+     coming forward out of the page rather than simply appearing. */
+  transform: scale(1.12);
+  transition:
+    opacity 620ms var(--ease-out-soft),
+    transform 900ms var(--ease-out-soft);
+  will-change: opacity, transform;
+}
+
+.work-backdrop-image.is-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Holds the copy legible over whatever photograph appears. At 0.86 the image
+   contributes only 14% of the composite, so white text clears 10:1 even against
+   a fully white photograph. */
+.work-backdrop-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(8, 38, 46, 0.9) 0%, rgba(8, 38, 46, 0.84) 45%, rgba(8, 38, 46, 0.92) 100%);
+  opacity: 0;
+  transition: opacity 620ms var(--ease-out-soft);
+}
+
+.home-work-section.is-immersive .work-backdrop-scrim {
+  opacity: 1;
+}
+
+.home-work-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- text and cards invert while a photograph is showing ---- */
+
+.home-work-section .home-section-title,
+.home-work-section .home-section-sub,
+.home-work-section .work-card-title,
+.home-work-section .work-card-text,
+.home-work-section .work-card-meta,
+.home-work-section .home-empty {
+  transition: color var(--dur-slow) var(--ease-out-soft);
+}
+
+.home-work-section.is-immersive .home-section-title,
+.home-work-section.is-immersive .home-section-title .home-title-accent {
+  color: #FFFFFF;
+}
+
+.home-work-section.is-immersive .home-section-sub {
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.home-work-section.is-immersive .btn-ghost-green {
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+.home-work-section.is-immersive .btn-ghost-green:hover {
+  background: #FFFFFF;
+  color: var(--home-ink);
+}
+
+.home-work-section .work-card {
+  transition:
+    transform var(--dur-slow) var(--ease-out-soft),
+    box-shadow var(--dur-slow) var(--ease-out-soft),
+    border-color var(--dur-slow) var(--ease-out-soft),
+    background-color var(--dur-slow) var(--ease-out-soft),
+    opacity var(--dur-slow) var(--ease-out-soft);
+}
+
+/* Cards that are not the one being pointed at recede, so attention lands on the
+   photograph and its card rather than on four competing tiles. */
+.home-work-section.is-immersive .work-card {
+  background: rgba(8, 38, 46, 0.55);
+  border-color: rgba(255, 255, 255, 0.18);
+  opacity: 0.55;
+}
+
+.home-work-section.is-immersive .work-card.is-active {
+  background: rgba(8, 38, 46, 0.72);
+  border-color: rgba(255, 255, 255, 0.45);
+  opacity: 1;
+}
+
+.home-work-section.is-immersive .work-card-title {
+  color: #FFFFFF;
+}
+
+.home-work-section.is-immersive .work-card-text {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.home-work-section.is-immersive .work-card-meta,
+.home-work-section.is-immersive .work-card-link {
+  color: #FFFFFF;
+}
+
+.home-work-section.is-immersive .work-card-link:hover {
+  color: var(--clay-on-dark);
+}
+
+.home-work-section.is-immersive .work-card-badge {
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Touch devices report no hover, so the reveal never fires there and the cards
+   must keep their normal light styling. */
+@media (hover: none) {
+  .home-work-section.is-immersive .work-card,
+  .home-work-section.is-immersive .work-card.is-active {
+    background: var(--bg-card);
+    border-color: var(--home-line);
+    opacity: 1;
+  }
+
+  .home-work-section.is-immersive .work-card-title {
+    color: var(--home-ink);
+  }
+
+  .home-work-section.is-immersive .work-card-text {
+    color: var(--text-muted);
+  }
+
+  .home-work-section.is-immersive .work-card-meta,
+  .home-work-section.is-immersive .work-card-link {
+    color: var(--accent-teal);
+  }
+
+  .home-work-section.is-immersive .home-section-title,
+  .home-work-section.is-immersive .home-section-title .home-title-accent {
+    color: var(--home-ink);
+  }
+
+  .home-work-section.is-immersive .home-section-sub {
+    color: var(--text-muted);
+  }
+
+  .home-work-section.is-immersive .work-backdrop-scrim,
+  .work-backdrop-image.is-active {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .work-backdrop-image {
+    /* The photograph still appears, it simply does not travel to get there. */
+    transform: none;
+    transition: opacity 200ms linear;
+  }
+
+  .work-backdrop-image.is-active {
+    transform: none;
+  }
+
+  .work-backdrop-scrim,
+  .home-work-section .work-card,
+  .home-work-section .home-section-title,
+  .home-work-section .home-section-sub {
+    transition: none;
+  }
+}
+
+/* =============================================== hero: immersive backdrop */
+
+.home-hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.hero-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-backdrop-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(1.12);
+  transition:
+    opacity 620ms var(--ease-out-soft),
+    transform 900ms var(--ease-out-soft);
+  will-change: opacity, transform;
+}
+
+.home-hero.is-immersive .hero-backdrop-image {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.hero-backdrop-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(8, 38, 46, 0.9) 0%, rgba(8, 38, 46, 0.84) 45%, rgba(8, 38, 46, 0.92) 100%);
+  opacity: 0;
+  transition: opacity 620ms var(--ease-out-soft);
+}
+
+.home-hero.is-immersive .hero-backdrop-scrim {
+  opacity: 1;
+}
+
+.home-hero-inner {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- copy inverts while the photograph is expanded ---- */
+
+.home-hero-title,
+.home-hero-lede,
+.home-hero-proof-item,
+.home-hero-proof-item strong,
+.home-eyebrow {
+  transition: color var(--dur-slow) var(--ease-out-soft);
+}
+
+.home-hero.is-immersive .home-hero-title,
+.home-hero.is-immersive .home-hero-title-accent,
+.home-hero.is-immersive .home-hero-proof-item strong {
+  color: #FFFFFF;
+}
+
+.home-hero.is-immersive .home-hero-lede,
+.home-hero.is-immersive .home-hero-proof-item {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.home-hero.is-immersive .home-eyebrow {
+  color: var(--clay-on-dark);
+}
+
+.home-hero.is-immersive .home-hero-proof-item svg {
+  color: #FFFFFF !important;
+}
+
+/* The framed slideshow lifts slightly and loses its shadow against the now-dark
+   surround, so the frame reads as part of the backdrop rather than a card
+   floating on top of it. */
+.home-hero-media {
+  transition:
+    transform var(--dur-slow) var(--ease-out-soft),
+    box-shadow var(--dur-slow) var(--ease-out-soft);
+}
+
+.home-hero.is-immersive .home-hero-media {
+  transform: scale(1.015);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+}
+
+.home-hero.is-immersive .btn-ghost-green {
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+/* Touch reports no hover, so the reveal never fires and the copy must stay dark
+   on the white hero rather than being stranded in its inverted state. */
+@media (hover: none) {
+  .home-hero.is-immersive .hero-backdrop-image,
+  .home-hero.is-immersive .hero-backdrop-scrim {
+    opacity: 0;
+  }
+
+  .home-hero.is-immersive .home-hero-title,
+  .home-hero.is-immersive .home-hero-proof-item strong {
+    color: var(--home-ink);
+  }
+
+  .home-hero.is-immersive .home-hero-title-accent {
+    color: var(--accent-teal);
+  }
+
+  .home-hero.is-immersive .home-hero-lede,
+  .home-hero.is-immersive .home-hero-proof-item {
+    color: var(--text-muted);
+  }
+
+  .home-hero.is-immersive .home-eyebrow {
+    color: var(--cta-clay);
+  }
+
+  .home-hero.is-immersive .home-hero-media {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-backdrop-image {
+    transform: none;
+    transition: opacity 200ms linear;
+  }
+
+  .home-hero.is-immersive .hero-backdrop-image {
+    transform: none;
+  }
+
+  .hero-backdrop-scrim,
+  .home-hero-media,
+  .home-hero-title,
+  .home-hero-lede {
+    transition: none;
+  }
+
+  .home-hero.is-immersive .home-hero-media {
+    transform: none;
+  }
+}

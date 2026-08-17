@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Plus, Edit, Trash2, Upload, X, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import { cacheBust } from '@/lib/apiClient';
@@ -244,7 +244,7 @@ const TeamPillars = () => {
                   className="w-24 h-24 object-cover rounded identity-lock"
                 />
                 <div className="flex-1 text-center sm:text-left">
-                  <p className="text-[var(--text-primary)] text-sm mb-2">Photo uploaded âœ“</p>
+                  <p className="text-[var(--text-primary)] text-sm mb-2">Photo uploaded ✓</p>
                   <button 
                     onClick={uploadImage} 
                     disabled={uploading}
