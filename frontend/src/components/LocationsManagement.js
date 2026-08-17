@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { Edit, MapPin, Plus, Trash2, X } from 'lucide-react';
 import axios from 'axios';
+import { cacheBust } from '@/lib/apiClient';
 import { toast } from 'sonner';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-foundation.onrender.com';
@@ -17,7 +18,7 @@ const LocationsManagement = () => {
 
   const fetchLocations = async () => {
     try {
-      const response = await axios.get(`${API}/locations`);
+      const response = await axios.get(`${API}/locations`, { params: cacheBust() });
       setLocations(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Failed to fetch locations:', error);

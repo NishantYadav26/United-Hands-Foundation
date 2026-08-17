@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { Loader2, Newspaper, Upload } from 'lucide-react';
 import axios from 'axios';
+import { cacheBust } from '@/lib/apiClient';
 import { toast } from 'sonner';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-foundation.onrender.com';
@@ -30,7 +31,7 @@ const PressManagement = () => {
 
   const fetchPressItems = async () => {
     try {
-      const response = await axios.get(`${API}/press-media`);
+      const response = await axios.get(`${API}/press-media`, { params: cacheBust() });
       setPressItems(response.data);
     } catch (error) {
       console.error('Failed to fetch press media:', error);
@@ -226,7 +227,7 @@ const PressManagement = () => {
               <img src={item.image_url} alt={item.title} className="w-full h-44 object-cover" />
               <div className="p-4">
                 <h4 className="font-semibold text-sm mb-1" style={{ color: 'var(--text-primary)' }}>{item.title}</h4>
-                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{item.publication} • {item.district} • {item.year}</p>
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{item.publication} â€¢ {item.district} â€¢ {item.year}</p>
                 <div className="mt-3 flex gap-2">
                   <button
                     onClick={() => startEdit(item)}

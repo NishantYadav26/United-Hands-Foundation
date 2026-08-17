@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Plus, Edit, Trash2, Upload, X, Loader2 } from 'lucide-react';
 import axios from 'axios';
-import { invalidateCachedGet } from '@/lib/apiClient';
+import { invalidateCachedGet, cacheBust } from '@/lib/apiClient';
 import { toast } from 'sonner';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 
@@ -33,7 +33,7 @@ const ProjectsManagement = () => {
 
   const fetchProjects = async () => {
     try {
-      const response = await axios.get(`${API}/projects`);
+      const response = await axios.get(`${API}/projects`, { params: cacheBust() });
       setProjects(response.data);
     } catch (error) {
       console.error('Failed to fetch projects:', error);

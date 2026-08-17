@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+﻿import { useState, useEffect, useRef } from 'react';
 import { Plus, Edit, Trash2, Upload, X, Loader2 } from 'lucide-react';
 import axios from 'axios';
+import { cacheBust } from '@/lib/apiClient';
 import { toast } from 'sonner';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || process.env.REACT_APP_BACKEND_URL || 'https://united-hands-foundation.onrender.com';
@@ -30,7 +31,7 @@ const TeamPillars = () => {
 
   const fetchPillars = async () => {
     try {
-      const response = await axios.get(`${API}/pillars`);
+      const response = await axios.get(`${API}/pillars`, { params: cacheBust() });
       setPillars(response.data);
     } catch (error) {
       console.error('Failed to fetch pillars:', error);
@@ -243,7 +244,7 @@ const TeamPillars = () => {
                   className="w-24 h-24 object-cover rounded identity-lock"
                 />
                 <div className="flex-1 text-center sm:text-left">
-                  <p className="text-[var(--text-primary)] text-sm mb-2">Photo uploaded ✓</p>
+                  <p className="text-[var(--text-primary)] text-sm mb-2">Photo uploaded âœ“</p>
                   <button 
                     onClick={uploadImage} 
                     disabled={uploading}
