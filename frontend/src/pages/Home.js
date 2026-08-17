@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Users, MapPin, HandCoins, FolderCheck, ArrowRight, Heart,
@@ -100,7 +100,10 @@ const iconForCategory = (category = '') => {
   return HandHeart;
 };
 
-const CATEGORY_TINTS = ['#0E7A3E', '#F5822A', '#C0392B', '#7D5BA6'];
+// Category tints for icon badges and date chips. All four carry white glyphs at
+// 3:1 or better, and stay within the teal/clay family so the cards read as one
+// set rather than four unrelated colours.
+const CATEGORY_TINTS = ['#0E5C6B', '#BC5318', '#3F6B57', '#6B4E7D'];
 
 const Home = () => {
   // null means "not known yet" so the UI can show a placeholder rather than
@@ -371,7 +374,7 @@ const Home = () => {
       id: 'stat-amount',
       Icon: HandCoins,
       value: displayStats.total_amount,
-      display: `₹${formatIndianCompact(displayStats.total_amount)}`,
+      display: `â‚¹${formatIndianCompact(displayStats.total_amount)}`,
       suffix: '+',
       label: 'Funds Utilized',
       // Lakh/crore shorthand cannot be produced by a numeric tween, so this one
@@ -403,7 +406,7 @@ const Home = () => {
               <Link to="/projects" className="btn-primary-green" data-testid="hero-explore-button">
                 Explore Our Work <ArrowRight size={18} aria-hidden="true" />
               </Link>
-              <Link to="/donate" className="btn-primary-orange" data-testid="hero-donate-button">
+              <Link to="/donate" className="btn-primary-clay" data-testid="hero-donate-button">
                 Donate Now <Heart size={18} aria-hidden="true" />
               </Link>
             </div>
@@ -770,7 +773,7 @@ const Home = () => {
               Your support helps us reach more lives and build a brighter future.
             </p>
           </div>
-          <Link to="/donate" className="btn-primary-orange" data-testid="cta-donate-button">
+          <Link to="/donate" className="btn-primary-clay" data-testid="cta-donate-button">
             Donate Now <Heart size={18} aria-hidden="true" />
           </Link>
         </div>

@@ -6,23 +6,31 @@
   --space-3: 24px;
   --space-4: 32px;
   --space-6: 48px;
+  /* Palette: deep teal + warm clay.
+     Teal carries care and trust without reading as the default charity green,
+     and sits behind the warm village photography rather than competing with it.
+     Clay gives the donate action its own heat so it never gets lost in a teal
+     section. Every value below clears 4.5:1 against its intended background --
+     the previous brand orange (#F5822A) only reached 2.6:1 on white and could
+     not legally carry text. Variable names are unchanged so the whole site
+     re-themes from this one block. */
   --bg-deep: #FFFFFF;
   --bg-card: #FFFFFF;
-  --bg-surface: #F3F8F4;
-  --accent-gold: #F5822A;
-  --accent-gold-light: #F7A05C;
-  --accent-teal: #0E7A3E;
-  --accent-teal-light: #57AC77;
-  --accent-warm: #F5822A;
-  --accent-warm-light: #F7A05C;
-  --text-primary: #2C3A31;
-  --text-muted: #5C6B60;
-  --text-soft: #74857A;
-  --border-subtle: rgba(14, 122, 62, 0.12);
-  --border-warm: rgba(14, 122, 62, 0.25);
+  --bg-surface: #F1F7F8;
+  --accent-gold: #BC5318;
+  --accent-gold-light: #D9762E;
+  --accent-teal: #0E5C6B;
+  --accent-teal-light: #4E93A0;
+  --accent-warm: #BC5318;
+  --accent-warm-light: #D9762E;
+  --text-primary: #1B3239;
+  --text-muted: #566B71;
+  --text-soft: #6F868D;
+  --border-subtle: rgba(14, 92, 107, 0.12);
+  --border-warm: rgba(14, 92, 107, 0.25);
   --glass-bg: rgba(255, 255, 255, 0.82);
-  --glass-border: rgba(14, 122, 62, 0.1);
-  --hero-dark: #0A3D22;
+  --glass-border: rgba(14, 92, 107, 0.1);
+  --hero-dark: #06333D;
   --font-sans: 'Mulish', 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
   --font-serif: 'Lora', Georgia, serif;
   --font-heading: 'Lora', Georgia, serif;

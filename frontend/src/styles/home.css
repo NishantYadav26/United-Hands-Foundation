@@ -1,19 +1,23 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    Homepage v2
    Layout and components for the redesigned homepage. Scoped to classes used
    only by src/pages/Home.js so the rest of the site is unaffected.
    ========================================================================== */
 
 :root {
-  /* The brand orange (#F5822A) only reaches 2.6:1 against white, so it cannot
-     carry text or act as a button fill with a white label. This deeper shade
-     hits 4.59:1 against white in both directions, which lets it serve as the
-     donate-button background AND as accent text. #F5822A stays in use for
-     decorative fills where no text sits on it. */
-  --cta-orange: #B85C10;
-  --cta-orange-hover: #9C4C0B;
-  --home-ink: #1F3A2B;
-  --home-line: rgba(14, 122, 62, 0.14);
+  /* Warm clay, the counterweight to the teal. Deep enough to carry a white
+     label at 4.79:1 and to sit on white as text at the same ratio. */
+  --cta-clay: #BC5318;
+  --cta-clay-hover: #9E4413;
+  --home-ink: #14313A;
+  --home-line: rgba(14, 92, 107, 0.14);
+
+  /* One easing curve and two durations across the whole page, so every hover
+     feels like it belongs to the same interface rather than each component
+     inventing its own timing. */
+  --ease-out-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur-fast: 180ms;
+  --dur-slow: 320ms;
 }
 
 .home-container {
@@ -72,7 +76,7 @@
   letter-spacing: 0.22em;
   text-transform: uppercase;
   font-weight: 700;
-  color: var(--cta-orange);
+  color: var(--cta-clay);
   margin: 0 0 0.75rem;
 }
 
@@ -93,7 +97,7 @@
 /* ------------------------------------------------------------------ buttons */
 
 .btn-primary-green,
-.btn-primary-orange,
+.btn-primary-clay,
 .btn-ghost-green {
   display: inline-flex;
   align-items: center;
@@ -103,8 +107,30 @@
   font-weight: 600;
   font-size: 0.95rem;
   text-decoration: none;
-  transition: background-color 180ms ease, color 180ms ease, transform 180ms ease;
   white-space: nowrap;
+  border: 1px solid transparent;
+  transition:
+    background-color var(--dur-fast) var(--ease-out-soft),
+    color var(--dur-fast) var(--ease-out-soft),
+    transform var(--dur-fast) var(--ease-out-soft),
+    box-shadow var(--dur-fast) var(--ease-out-soft);
+}
+
+/* Icons inside buttons pick up the same forward nudge as the card links. */
+.btn-primary-green svg,
+.btn-primary-clay svg,
+.btn-ghost-green svg {
+  transition: transform var(--dur-fast) var(--ease-out-soft);
+}
+
+.btn-primary-green:hover svg,
+.btn-ghost-green:hover svg {
+  transform: translateX(3px);
+}
+
+/* The donate heart pulses rather than slides -- it is not a "go there" arrow. */
+.btn-primary-clay:hover svg {
+  transform: scale(1.18);
 }
 
 .btn-primary-green {
@@ -113,33 +139,45 @@
 }
 
 .btn-primary-green:hover {
-  background: #0B5E30;
-  transform: translateY(-1px);
+  background: #08404E;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(14, 92, 107, 0.3);
 }
 
-.btn-primary-orange {
-  background: var(--cta-orange);
+.btn-primary-clay {
+  background: var(--cta-clay);
   color: #FFFFFF;
 }
 
-.btn-primary-orange:hover {
-  background: var(--cta-orange-hover);
-  transform: translateY(-1px);
+.btn-primary-clay:hover {
+  background: var(--cta-clay-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(188, 83, 24, 0.32);
 }
 
 .btn-ghost-green {
   background: transparent;
   color: var(--accent-teal);
-  border: 1px solid var(--accent-teal);
+  border-color: var(--accent-teal);
 }
 
 .btn-ghost-green:hover {
   background: var(--accent-teal);
   color: #FFFFFF;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(14, 92, 107, 0.24);
+}
+
+/* Pressing returns the button to rest, so a click feels like it lands. */
+.btn-primary-green:active,
+.btn-primary-clay:active,
+.btn-ghost-green:active {
+  transform: translateY(0);
+  box-shadow: none;
 }
 
 .btn-primary-green:focus-visible,
-.btn-primary-orange:focus-visible,
+.btn-primary-clay:focus-visible,
 .btn-ghost-green:focus-visible,
 .work-card-link:focus-visible,
 .contact-card:focus-visible {
@@ -217,7 +255,7 @@
 .home-hero-media {
   border-radius: 1.25rem;
   overflow: hidden;
-  box-shadow: 0 18px 50px rgba(14, 122, 62, 0.16);
+  box-shadow: 0 18px 50px rgba(14, 92, 107, 0.16);
 }
 
 .home-hero-media img {
@@ -243,18 +281,25 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: transform 200ms ease, box-shadow 200ms ease;
+  transition:
+    transform var(--dur-slow) var(--ease-out-soft),
+    box-shadow var(--dur-slow) var(--ease-out-soft),
+    border-color var(--dur-slow) var(--ease-out-soft);
 }
 
-.work-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 14px 34px rgba(14, 122, 62, 0.14);
+.work-card:hover,
+.work-card:focus-within {
+  transform: translateY(-6px);
+  border-color: rgba(14, 92, 107, 0.28);
+  box-shadow: 0 18px 40px rgba(14, 92, 107, 0.16);
 }
 
 .work-card-media {
   position: relative;
   aspect-ratio: 3 / 2;
   background: var(--bg-surface);
+  /* Clips the image as it scales so the zoom stays inside the card. */
+  overflow: hidden;
 }
 
 .work-card-media img {
@@ -262,12 +307,30 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  /* Scale only -- animating width/height would force layout on every frame. */
+  transition: transform var(--dur-slow) var(--ease-out-soft);
+}
+
+.work-card:hover .work-card-media img,
+.work-card:focus-within .work-card-media img {
+  transform: scale(1.06);
+}
+
+/* The badge rises slightly ahead of the card so the two reads as depth rather
+   than one flat plane moving. */
+.work-card-badge {
+  transition: transform var(--dur-slow) var(--ease-out-soft);
+}
+
+.work-card:hover .work-card-badge,
+.work-card:focus-within .work-card-badge {
+  transform: translateY(-3px) scale(1.06);
 }
 
 .work-card-media-empty {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, var(--bg-surface), #E3EFE7);
+  background: linear-gradient(135deg, var(--bg-surface), #DDECEF);
 }
 
 .work-card-badge {
@@ -326,16 +389,31 @@
   font-weight: 600;
   color: var(--accent-teal);
   text-decoration: none;
+  transition: gap var(--dur-fast) var(--ease-out-soft), color var(--dur-fast) var(--ease-out-soft);
 }
 
-.work-card-link:hover {
-  text-decoration: underline;
+/* The arrow travels forward on hover -- the widening gap says "this goes
+   somewhere" more clearly than an underline does. */
+.work-card-link svg {
+  transition: transform var(--dur-fast) var(--ease-out-soft);
+}
+
+.work-card:hover .work-card-link,
+.work-card-link:hover,
+.work-card-link:focus-visible {
+  color: var(--cta-clay);
+}
+
+.work-card:hover .work-card-link svg,
+.work-card-link:hover svg,
+.work-card-link:focus-visible svg {
+  transform: translateX(4px);
 }
 
 /* --------------------------------------------------------------- our impact */
 
 .home-impact {
-  background: linear-gradient(140deg, #0E7A3E 0%, #0A5B2E 100%);
+  background: linear-gradient(140deg, #0E5C6B 0%, #08404E 100%);
   padding: 3.5rem 0;
   color: #FFFFFF;
 }
@@ -422,18 +500,24 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: transform 200ms ease, box-shadow 200ms ease;
+  transition:
+    transform var(--dur-slow) var(--ease-out-soft),
+    box-shadow var(--dur-slow) var(--ease-out-soft),
+    border-color var(--dur-slow) var(--ease-out-soft);
 }
 
-.update-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 14px 34px rgba(14, 122, 62, 0.14);
+.update-card:hover,
+.update-card:focus-within {
+  transform: translateY(-6px);
+  border-color: rgba(14, 92, 107, 0.28);
+  box-shadow: 0 18px 40px rgba(14, 92, 107, 0.16);
 }
 
 .update-card-media {
   position: relative;
   aspect-ratio: 3 / 2;
   background: var(--bg-surface);
+  overflow: hidden;
 }
 
 .update-card-media img {
@@ -441,6 +525,12 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform var(--dur-slow) var(--ease-out-soft);
+}
+
+.update-card:hover .update-card-media img,
+.update-card:focus-within .update-card-media img {
+  transform: scale(1.06);
 }
 
 .update-card-date {
@@ -597,7 +687,7 @@
 
 .story-card-meta strong {
   display: block;
-  color: var(--cta-orange);
+  color: var(--cta-clay);
 }
 
 /* ------------------------------------------------------------ team/partners */
@@ -627,11 +717,11 @@
   margin: 0 auto 1rem;
   border-radius: 50%;
   overflow: hidden;
-  box-shadow: 0 0 0 3px #fff, 0 0 0 5px rgba(14, 122, 62, 0.35);
+  box-shadow: 0 0 0 3px #fff, 0 0 0 5px rgba(14, 92, 107, 0.35);
 }
 
 .person-card-photo-partner {
-  box-shadow: 0 0 0 3px #fff, 0 0 0 5px rgba(184, 92, 16, 0.4);
+  box-shadow: 0 0 0 3px #fff, 0 0 0 5px rgba(188, 83, 24, 0.4);
 }
 
 .person-card-photo img {
@@ -657,7 +747,7 @@
 }
 
 .person-card-role-partner {
-  color: var(--cta-orange);
+  color: var(--cta-clay);
 }
 
 .person-card-note {
@@ -669,7 +759,7 @@
 /* -------------------------------------------------------------------- CTA */
 
 .home-cta {
-  background: linear-gradient(140deg, #0E7A3E 0%, #0A5B2E 100%);
+  background: linear-gradient(140deg, #0E5C6B 0%, #08404E 100%);
   padding: 2.5rem 0;
 }
 
@@ -724,7 +814,7 @@
 
 a.contact-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 28px rgba(14, 122, 62, 0.12);
+  box-shadow: 0 12px 28px rgba(14, 92, 107, 0.12);
 }
 
 .contact-card-icon {
@@ -809,7 +899,7 @@ a.contact-card:hover {
   }
 
   .home-hero-actions .btn-primary-green,
-  .home-hero-actions .btn-primary-orange {
+  .home-hero-actions .btn-primary-clay {
     flex: 1;
     justify-content: center;
   }
@@ -828,19 +918,136 @@ a.contact-card:hover {
   }
 }
 
+/* --------------------------------------------------- remaining hover states */
+
+.person-card,
+.story-card-v2 {
+  transition:
+    transform var(--dur-slow) var(--ease-out-soft),
+    box-shadow var(--dur-slow) var(--ease-out-soft),
+    border-color var(--dur-slow) var(--ease-out-soft);
+}
+
+.person-card:hover,
+.story-card-v2:hover {
+  transform: translateY(-4px);
+  border-color: rgba(14, 92, 107, 0.26);
+  box-shadow: 0 16px 34px rgba(14, 92, 107, 0.14);
+}
+
+.person-card-photo {
+  transition: box-shadow var(--dur-slow) var(--ease-out-soft);
+}
+
+.person-card:hover .person-card-photo {
+  box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--accent-teal);
+}
+
+.person-card-photo img {
+  transition: transform var(--dur-slow) var(--ease-out-soft);
+}
+
+.person-card:hover .person-card-photo img {
+  transform: scale(1.07);
+}
+
+/* Impact figures brighten their ring on hover; the numbers themselves stay put
+   so a reader is never chasing a moving value. */
+.impact-item-icon {
+  transition:
+    border-color var(--dur-slow) var(--ease-out-soft),
+    background-color var(--dur-slow) var(--ease-out-soft),
+    transform var(--dur-slow) var(--ease-out-soft);
+}
+
+.impact-item:hover .impact-item-icon {
+  border-color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-3px);
+}
+
+.home-district-list li {
+  transition: transform var(--dur-fast) var(--ease-out-soft);
+}
+
+.home-district-list li:hover {
+  transform: translateX(3px);
+}
+
+.contact-card {
+  transition:
+    transform var(--dur-slow) var(--ease-out-soft),
+    box-shadow var(--dur-slow) var(--ease-out-soft),
+    border-color var(--dur-slow) var(--ease-out-soft);
+}
+
+.contact-card-icon {
+  transition:
+    background-color var(--dur-fast) var(--ease-out-soft),
+    color var(--dur-fast) var(--ease-out-soft),
+    transform var(--dur-fast) var(--ease-out-soft);
+}
+
+a.contact-card:hover .contact-card-icon {
+  background: var(--accent-teal);
+  color: #FFFFFF;
+  transform: scale(1.08);
+}
+
+/* Every motion above is decoration on top of a state that already reads without
+   it -- colour, shadow and focus outline all remain when motion is switched
+   off, so nothing becomes unusable here. */
 @media (prefers-reduced-motion: reduce) {
   .work-card,
   .update-card,
   .contact-card,
+  .person-card,
+  .story-card-v2,
+  .person-card-photo,
+  .person-card-photo img,
+  .impact-item-icon,
+  .contact-card-icon,
+  .home-district-list li,
+  .work-card-media img,
+  .update-card-media img,
+  .work-card-badge,
+  .work-card-link,
+  .work-card-link svg,
   .btn-primary-green,
-  .btn-primary-orange,
-  .btn-ghost-green {
+  .btn-primary-clay,
+  .btn-ghost-green,
+  .btn-primary-green svg,
+  .btn-primary-clay svg,
+  .btn-ghost-green svg {
     transition: none;
   }
 
   .work-card:hover,
+  .work-card:focus-within,
   .update-card:hover,
-  a.contact-card:hover {
+  .update-card:focus-within,
+  .person-card:hover,
+  .story-card-v2:hover,
+  a.contact-card:hover,
+  .btn-primary-green:hover,
+  .btn-primary-clay:hover,
+  .btn-ghost-green:hover,
+  .home-district-list li:hover,
+  .impact-item:hover .impact-item-icon {
+    transform: none;
+  }
+
+  .work-card:hover .work-card-media img,
+  .work-card:focus-within .work-card-media img,
+  .update-card:hover .update-card-media img,
+  .update-card:focus-within .update-card-media img,
+  .person-card:hover .person-card-photo img,
+  .work-card:hover .work-card-badge,
+  .work-card:hover .work-card-link svg,
+  .btn-primary-green:hover svg,
+  .btn-primary-clay:hover svg,
+  .btn-ghost-green:hover svg,
+  a.contact-card:hover .contact-card-icon {
     transform: none;
   }
 }
