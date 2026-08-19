@@ -1681,244 +1681,277 @@ a.contact-card:hover .contact-card-icon {
   }
 }
 
-/* ================================================== hero: the living figure
+/* ================================================== hero: documentary stage
 
-   The number of lives touched, set enormous and bleeding off the right edge,
-   with the photographs of those lives showing through the digits.
+   One photograph fills the section and cross-fades to the next, drifting very
+   slowly while it holds. The headline never moves; only the image and the
+   caption beneath it change.
 
-   Three numerals are stacked in the same grid cell. The bottom one is solid
-   clay and is the guaranteed floor: if background-clip is unsupported or a
-   photograph fails, that is what remains on screen. The two above it are
-   clipped to the glyphs and cross-fade between gallery photographs.
+   Every frame is mounted and cross-faded by opacity — the only two properties
+   that animate here are opacity and transform, so the whole sequence runs on
+   the compositor and never touches layout.                                  */
 
-   Only opacity and background-position change while the visitor moves, so the
-   whole effect stays on the compositor.                                     */
-
-.home-hero-figure {
+.home-hero-stage {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background:
-    radial-gradient(120% 90% at 82% 18%, rgba(14, 92, 107, 0.55) 0%, rgba(4, 25, 32, 0) 62%),
-    linear-gradient(168deg, #04212A 0%, #06333D 52%, #04212A 100%);
+  background: #04212A;
+  min-height: min(92vh, 900px);
+  display: flex;
+  align-items: flex-end;
 }
 
-/* A hairline grid, barely there, to give the ground the feel of a printed
-   sheet rather than a flat fill. */
-.home-hero-figure::before {
-  content: '';
+.hero-stage {
   position: absolute;
   inset: 0;
-  background-image:
-    linear-gradient(to right, rgba(233, 243, 245, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(233, 243, 245, 0.05) 1px, transparent 1px);
-  background-size: 88px 88px;
-  mask-image: radial-gradient(120% 80% at 50% 40%, #000 25%, transparent 78%);
-  -webkit-mask-image: radial-gradient(120% 80% at 50% 40%, #000 25%, transparent 78%);
-  pointer-events: none;
+  /* Deliberately no z-index. Giving this a stacking context would trap the
+     ticks and caption inside it, and the copy layer above (z-index 2) would
+     then cover them and swallow every click. Left at auto, the ticks compete
+     in the section's own stacking context and stay reachable. */
 }
 
-.home-hero-figure .home-hero-inner {
-  position: relative;
-  z-index: 2;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-  align-items: center;
-  gap: 2rem;
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: clamp(4rem, 9vh, 7rem) 1.5rem clamp(3.5rem, 8vh, 6rem);
-  min-height: min(88vh, 820px);
+.hero-stage-frames {
+  position: absolute;
+  inset: 0;
+}
+
+.hero-stage-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  /* Holds slightly enlarged and settles back over the life of the slide. The
+     movement should be barely perceptible — anything faster reads as a
+     slideshow effect rather than as a photograph being looked at. */
+  transform: scale(1.06);
+  transition: opacity var(--dur-slow, 320ms) linear,
+              transform 9000ms cubic-bezier(0.16, 0.62, 0.32, 1);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.hero-stage-frame.is-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Weighted to the bottom-left where the copy sits, and opened up top-right so
+   the photograph is still legible as a photograph. */
+.hero-stage-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(74deg,
+      rgba(3, 22, 28, 0.94) 0%,
+      rgba(3, 22, 28, 0.80) 30%,
+      rgba(3, 22, 28, 0.38) 58%,
+      rgba(3, 22, 28, 0.12) 100%),
+    linear-gradient(180deg,
+      rgba(3, 22, 28, 0.68) 0%,
+      rgba(3, 22, 28, 0) 26%,
+      rgba(3, 22, 28, 0) 58%,
+      rgba(3, 22, 28, 0.72) 100%);
+  pointer-events: none;
 }
 
 /* ------------------------------------------------------------------- copy */
 
-.home-hero-figure .home-hero-copy {
-  max-width: 33rem;
+.home-hero-stage .home-hero-inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: clamp(8rem, 18vh, 12rem) 1.5rem clamp(3.25rem, 8vh, 5rem);
+  display: block;
 }
 
-.home-hero-figure .home-eyebrow {
+.home-hero-stage .home-hero-copy {
+  max-width: 40rem;
+}
+
+.home-hero-stage .home-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
   color: var(--clay-on-dark, #EFA96F);
 }
 
-.home-hero-figure .home-hero-title {
+.home-hero-stage .home-eyebrow::before {
+  content: '';
+  width: 2.75rem;
+  height: 1px;
+  background: currentColor;
+}
+
+.home-hero-stage .home-hero-title {
   color: #FFFFFF;
-  font-size: clamp(2.3rem, 4.4vw, 3.5rem);
-  line-height: 1.06;
-  letter-spacing: -0.025em;
+  font-size: clamp(2.6rem, 6.6vw, 5rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
   text-wrap: balance;
+  margin-bottom: 1.25rem;
 }
 
 /* Lora's italic is the most characterful face already loaded on this site, so
-   the second line leans on it rather than pulling in another. */
-.home-hero-figure .home-hero-title-accent {
+   the accent line leans on it rather than pulling in another. */
+.home-hero-stage .home-hero-title-accent {
   color: var(--clay-on-dark, #EFA96F);
   font-style: italic;
 }
 
-.home-hero-figure .home-hero-lede {
-  color: rgba(233, 243, 245, 0.88);
-  font-size: clamp(1rem, 1.3vw, 1.12rem);
-  max-width: 30rem;
+.home-hero-stage .home-hero-lede {
+  color: rgba(233, 243, 245, 0.9);
+  font-size: clamp(1.02rem, 1.35vw, 1.18rem);
+  line-height: 1.62;
+  max-width: 31rem;
+  margin-bottom: 2rem;
 }
 
-.home-hero-figure .home-hero-proof {
-  gap: 1.5rem 2.25rem;
-  padding-top: 1.6rem;
-  border-top: 1px solid rgba(233, 243, 245, 0.16);
+.home-hero-stage .home-hero-proof {
+  gap: 1.25rem 2.5rem;
+  margin-top: 2.25rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(233, 243, 245, 0.2);
 }
 
-.home-hero-figure .home-hero-proof-item {
-  color: rgba(233, 243, 245, 0.82);
+.home-hero-stage .home-hero-proof-item {
+  color: rgba(233, 243, 245, 0.84);
 }
 
-.home-hero-figure .home-hero-proof-item strong {
+.home-hero-stage .home-hero-proof-item strong {
   color: #FFFFFF;
+  font-size: 1.6rem;
+  font-variant-numeric: tabular-nums;
 }
 
-/* ----------------------------------------------------------------- figure */
+/* --------------------------------------------------- caption and the ticks */
 
-.hero-figure {
-  position: relative;
-  justify-self: end;
-  width: 100%;
-  /* The numerals run past the right edge on purpose: a figure this size reads
-     as a printed page only if it is allowed to be cropped. */
-  margin-right: clamp(-7rem, -4vw, -1rem);
-  --drift-x: 0%;
-  --drift-y: 0%;
-}
-
-.hero-figure-stack {
-  position: relative;
-  display: grid;
-}
-
-.hero-figure-digits {
-  grid-area: 1 / 1;
-  display: block;
-  font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: clamp(5.5rem, 15.5vw, 15rem);
-  line-height: 0.82;
-  letter-spacing: -0.055em;
-  /* Lining figures of even width, so the number does not jitter sideways as it
-     counts up through different digits. */
-  font-variant-numeric: tabular-nums lining-nums;
-  font-feature-settings: 'tnum' 1, 'lnum' 1;
-  white-space: nowrap;
-  user-select: none;
-}
-
-.hero-figure-solid {
-  color: var(--clay-on-dark, #EFA96F);
-  opacity: 0.28;
-}
-
-.hero-figure-fill {
-  color: transparent;
-  background-repeat: no-repeat;
-  background-size: 118% auto;
-  background-position: calc(50% + var(--drift-x)) calc(42% + var(--drift-y));
-  -webkit-background-clip: text;
-          background-clip: text;
-  opacity: 0;
-  transition: opacity 1200ms var(--ease-out-soft, ease),
-              background-position 700ms var(--ease-out-soft, ease);
-  /* Keeps the clipped text on its own layer so the parallax never repaints the
-     numerals themselves. */
-  will-change: background-position;
-}
-
-.hero-figure-fill.is-top {
-  opacity: 1;
-}
-
-/* A thin clay keyline traced around the glyphs. Without it the photograph
-   dissolves into the ground wherever the image happens to be dark. */
-.hero-figure-solid {
-  -webkit-text-stroke: 1px rgba(239, 169, 111, 0.42);
-}
-
-.hero-figure-label {
-  margin: 1.1rem 0 0;
-  padding-left: 0.35rem;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.28em;
+/* The caption names the photograph currently on screen. It sits on the
+   opposite side from the copy so the two never compete. */
+.hero-stage-caption {
+  position: absolute;
+  right: 1.75rem;
+  bottom: 3.65rem;
+  z-index: 3;
+  margin: 0;
+  max-width: 18rem;
+  text-align: right;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--clay-on-dark, #EFA96F);
+  color: rgba(233, 243, 245, 0.78);
 }
 
-.hero-figure-label::before {
-  content: '';
-  display: inline-block;
-  width: 2.25rem;
+.hero-stage-ticks {
+  position: absolute;
+  right: 1.75rem;
+  bottom: 2.1rem;
+  z-index: 3;
+  display: flex;
+  gap: 0.4rem;
+}
+
+/* Each tick is a hairline, not a dot — it reads as a filmstrip index rather
+   than as carousel furniture. The hit area is padded out to 44px. */
+.hero-stage-tick {
+  position: relative;
+  width: 1.6rem;
   height: 1px;
-  margin-right: 0.75rem;
-  vertical-align: middle;
-  background: currentColor;
+  padding: 0;
+  border: 0;
+  background: rgba(233, 243, 245, 0.34);
+  cursor: pointer;
+  transition: background var(--dur-slow, 320ms) var(--ease-out-soft, ease);
 }
 
-/* ------------------------------------------------------------- responsive */
-
-@media (max-width: 1024px) {
-  .home-hero-figure .home-hero-inner {
-    grid-template-columns: 1fr;
-    gap: 2.75rem;
-    min-height: auto;
-    padding-top: 3.5rem;
-  }
-
-  /* Below the split, the figure leads and the copy follows it. */
-  .hero-figure {
-    order: -1;
-    justify-self: start;
-    margin-right: 0;
-  }
-
-  .hero-figure-digits {
-    font-size: clamp(4.75rem, 22vw, 11rem);
-  }
-
-  .home-hero-figure .home-hero-copy,
-  .home-hero-figure .home-hero-lede {
-    max-width: 40rem;
-  }
+.hero-stage-tick::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 44px;
+  transform: translateY(-50%);
 }
 
-@media (max-width: 640px) {
-  .home-hero-figure .home-hero-inner {
-    padding: 3rem 1.25rem 3.25rem;
+.hero-stage-tick:hover {
+  background: rgba(233, 243, 245, 0.7);
+}
+
+.hero-stage-tick.is-active {
+  background: var(--clay-on-dark, #EFA96F);
+}
+
+.hero-stage-tick:focus-visible {
+  outline: 2px solid var(--clay-on-dark, #EFA96F);
+  outline-offset: 6px;
+}
+
+/* ---------------------------------------------------------------- mobile */
+
+@media (max-width: 768px) {
+  .home-hero-stage {
+    min-height: min(88vh, 720px);
   }
 
-  .hero-figure-digits {
-    font-size: clamp(4.25rem, 25vw, 8rem);
-    letter-spacing: -0.045em;
+  .home-hero-stage .home-hero-inner {
+    padding: 7rem 1.25rem 4.5rem;
   }
 
-  .hero-figure-label {
+  /* At this width the copy runs the full column, so the scrim becomes a
+     straight vertical wash rather than a diagonal one. */
+  .hero-stage-scrim {
+    background: linear-gradient(180deg,
+      rgba(3, 22, 28, 0.72) 0%,
+      rgba(3, 22, 28, 0.42) 34%,
+      rgba(3, 22, 28, 0.86) 78%,
+      rgba(3, 22, 28, 0.95) 100%);
+  }
+
+  .hero-stage-caption {
+    left: 1.25rem;
+    right: 1.25rem;
+    bottom: 3.35rem;
+    max-width: none;
+    text-align: left;
     font-size: 0.72rem;
-    letter-spacing: 0.22em;
   }
 
-  .hero-figure-label::before {
-    width: 1.5rem;
-    margin-right: 0.55rem;
+  .hero-stage-ticks {
+    left: 1.25rem;
+    right: auto;
+    bottom: 1.9rem;
+  }
+
+  .home-hero-stage .home-hero-proof-item strong {
+    font-size: 1.4rem;
   }
 }
 
-/* ---------------------------------------------------------- reduced motion */
+/* -------------------------------------------------------- reduced motion */
 
-/* No count-up and no parallax are scheduled from JS in this mode; this covers
-   the cross-fade so a layer swap cannot animate either. */
+/* No rotation is scheduled from JS in this mode. This stops the drift and the
+   crossfade as well, so the first photograph simply is the photograph. */
 @media (prefers-reduced-motion: reduce) {
-  .hero-figure-fill {
+  .hero-stage-frame {
     transition: none;
-    will-change: auto;
+    transform: none;
+  }
+
+  .hero-stage-frame.is-active {
+    transform: none;
+  }
+
+  .hero-stage-tick {
+    transition: none;
   }
 }
 
-.hero-figure.is-still .hero-figure-fill {
+.hero-stage.is-still .hero-stage-frame {
   transition: none;
+  transform: none;
 }
