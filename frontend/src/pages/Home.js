@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Users, MapPin, HandCoins, FolderCheck, ArrowRight, Heart,
@@ -8,7 +8,7 @@ import {
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import MaharashtraMap from '@/components/MaharashtraMap';
-import HeroSlideshow from '@/components/HeroSlideshow';
+import HeroLedger from '@/components/HeroLedger';
 import { getCached } from '@/lib/apiClient';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import '@/styles/home.css';
@@ -121,16 +121,6 @@ const Home = () => {
   // Which project card is currently hovered or focused. Its photograph expands
   // to fill the section behind the grid; null means no card is engaged.
   const [activeProject, setActiveProject] = useState(null);
-  // The hero mirrors whichever photograph the slideshow is showing, expanding it
-  // across the whole section while the visitor is engaged with it.
-  const [heroSlide, setHeroSlide] = useState(null);
-  const [heroEngaged, setHeroEngaged] = useState(false);
-
-  // Stable identities: HeroSlideshow reports upward from an effect, and a fresh
-  // function each render would restart that effect on every state change.
-  const handleHeroSlideChange = useCallback((slide) => setHeroSlide(slide || null), []);
-  const handleHeroHoverChange = useCallback((engaged) => setHeroEngaged(engaged), []);
-
   const hasStats = stats !== null;
   const displayStats = stats || {
     patients_served: 0,
@@ -352,7 +342,54 @@ const Home = () => {
         });
       }
 
+      // Repeated items arrive one after another rather than as one block. A
+      // whole section fading in at once reads as a page still loading; the
+      // same content staggered reads as it arriving, which is the difference
+      // between the two on any well-made site.
+      const STAGGER_ITEMS = [
+        '.work-card', '.person-card', '.story-card-v2', '.update-card',
+        '.impact-item', '.trust-card', '.contact-card', '.home-district-list li'
+      ].join(', ');
+
       gsap.utils.toArray('.reveal-section').forEach((section) => {
+        const items = Array.from(section.querySelectorAll(STAGGER_ITEMS));
+
+        if (items.length > 1) {
+          // Where a section has a run of items, the heading leads and the items
+          // follow it in. Fading the section as well would flatten the stagger
+          // back into a single block, so it is deliberately left alone.
+          const head = section.querySelector('.home-section-head, .home-eyebrow, .home-section-title');
+          if (head) {
+            gsap.fromTo(
+              head,
+              { opacity: 0, y: yOffset * 0.5 },
+              {
+                opacity: 1,
+                y: 0,
+                duration: 0.6,
+                ease: 'power2.out',
+                scrollTrigger: { trigger: section, start: 'top 85%', once: true }
+              }
+            );
+          }
+
+          gsap.fromTo(
+            items,
+            { opacity: 0, y: yOffset * 0.62 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.62,
+              ease: 'power2.out',
+              // 70ms apart: below about 50 the run reads as one event, above
+              // about 100 the last card is visibly late.
+              stagger: isSmallScreen ? 0.05 : 0.07,
+              scrollTrigger: { trigger: section, start: 'top 80%', once: true }
+            }
+          );
+          return;
+        }
+
         gsap.fromTo(
           section,
           { opacity: 0, y: yOffset },
@@ -419,74 +456,57 @@ const Home = () => {
       <Navbar />
 
       {/* ---------------------------------------------------------------- Hero */}
-      <section
-        className={`home-hero${heroEngaged && heroSlide?.image_url ? ' is-immersive' : ''}`}
-        data-testid="hero-section"
-      >
-        {/* A single element rather than one per photograph: it points at the
-            same URL the slideshow is already displaying, so the browser serves
-            it from cache and the expansion starts instantly. Mounting all
-            eleven gallery images a second time would double the hero's bytes
-            for no visual gain. */}
-        <div className="hero-backdrop" aria-hidden="true">
-          {heroSlide?.image_url && (
-            <img
-              src={optimizeCloudinaryUrl(heroSlide.image_url, { width: 1200 })}
-              alt=""
-              decoding="async"
-              className="hero-backdrop-image"
-            />
-          )}
-          <div className="hero-backdrop-scrim" />
-        </div>
+      <section className="home-hero home-hero-ledger" data-testid="hero-section">
+        <HeroLedger slides={gallery} fallbackImage={heroImage} />
 
         <div className="home-hero-inner" ref={heroRef}>
           <div className="home-hero-copy">
-            <p className="home-eyebrow">Together, We Create Change</p>
+            <p className="home-eyebrow">Registered public trust · Maharashtra</p>
             <h1 className="home-hero-title">
-              Hands United,
+              Every rupee,
               <br />
-              <span className="home-hero-title-accent">Hearts Connected.</span>
+              <span className="home-hero-title-accent">accounted for.</span>
             </h1>
             <p className="home-hero-lede">
-              Empowering communities through healthcare, education, disaster relief,
-              and elderly care across Maharashtra.
+              Home-based palliative care, elderly care and medical camps across rural
+              Maharashtra — with the books open on every one of them.
             </p>
 
             <div className="home-hero-actions">
-              <Link to="/projects" className="btn-primary-green" data-testid="hero-explore-button">
-                Explore Our Work <ArrowRight size={18} aria-hidden="true" />
-              </Link>
               <Link to="/donate" className="btn-primary-clay" data-testid="hero-donate-button">
                 Donate Now <Heart size={18} aria-hidden="true" />
               </Link>
-            </div>
-
-            <div className="home-hero-proof">
-              {hasStats && displayStats.patients_served > 0 && (
-                <div className="home-hero-proof-item">
-                  <strong>{displayStats.patients_served.toLocaleString('en-IN')}+</strong>
-                  <span>Lives Touched</span>
-                </div>
-              )}
-              <div className="home-hero-proof-item">
-                <MapPin size={16} aria-hidden="true" style={{ color: 'var(--accent-teal)' }} />
-                <span>
-                  Working in {visibleLocations.length}+ Districts
-                  <br />Across Maharashtra
-                </span>
-              </div>
+              <Link to="/transparency" className="btn-primary-green" data-testid="hero-explore-button">
+                See The Numbers <ArrowRight size={18} aria-hidden="true" />
+              </Link>
             </div>
           </div>
 
-          <div className="home-hero-media">
-            <HeroSlideshow
-              slides={gallery}
-              fallbackImage={heroImage}
-              fallbackAlt="A United Hands Foundation volunteer handing supplies to children in a Maharashtra village"
-              onActiveChange={handleHeroSlideChange}
-              onHoverChange={handleHeroHoverChange}
-            />
+          {/* Every figure here is read from the API rather than written into
+              the page, so the ledger cannot drift out of date. */}
+          <div className="ledger-figures" data-testid="ledger-figures">
+            <div className="ledger-cell">
+              <span className="ledger-value">
+                {hasStats ? displayStats.patients_served.toLocaleString('en-IN') : '—'}
+              </span>
+              <span className="ledger-label">Lives touched</span>
+            </div>
+            <div className="ledger-cell">
+              <span className="ledger-value">{visibleLocations.length}</span>
+              <span className="ledger-label">Districts</span>
+            </div>
+            <div className="ledger-cell">
+              <span className="ledger-value">
+                {hasStats ? formatIndianCompact(displayStats.total_amount) : '—'}
+              </span>
+              <span className="ledger-label">Deployed</span>
+            </div>
+            <div className="ledger-cell">
+              <span className="ledger-value">
+                {hasStats ? displayStats.total_donations.toLocaleString('en-IN') : '—'}
+              </span>
+              <span className="ledger-label">Donations received</span>
+            </div>
           </div>
         </div>
       </section>

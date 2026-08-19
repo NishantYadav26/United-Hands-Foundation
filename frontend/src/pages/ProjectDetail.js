@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import { ArrowLeft, Heart } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { apiClient } from '@/lib/apiClient';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
+import '@/styles/pages.css';
 
 const slugify = (value = '') => value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
@@ -11,6 +13,8 @@ const matchesProjectRoute = (project, routeValue) => {
   if (!project || !routeValue) return false;
   return project.id === routeValue || project.slug === routeValue || slugify(project.title) === routeValue;
 };
+
+const rupees = (value) => `₹${Number(value || 0).toLocaleString('en-IN')}`;
 
 export default function ProjectDetail() {
   const { slug } = useParams();
@@ -53,25 +57,107 @@ export default function ProjectDetail() {
     };
   }, [slug]);
 
-  if (loading) return <div><Navbar /><main className='pt-32 text-center'>Loading project...</main><Footer /></div>;
-  if (!project) return <div><Navbar /><main className='pt-32 text-center'>Project not found</main><Footer /></div>;
-  const progress = Math.min((project.raised_amount / Math.max(project.target_amount, 1)) * 100, 100);
+  if (loading || !project) {
+    return (
+      <div className="page-shell">
+        <Navbar />
+        <header className="page-head">
+          <div className="page-wrap">
+            <Link to="/projects" className="page-crumb">
+              <ArrowLeft size={15} aria-hidden="true" /> All projects
+            </Link>
+            <h1 className="page-title">{loading ? 'Loading…' : 'Project not found'}</h1>
+            {!loading && (
+              <p className="page-lede">
+                This project may have been renamed or retired. Browse everything we are
+                running from the projects page.
+              </p>
+            )}
+          </div>
+        </header>
+        <Footer />
+      </div>
+    );
+  }
 
-  return <div className="min-h-screen" style={{ background: 'var(--bg-deep)' }}>
-    <Navbar />
-    <main className="max-w-6xl mx-auto px-4 sm:px-6 py-14">
-      <img src={optimizeCloudinaryUrl(project.hero_image, { width: 1200 })} alt={project.title} loading="eager" className="w-full h-[420px] object-cover rounded mb-8" />
-      <h1 className="text-4xl mb-4" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-heading)' }}>{project.title}</h1>
-      <p className="mb-6" style={{ color: 'var(--text-muted)' }}>{project.description}</p>
-      <div className="mb-8">
-        <div className="w-full bg-[var(--bg-surface)] rounded h-3 overflow-hidden"><div className="h-full bg-[var(--accent-teal)]" style={{ width: `${progress}%` }} /></div>
-        <p className="mt-2 text-sm" style={{ color: 'var(--text-muted)' }}>Raised ₹{project.raised_amount?.toLocaleString?.() || 0} of ₹{project.target_amount?.toLocaleString?.() || 0}</p>
-      </div>
-      <h3 className="text-2xl mb-4" style={{ color: 'var(--text-primary)' }}>Impact Gallery</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {(project.images || []).map((image, idx) => <img key={idx} src={optimizeCloudinaryUrl(image, { width: 800 })} alt={`${project.title}-${idx + 1}`} loading="lazy" className="w-full h-56 object-cover rounded" />)}
-      </div>
-    </main>
-    <Footer />
-  </div>;
+  const target = Number(project.target_amount) || 0;
+  const raised = Number(project.raised_amount) || 0;
+  const progress = target > 0 ? Math.min((raised / target) * 100, 100) : 0;
+  const gallery = (project.images || []).filter(Boolean);
+
+  return (
+    <div className="page-shell">
+      <Navbar />
+
+      <header className="page-head">
+        <div className="page-wrap">
+          <Link to="/projects" className="page-crumb">
+            <ArrowLeft size={15} aria-hidden="true" /> All projects
+          </Link>
+          {project.category && <p className="page-eyebrow">{project.category}</p>}
+          <h1 className="page-title">{project.title}</h1>
+        </div>
+      </header>
+
+      <main className="page-body">
+        <div className="page-wrap">
+          {project.hero_image && (
+            <div className="detail-hero">
+              <img
+                src={optimizeCloudinaryUrl(project.hero_image, { width: 1400 })}
+                alt={project.title}
+                loading="eager"
+                decoding="async"
+              />
+            </div>
+          )}
+
+          <div className="detail-layout">
+            <div>
+              {/* white-space: pre-line in the stylesheet — the stored copy carries
+                  its own paragraph breaks, which the previous markup collapsed. */}
+              <div className="detail-prose">{project.description}</div>
+            </div>
+
+            <aside className="detail-aside">
+              <h2>Support this work</h2>
+              {target > 0 && (
+                <>
+                  <div className="detail-meter" role="img" aria-label={`${rupees(raised)} raised of a ${rupees(target)} goal`}>
+                    <span style={{ width: `${progress}%` }} />
+                  </div>
+                  <div className="detail-figures">
+                    <div><strong>{rupees(raised)}</strong>Raised</div>
+                    <div style={{ textAlign: 'right' }}><strong>{rupees(target)}</strong>Goal</div>
+                  </div>
+                </>
+              )}
+              <Link to="/donate" className="btn-primary-clay" style={{ justifyContent: 'center' }}>
+                Donate now <Heart size={17} aria-hidden="true" />
+              </Link>
+            </aside>
+          </div>
+
+          {gallery.length > 0 && (
+            <>
+              <h2 className="detail-section-title">From the field</h2>
+              <div className="detail-gallery">
+                {gallery.map((image, idx) => (
+                  <img
+                    key={image}
+                    src={optimizeCloudinaryUrl(image, { width: 800 })}
+                    alt={`${project.title} — photograph ${idx + 1}`}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  );
 }

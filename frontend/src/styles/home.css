@@ -114,11 +114,15 @@
   text-decoration: none;
   white-space: nowrap;
   border: 1px solid transparent;
+  /* The lift stays quick so the button feels responsive under the finger, but
+     the colour and shadow settle more slowly. Matching every property to the
+     same short duration is what makes a button read as a switch rather than a
+     surface. */
   transition:
-    background-color var(--dur-fast) var(--ease-out-soft),
-    color var(--dur-fast) var(--ease-out-soft),
+    background-color var(--dur-slow) var(--ease-out-soft),
+    color var(--dur-slow) var(--ease-out-soft),
     transform var(--dur-fast) var(--ease-out-soft),
-    box-shadow var(--dur-fast) var(--ease-out-soft);
+    box-shadow var(--dur-slow) var(--ease-out-soft);
 }
 
 /* Icons inside buttons pick up the same forward nudge as the card links. */
@@ -1679,4 +1683,270 @@ a.contact-card:hover .contact-card-icon {
   .home-hero.is-immersive .home-hero-media {
     transform: none;
   }
+}
+
+/* ======================================================= hero: the ledger
+
+   A printed ground rather than a screen one: pale cool grey, deep teal ink, a
+   single clay accent, and the figures ruled off along the bottom the way an
+   annual report opens.
+
+   The ground is a grey biased toward the brand teal rather than a cream, which
+   keeps it out of warm-paper territory and lets the teal ink sit on it as one
+   family. Clay on this ground measures 5.2:1, so the accent carries body text
+   as well as display.
+
+   Written mobile first: the phone stack is the base rule and the two-column
+   arrangement with the full-height photograph is the enhancement.           */
+
+.home-hero-ledger {
+  --ledger-ground: #E4E7E1;
+  --ledger-ink: #123138;
+  --ledger-accent: #8C4E28;
+  --ledger-rule: rgba(18, 49, 56, 0.26);
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--ledger-ground);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ------------------------------------------------------------ photograph */
+
+/* Phone: a band across the top, under the navbar. Desktop turns it into the
+   full-height column on the right. */
+.ledger-strip {
+  position: relative;
+  order: -1;
+  width: 100%;
+  height: clamp(11rem, 34vw, 16rem);
+  /* No top margin: the navbar is position:sticky, so it already occupies flow
+     space and the section begins below it. Clearing it again left a dead band
+     of flat ground between the navbar and the photograph. */
+  overflow: hidden;
+  background: #D3D9D4;
+}
+
+.ledger-strip-layer {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: 50% 42%;
+  opacity: 0;
+  transition: opacity 1500ms var(--ease-out-soft, ease);
+}
+
+.ledger-strip-layer.is-top {
+  opacity: 1;
+}
+
+/* ------------------------------------------------------------------ copy */
+
+.home-hero-ledger .home-hero-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2.25rem 1.25rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.home-hero-ledger .home-hero-copy {
+  max-width: 36rem;
+}
+
+.home-hero-ledger .home-eyebrow {
+  display: block;
+  margin-bottom: 1rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ledger-accent);
+}
+
+.home-hero-ledger .home-hero-title {
+  color: var(--ledger-ink);
+  font-size: clamp(2.35rem, 9.5vw, 5.2rem);
+  line-height: 1.0;
+  letter-spacing: -0.032em;
+  margin-bottom: 1.1rem;
+  text-wrap: balance;
+}
+
+/* Lora's italic is the most characterful face already loaded here, so the
+   accent line leans on it rather than pulling in another. */
+.home-hero-ledger .home-hero-title-accent {
+  color: var(--ledger-accent);
+  font-style: italic;
+}
+
+.home-hero-ledger .home-hero-lede {
+  color: rgba(18, 49, 56, 0.78);
+  font-size: 1rem;
+  line-height: 1.65;
+  max-width: 32rem;
+  margin-bottom: 1.75rem;
+}
+
+.home-hero-ledger .home-hero-actions {
+  gap: 0.75rem;
+  margin-bottom: 0;
+}
+
+@media (max-width: 400px) {
+  .home-hero-ledger .home-hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .home-hero-ledger .home-hero-actions > a {
+    justify-content: center;
+    min-height: 3rem;
+  }
+}
+
+/* --------------------------------------------------------------- figures */
+
+/* The ledger itself. A rule across the top and hairlines between the cells,
+   set in the heading face with tabular figures so the columns align. */
+.ledger-figures {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 2.25rem;
+  padding-top: 1.35rem;
+  border-top: 2px solid var(--ledger-ink);
+  gap: 1.35rem 0;
+}
+
+.ledger-cell {
+  padding: 0 1rem;
+}
+
+.ledger-cell:nth-child(odd) {
+  padding-left: 0;
+}
+
+.ledger-cell:nth-child(even) {
+  border-left: 1px solid var(--ledger-rule);
+}
+
+.ledger-value {
+  display: block;
+  font-family: var(--font-heading, Georgia, serif);
+  font-size: clamp(1.7rem, 6.5vw, 2.5rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--ledger-ink);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.ledger-label {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(18, 49, 56, 0.62);
+}
+
+/* ------------------------------------------------------------ tablet up */
+
+@media (min-width: 680px) {
+  .ledger-figures {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+  }
+
+  .ledger-cell:nth-child(odd) {
+    padding-left: 1rem;
+  }
+
+  .ledger-cell:first-child {
+    padding-left: 0;
+  }
+
+  /* Every cell but the first gets the hairline once they sit in one row. */
+  .ledger-cell + .ledger-cell {
+    border-left: 1px solid var(--ledger-rule);
+  }
+
+  .ledger-label {
+    font-size: 0.68rem;
+  }
+}
+
+/* -------------------------------------------------------------- desktop */
+
+@media (min-width: 1024px) {
+  .home-hero-ledger {
+    display: block;
+    min-height: 100dvh;
+  }
+
+  /* The photograph becomes the right-hand column, bled to all three edges. */
+  .ledger-strip {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    order: 0;
+    width: 42%;
+    height: auto;
+  }
+
+  /* Fades the column into the ground so it reads as a printed plate on the
+     page rather than a rectangle pasted over it. */
+  /* Softens only the inner edge so the plate meets the ground without a hard
+     seam. The earlier ramp stayed 55% opaque a fifth of the way in and did not
+     clear until past the middle, which veiled most of the photograph. */
+  .ledger-strip::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg,
+      var(--ledger-ground) 0%,
+      rgba(228, 231, 225, 0.42) 6%,
+      rgba(228, 231, 225, 0) 20%);
+    pointer-events: none;
+  }
+
+  .home-hero-ledger .home-hero-inner {
+    min-height: 100dvh;
+    justify-content: center;
+    padding: 8rem 2.5rem 4rem;
+    /* Clears the photograph column. */
+    padding-right: 45%;
+  }
+
+  .home-hero-ledger .home-hero-title {
+    font-size: clamp(3.4rem, 5.2vw, 5.2rem);
+  }
+
+  .home-hero-ledger .home-hero-lede {
+    font-size: 1.1rem;
+  }
+
+  .ledger-figures {
+    margin-top: 3.25rem;
+    padding-top: 1.6rem;
+  }
+}
+
+@supports not (min-height: 100dvh) {
+  @media (min-width: 1024px) {
+    .home-hero-ledger,
+    .home-hero-ledger .home-hero-inner { min-height: 100vh; }
+  }
+}
+
+/* ------------------------------------------------------- reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .ledger-strip-layer { transition: none; }
 }

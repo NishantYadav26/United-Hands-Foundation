@@ -1,0 +1,409 @@
+/* =========================================================== inner pages
+
+   Shared shell for the pages behind the homepage's calls to action. The
+   homepage was rebuilt but everything a visitor clicked into was still the
+   original thin markup, so the site changed character the moment anyone
+   navigated. This carries the homepage's language across.
+
+   The token block mirrors the one in home.css by design: a visitor can land
+   on /projects directly, in which case home.css was never imported and its
+   custom properties do not exist. Values are identical, so when both files
+   are present the cascade resolves to the same result either way.          */
+
+:root {
+  --page-ink: #14313A;
+  --page-clay: #BC5318;
+  --page-clay-hover: #9E4413;
+  --page-clay-dark: #EFA96F;
+  --page-teal: #0E5C6B;
+  --page-deep: #06333D;
+  --page-rule: #DDE7E9;
+  --page-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.page-shell {
+  min-height: 100vh;
+  background: var(--bg-deep, #FAF8F5);
+}
+
+.page-wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* ------------------------------------------------------------ page header */
+
+.page-head {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(110% 90% at 78% 16%, rgba(14, 92, 107, 0.5) 0%, rgba(4, 25, 32, 0) 62%),
+    linear-gradient(168deg, #04212A 0%, #06333D 54%, #04212A 100%);
+  padding: clamp(6.5rem, 13vh, 9rem) 0 clamp(3rem, 7vh, 4.5rem);
+  overflow: hidden;
+}
+
+.page-head::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(233, 243, 245, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(233, 243, 245, 0.05) 1px, transparent 1px);
+  background-size: 84px 84px;
+  -webkit-mask-image: radial-gradient(110% 80% at 40% 40%, #000 20%, transparent 76%);
+          mask-image: radial-gradient(110% 80% at 40% 40%, #000 20%, transparent 76%);
+  pointer-events: none;
+}
+
+.page-head > * {
+  position: relative;
+  z-index: 1;
+}
+
+.page-eyebrow {
+  margin: 0 0 0.9rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--page-clay-dark);
+}
+
+.page-title {
+  margin: 0;
+  font-family: var(--font-heading, Georgia, serif);
+  font-size: clamp(2.3rem, 5.2vw, 3.7rem);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  color: #FFFFFF;
+  text-wrap: balance;
+}
+
+.page-title em {
+  font-style: italic;
+  color: var(--page-clay-dark);
+}
+
+.page-lede {
+  margin: 1.1rem 0 0;
+  max-width: 42rem;
+  font-size: clamp(1rem, 1.3vw, 1.1rem);
+  line-height: 1.65;
+  color: rgba(233, 243, 245, 0.85);
+}
+
+.page-body {
+  padding: clamp(3rem, 7vh, 4.5rem) 0 clamp(4rem, 9vh, 6rem);
+}
+
+/* ------------------------------------------------------------ breadcrumb */
+
+.page-crumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 1.4rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--page-clay-dark);
+  text-decoration: none;
+  transition: color 180ms var(--page-ease);
+}
+
+.page-crumb:hover {
+  color: #FFFFFF;
+}
+
+.page-crumb svg {
+  transition: transform 180ms var(--page-ease);
+}
+
+.page-crumb:hover svg {
+  transform: translateX(-3px);
+}
+
+/* ------------------------------------------------------- project card grid */
+
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  gap: 1.75rem;
+}
+
+.project-card {
+  display: flex;
+  flex-direction: column;
+  background: #FFFFFF;
+  border: 1px solid var(--page-rule);
+  border-radius: 1rem;
+  overflow: hidden;
+  transition: transform 320ms var(--page-ease), box-shadow 320ms var(--page-ease),
+              border-color 320ms var(--page-ease);
+}
+
+.project-card:hover,
+.project-card:focus-within {
+  transform: translateY(-4px);
+  border-color: rgba(14, 92, 107, 0.28);
+  box-shadow: 0 18px 44px rgba(14, 92, 107, 0.16);
+}
+
+.project-card-media {
+  position: relative;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  background: #E8F0F1;
+}
+
+.project-card-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 520ms var(--page-ease);
+}
+
+.project-card:hover .project-card-media img {
+  transform: scale(1.045);
+}
+
+.project-card-badge {
+  position: absolute;
+  left: 0.9rem;
+  top: 0.9rem;
+  padding: 0.32rem 0.75rem;
+  border-radius: 100px;
+  background: var(--page-teal);
+  color: #FFFFFF;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.project-card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 0.6rem;
+  padding: 1.35rem 1.4rem 1.5rem;
+}
+
+.project-card-title {
+  margin: 0;
+  font-family: var(--font-heading, Georgia, serif);
+  font-size: 1.35rem;
+  line-height: 1.22;
+  letter-spacing: -0.01em;
+  color: var(--page-ink);
+}
+
+.project-card-text {
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.6;
+  color: var(--text-muted, #566B71);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.project-card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: auto;
+  padding-top: 0.7rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--page-clay);
+  text-decoration: none;
+}
+
+.project-card-link svg {
+  transition: transform 200ms var(--page-ease);
+}
+
+.project-card:hover .project-card-link svg {
+  transform: translateX(4px);
+}
+
+/* -------------------------------------------------------------- states */
+
+.page-empty {
+  padding: 3.5rem 1.5rem;
+  text-align: center;
+  border: 1px dashed var(--page-rule);
+  border-radius: 1rem;
+  color: var(--text-muted, #566B71);
+}
+
+.page-skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  gap: 1.75rem;
+}
+
+.page-skeleton {
+  height: 22rem;
+  border-radius: 1rem;
+  background: linear-gradient(100deg, #EEF4F5 30%, #F7FAFB 50%, #EEF4F5 70%);
+  background-size: 220% 100%;
+  animation: page-shimmer 1.4s linear infinite;
+}
+
+@keyframes page-shimmer {
+  to { background-position: -220% 0; }
+}
+
+/* ------------------------------------------------------- project detail */
+
+.detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 20rem;
+  gap: 3rem;
+  align-items: start;
+}
+
+.detail-hero {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: #E8F0F1;
+  margin-bottom: 2.25rem;
+}
+
+.detail-hero img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The stored descriptions carry their own line breaks and use a leading
+   asterisk for sub-headings. Collapsing that whitespace, as the previous
+   markup did, ran the whole thing together into one unreadable block. */
+.detail-prose {
+  font-size: 1.03rem;
+  line-height: 1.75;
+  color: #38505A;
+  white-space: pre-line;
+}
+
+.detail-aside {
+  position: sticky;
+  top: 6.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.6rem 1.5rem;
+  border: 1px solid var(--page-rule);
+  border-radius: 1rem;
+  background: #F6FAFB;
+}
+
+.detail-aside h2 {
+  margin: 0;
+  font-family: var(--font-heading, Georgia, serif);
+  font-size: 1.15rem;
+  color: var(--page-ink);
+}
+
+.detail-meter {
+  height: 0.55rem;
+  border-radius: 100px;
+  background: #DCE8EA;
+  overflow: hidden;
+}
+
+.detail-meter span {
+  display: block;
+  height: 100%;
+  border-radius: 100px;
+  background: linear-gradient(90deg, var(--page-teal), #16849A);
+}
+
+.detail-figures {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.86rem;
+  color: var(--text-muted, #566B71);
+}
+
+.detail-figures strong {
+  display: block;
+  font-family: var(--font-heading, Georgia, serif);
+  font-size: 1.2rem;
+  color: var(--page-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.detail-section-title {
+  margin: 3rem 0 1.25rem;
+  font-family: var(--font-heading, Georgia, serif);
+  font-size: 1.6rem;
+  letter-spacing: -0.015em;
+  color: var(--page-ink);
+}
+
+.detail-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 1rem;
+}
+
+.detail-gallery img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 0.75rem;
+  transition: transform 420ms var(--page-ease);
+}
+
+.detail-gallery img:hover {
+  transform: scale(1.02);
+}
+
+/* ---------------------------------------------------------- responsive */
+
+@media (max-width: 900px) {
+  .detail-layout {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .detail-aside {
+    position: static;
+    order: -1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-card,
+  .project-card-media img,
+  .project-card-link svg,
+  .page-crumb svg,
+  .detail-gallery img {
+    transition: none;
+  }
+
+  .project-card:hover {
+    transform: none;
+  }
+
+  .project-card:hover .project-card-media img,
+  .detail-gallery img:hover {
+    transform: none;
+  }
+
+  .page-skeleton {
+    animation: none;
+  }
+}
