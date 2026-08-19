@@ -1681,280 +1681,265 @@ a.contact-card:hover .contact-card-icon {
   }
 }
 
-/* ==================================================== hero: field notes
+/* ======================================================= hero: the ledger
 
-   A warm dark ground, the copy set left, and three gallery photographs handled
-   as physical prints on the right — cream border, drop shadow, a few degrees
-   of tilt, the place name written in the bottom margin.
+   A printed ground rather than a screen one: pale cool grey, deep teal ink, a
+   single clay accent, and the figures ruled off along the bottom the way an
+   annual report opens.
 
-   Written mobile-first. The phone layout is the base and the desktop cluster
-   is the enhancement, because the previous hero's phone view was an
-   afterthought bolted on with max-width overrides.                          */
+   The ground is a grey biased toward the brand teal rather than a cream, which
+   keeps it out of warm-paper territory and lets the teal ink sit on it as one
+   family. Clay on this ground measures 5.2:1, so the accent carries body text
+   as well as display.
 
-.home-hero-field {
+   Written mobile first: the phone stack is the base rule and the two-column
+   arrangement with the full-height photograph is the enhancement.           */
+
+.home-hero-ledger {
+  --ledger-ground: #E4E7E1;
+  --ledger-ink: #123138;
+  --ledger-accent: #8C4E28;
+  --ledger-rule: rgba(18, 49, 56, 0.26);
+
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background: #10211F;
-  /* dvh, not vh: on a phone vh includes the browser chrome, so the section is
-     taller than the visible screen and the stats row falls below the fold. */
-  min-height: 100dvh;
+  background: var(--ledger-ground);
   display: flex;
-  align-items: center;
+  flex-direction: column;
 }
 
-/* Older engines without dvh fall back to the viewport unit they do have. */
-@supports not (min-height: 100dvh) {
-  .home-hero-field { min-height: 100vh; }
+/* ------------------------------------------------------------ photograph */
+
+/* Phone: a band across the top, under the navbar. Desktop turns it into the
+   full-height column on the right. */
+.ledger-strip {
+  position: relative;
+  order: -1;
+  width: 100%;
+  height: clamp(11rem, 34vw, 16rem);
+  /* No top margin: the navbar is position:sticky, so it already occupies flow
+     space and the section begins below it. Clearing it again left a dead band
+     of flat ground between the navbar and the photograph. */
+  overflow: hidden;
+  background: #D3D9D4;
 }
 
-.home-hero-field::before {
-  content: '';
+.ledger-strip-layer {
   position: absolute;
   inset: 0;
-  background: radial-gradient(88% 68% at 72% 42%, rgba(63, 107, 87, 0.38) 0%, rgba(16, 33, 31, 0) 70%);
-  pointer-events: none;
+  background-size: cover;
+  background-position: 50% 42%;
+  opacity: 0;
+  transition: opacity 1500ms var(--ease-out-soft, ease);
 }
 
-.home-hero-field .home-hero-inner {
+.ledger-strip-layer.is-top {
+  opacity: 1;
+}
+
+/* ------------------------------------------------------------------ copy */
+
+.home-hero-ledger .home-hero-inner {
   position: relative;
   z-index: 1;
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 6.5rem 1.25rem 3rem;
+  padding: 2.25rem 1.25rem 2.5rem;
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
 }
 
-/* ------------------------------------------------------------------ copy */
-
-.home-hero-field .home-hero-copy {
-  max-width: 34rem;
+.home-hero-ledger .home-hero-copy {
+  max-width: 36rem;
 }
 
-.home-hero-field .home-eyebrow {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
+.home-hero-ledger .home-eyebrow {
+  display: block;
   margin-bottom: 1rem;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
+  font-weight: 700;
   letter-spacing: 0.24em;
-  color: var(--clay-on-dark, #EFA96F);
+  text-transform: uppercase;
+  color: var(--ledger-accent);
 }
 
-.home-hero-field .home-eyebrow::before {
-  content: '';
-  width: 1.75rem;
-  height: 1px;
-  background: currentColor;
-  flex: none;
-}
-
-.home-hero-field .home-hero-title {
-  color: #EFF3F0;
-  font-size: clamp(2.15rem, 8.5vw, 4.4rem);
-  line-height: 1.04;
-  letter-spacing: -0.028em;
-  margin-bottom: 1rem;
+.home-hero-ledger .home-hero-title {
+  color: var(--ledger-ink);
+  font-size: clamp(2.35rem, 9.5vw, 5.2rem);
+  line-height: 1.0;
+  letter-spacing: -0.032em;
+  margin-bottom: 1.1rem;
   text-wrap: balance;
 }
 
 /* Lora's italic is the most characterful face already loaded here, so the
-   accent word leans on it rather than pulling in another. */
-.home-hero-field .home-hero-title-accent {
-  color: var(--clay-on-dark, #EFA96F);
+   accent line leans on it rather than pulling in another. */
+.home-hero-ledger .home-hero-title-accent {
+  color: var(--ledger-accent);
   font-style: italic;
 }
 
-.home-hero-field .home-hero-lede {
-  color: rgba(239, 243, 240, 0.82);
+.home-hero-ledger .home-hero-lede {
+  color: rgba(18, 49, 56, 0.78);
   font-size: 1rem;
-  line-height: 1.62;
-  max-width: 30rem;
+  line-height: 1.65;
+  max-width: 32rem;
   margin-bottom: 1.75rem;
 }
 
-.home-hero-field .home-hero-actions {
+.home-hero-ledger .home-hero-actions {
   gap: 0.75rem;
   margin-bottom: 0;
 }
 
-/* Full-width stacked buttons on the narrowest phones — side by side they wrap
-   into two ragged lines and the tap targets end up under 44px. */
 @media (max-width: 400px) {
-  .home-hero-field .home-hero-actions {
+  .home-hero-ledger .home-hero-actions {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .home-hero-field .home-hero-actions > a {
+  .home-hero-ledger .home-hero-actions > a {
     justify-content: center;
     min-height: 3rem;
   }
 }
 
-.home-hero-field .home-hero-proof {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.25rem 1.75rem;
-  margin-top: 1.9rem;
-  padding-top: 1.4rem;
-  border-top: 1px solid rgba(239, 243, 240, 0.2);
+/* --------------------------------------------------------------- figures */
+
+/* The ledger itself. A rule across the top and hairlines between the cells,
+   set in the heading face with tabular figures so the columns align. */
+.ledger-figures {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 2.25rem;
+  padding-top: 1.35rem;
+  border-top: 2px solid var(--ledger-ink);
+  gap: 1.35rem 0;
 }
 
-.home-hero-field .home-hero-proof-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  color: rgba(239, 243, 240, 0.66);
-  font-size: 0.68rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+.ledger-cell {
+  padding: 0 1rem;
 }
 
-.home-hero-field .home-hero-proof-item strong {
+.ledger-cell:nth-child(odd) {
+  padding-left: 0;
+}
+
+.ledger-cell:nth-child(even) {
+  border-left: 1px solid var(--ledger-rule);
+}
+
+.ledger-value {
+  display: block;
   font-family: var(--font-heading, Georgia, serif);
-  font-size: 1.55rem;
-  font-weight: 400;
-  letter-spacing: -0.02em;
-  color: #EFF3F0;
-  font-variant-numeric: tabular-nums;
-  text-transform: none;
+  font-size: clamp(1.7rem, 6.5vw, 2.5rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--ledger-ink);
+  font-variant-numeric: tabular-nums lining-nums;
 }
 
-/* ---------------------------------------------------------------- prints */
-
-/* Phone: a straight row, near-flat. Tilt that reads as casual on a wide screen
-   reads as a rendering fault on a narrow one. */
-.field-prints {
-  display: flex;
-  gap: 0.6rem;
-  width: 100%;
-}
-
-.field-print {
-  position: relative;
-  flex: 1 1 0;
-  min-width: 0;
-  margin: 0;
-  padding: 0.4rem 0.4rem 1.45rem;
-  background: #F4F2EC;
-  box-shadow: 0 0.6rem 1.6rem rgba(0, 0, 0, 0.38);
-}
-
-.field-print-window {
+.ledger-label {
   display: block;
-  aspect-ratio: 1 / 1;
-  overflow: hidden;
-  background: #DCD9D0;
-}
-
-.field-print img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  user-select: none;
-  -webkit-user-drag: none;
-}
-
-.field-print figcaption {
-  position: absolute;
-  left: 0.5rem;
-  right: 0.5rem;
-  bottom: 0.42rem;
-  font-size: 0.56rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
+  margin-top: 0.5rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #5C6360;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: rgba(18, 49, 56, 0.62);
 }
 
-.field-print-1 { transform: rotate(-1.4deg); }
-.field-print-2 { transform: rotate(1deg); }
-.field-print-3 { transform: rotate(-0.6deg); }
+/* ------------------------------------------------------------ tablet up */
 
-/* ------------------------------------------------------- tablet and above */
-
-@media (min-width: 768px) {
-  .home-hero-field .home-hero-inner {
-    padding: 7.5rem 2rem 4rem;
+@media (min-width: 680px) {
+  .ledger-figures {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
   }
 
-  .field-prints {
-    gap: 1rem;
-    max-width: 34rem;
+  .ledger-cell:nth-child(odd) {
+    padding-left: 1rem;
   }
 
-  .field-print { padding: 0.55rem 0.55rem 1.9rem; }
-  .field-print figcaption { font-size: 0.65rem; bottom: 0.6rem; }
+  .ledger-cell:first-child {
+    padding-left: 0;
+  }
+
+  /* Every cell but the first gets the hairline once they sit in one row. */
+  .ledger-cell + .ledger-cell {
+    border-left: 1px solid var(--ledger-rule);
+  }
+
+  .ledger-label {
+    font-size: 0.68rem;
+  }
 }
 
-/* --------------------------------------------------------------- desktop */
+/* -------------------------------------------------------------- desktop */
 
 @media (min-width: 1024px) {
-  .home-hero-field .home-hero-inner {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.02fr);
-    align-items: center;
-    gap: 3rem;
-    padding: 8rem 2.5rem 5rem;
-  }
-
-  .home-hero-field .home-hero-title {
-    font-size: clamp(3rem, 4.4vw, 4.4rem);
-  }
-
-  .home-hero-field .home-hero-lede { font-size: 1.08rem; }
-
-  .home-hero-field .home-hero-proof { gap: 1.25rem 2.75rem; }
-
-  .home-hero-field .home-hero-proof-item strong { font-size: 1.85rem; }
-
-  /* The cluster: prints overlap and tilt properly once there is room for the
-     shadows to fall without colliding. */
-  .field-prints {
+  .home-hero-ledger {
     display: block;
-    position: relative;
-    max-width: none;
-    aspect-ratio: 4 / 3.4;
+    min-height: 100dvh;
   }
 
-  .field-print {
+  /* The photograph becomes the right-hand column, bled to all three edges. */
+  .ledger-strip {
     position: absolute;
-    padding: 0.7rem 0.7rem 2.4rem;
-    box-shadow: 0 1.4rem 3rem rgba(0, 0, 0, 0.44);
-    transition: transform 420ms var(--ease-out-soft, ease);
+    top: 0;
+    right: 0;
+    bottom: 0;
+    order: 0;
+    width: 34%;
+    height: auto;
   }
 
-  .field-print-window { aspect-ratio: 4 / 3; }
+  /* Fades the column into the ground so it reads as a printed plate on the
+     page rather than a rectangle pasted over it. */
+  .ledger-strip::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg,
+      var(--ledger-ground) 0%,
+      rgba(228, 231, 225, 0.55) 22%,
+      rgba(228, 231, 225, 0) 55%);
+    pointer-events: none;
+  }
 
-  .field-print figcaption { font-size: 0.7rem; bottom: 0.85rem; letter-spacing: 0.13em; }
+  .home-hero-ledger .home-hero-inner {
+    min-height: 100dvh;
+    justify-content: center;
+    padding: 8rem 2.5rem 4rem;
+    /* Clears the photograph column. */
+    padding-right: 38%;
+  }
 
-  .field-print-1 { width: 46%; left: 2%;  top: 4%;  transform: rotate(-3.2deg); z-index: 2; }
-  .field-print-2 { width: 40%; right: 1%; top: 22%; transform: rotate(2.4deg);  z-index: 3; }
-  .field-print-3 { width: 32%; left: 22%; top: 50%; transform: rotate(4deg);    z-index: 4; }
+  .home-hero-ledger .home-hero-title {
+    font-size: clamp(3.4rem, 5.2vw, 5.2rem);
+  }
 
-  /* A print lifts and straightens under the pointer, the way you would pick
-     one up off a table to look at it. */
-  .field-print:hover {
-    transform: rotate(0deg) scale(1.035);
-    z-index: 5;
+  .home-hero-ledger .home-hero-lede {
+    font-size: 1.1rem;
+  }
+
+  .ledger-figures {
+    margin-top: 3.25rem;
+    padding-top: 1.6rem;
   }
 }
 
-@media (min-width: 1280px) {
-  .home-hero-field .home-hero-inner { gap: 4.5rem; }
+@supports not (min-height: 100dvh) {
+  @media (min-width: 1024px) {
+    .home-hero-ledger,
+    .home-hero-ledger .home-hero-inner { min-height: 100vh; }
+  }
 }
 
 /* ------------------------------------------------------- reduced motion */
 
 @media (prefers-reduced-motion: reduce) {
-  .field-print { transition: none; }
-  .field-print:hover { transform: none; }
+  .ledger-strip-layer { transition: none; }
 }

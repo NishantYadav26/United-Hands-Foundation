@@ -8,7 +8,7 @@ import {
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import MaharashtraMap from '@/components/MaharashtraMap';
-import HeroField from '@/components/HeroField';
+import HeroLedger from '@/components/HeroLedger';
 import { getCached } from '@/lib/apiClient';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import '@/styles/home.css';
@@ -409,52 +409,58 @@ const Home = () => {
       <Navbar />
 
       {/* ---------------------------------------------------------------- Hero */}
-      <section className="home-hero home-hero-field" data-testid="hero-section">
+      <section className="home-hero home-hero-ledger" data-testid="hero-section">
+        <HeroLedger slides={gallery} fallbackImage={heroImage} />
+
         <div className="home-hero-inner" ref={heroRef}>
           <div className="home-hero-copy">
-            <p className="home-eyebrow">From the field · Maharashtra</p>
+            <p className="home-eyebrow">Registered public trust · Maharashtra</p>
             <h1 className="home-hero-title">
-              We go where
+              Every rupee,
               <br />
-              the roads <span className="home-hero-title-accent">end.</span>
+              <span className="home-hero-title-accent">accounted for.</span>
             </h1>
             <p className="home-hero-lede">
-              Home-based palliative care, elderly care and medical camps, carried into
-              the districts where help arrives last.
+              Home-based palliative care, elderly care and medical camps across rural
+              Maharashtra — with the books open on every one of them.
             </p>
 
             <div className="home-hero-actions">
               <Link to="/donate" className="btn-primary-clay" data-testid="hero-donate-button">
                 Donate Now <Heart size={18} aria-hidden="true" />
               </Link>
-              <Link to="/projects" className="btn-primary-green" data-testid="hero-explore-button">
-                See Our Work <ArrowRight size={18} aria-hidden="true" />
+              <Link to="/transparency" className="btn-primary-green" data-testid="hero-explore-button">
+                See The Numbers <ArrowRight size={18} aria-hidden="true" />
               </Link>
-            </div>
-
-            <div className="home-hero-proof">
-              {hasStats && displayStats.patients_served > 0 && (
-                <div className="home-hero-proof-item">
-                  <strong>{displayStats.patients_served.toLocaleString('en-IN')}</strong>
-                  <span>Lives touched</span>
-                </div>
-              )}
-              <div className="home-hero-proof-item">
-                <strong>{visibleLocations.length}</strong>
-                <span>Districts</span>
-              </div>
-              {hasStats && displayStats.total_amount > 0 && (
-                <div className="home-hero-proof-item">
-                  <strong>{formatIndianCompact(displayStats.total_amount)}</strong>
-                  <span>Deployed</span>
-                </div>
-              )}
             </div>
           </div>
 
-          {/* Decorative: the place names are printed on the images themselves
-              and are repeated as real text in Where We Work below. */}
-          <HeroField slides={gallery} fallbackImage={heroImage} />
+          {/* Every figure here is read from the API rather than written into
+              the page, so the ledger cannot drift out of date. */}
+          <div className="ledger-figures" data-testid="ledger-figures">
+            <div className="ledger-cell">
+              <span className="ledger-value">
+                {hasStats ? displayStats.patients_served.toLocaleString('en-IN') : '—'}
+              </span>
+              <span className="ledger-label">Lives touched</span>
+            </div>
+            <div className="ledger-cell">
+              <span className="ledger-value">{visibleLocations.length}</span>
+              <span className="ledger-label">Districts</span>
+            </div>
+            <div className="ledger-cell">
+              <span className="ledger-value">
+                {hasStats ? formatIndianCompact(displayStats.total_amount) : '—'}
+              </span>
+              <span className="ledger-label">Deployed</span>
+            </div>
+            <div className="ledger-cell">
+              <span className="ledger-value">
+                {hasStats ? displayStats.total_donations.toLocaleString('en-IN') : '—'}
+              </span>
+              <span className="ledger-label">Donations received</span>
+            </div>
+          </div>
         </div>
       </section>
 
