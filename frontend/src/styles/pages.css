@@ -23,7 +23,7 @@
 
 .page-shell {
   min-height: 100vh;
-  background: #FFFFFF;
+  background: var(--bg-deep, #FAF8F5);
 }
 
 .page-wrap {

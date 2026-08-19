@@ -342,7 +342,54 @@ const Home = () => {
         });
       }
 
+      // Repeated items arrive one after another rather than as one block. A
+      // whole section fading in at once reads as a page still loading; the
+      // same content staggered reads as it arriving, which is the difference
+      // between the two on any well-made site.
+      const STAGGER_ITEMS = [
+        '.work-card', '.person-card', '.story-card-v2', '.update-card',
+        '.impact-item', '.trust-card', '.contact-card', '.home-district-list li'
+      ].join(', ');
+
       gsap.utils.toArray('.reveal-section').forEach((section) => {
+        const items = Array.from(section.querySelectorAll(STAGGER_ITEMS));
+
+        if (items.length > 1) {
+          // Where a section has a run of items, the heading leads and the items
+          // follow it in. Fading the section as well would flatten the stagger
+          // back into a single block, so it is deliberately left alone.
+          const head = section.querySelector('.home-section-head, .home-eyebrow, .home-section-title');
+          if (head) {
+            gsap.fromTo(
+              head,
+              { opacity: 0, y: yOffset * 0.5 },
+              {
+                opacity: 1,
+                y: 0,
+                duration: 0.6,
+                ease: 'power2.out',
+                scrollTrigger: { trigger: section, start: 'top 85%', once: true }
+              }
+            );
+          }
+
+          gsap.fromTo(
+            items,
+            { opacity: 0, y: yOffset * 0.62 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.62,
+              ease: 'power2.out',
+              // 70ms apart: below about 50 the run reads as one event, above
+              // about 100 the last card is visibly late.
+              stagger: isSmallScreen ? 0.05 : 0.07,
+              scrollTrigger: { trigger: section, start: 'top 80%', once: true }
+            }
+          );
+          return;
+        }
+
         gsap.fromTo(
           section,
           { opacity: 0, y: yOffset },

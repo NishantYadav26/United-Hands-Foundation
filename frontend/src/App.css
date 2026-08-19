@@ -14,7 +14,10 @@
      the previous brand orange (#F5822A) only reached 2.6:1 on white and could
      not legally carry text. Variable names are unchanged so the whole site
      re-themes from this one block. */
-  --bg-deep: #FFFFFF;
+  /* A warm off-white rather than pure white. Stark white against clay reads
+     hard, and it leaves card surfaces with nothing to sit against; a paper
+     ground lets the white cards lift slightly without adding a shadow. */
+  --bg-deep: #FAF8F5;
   --bg-card: #FFFFFF;
   --bg-surface: #F1F7F8;
   --accent-gold: #BC5318;
@@ -50,13 +53,18 @@
   box-sizing: border-box;
 }
 
+/* On the document scroller, not on body: scroll-behavior set on body does not
+   drive the page scroll, so anchor jumps had been landing instantly all along. */
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   padding: 0;
   background: var(--bg-deep);
   color: var(--text-primary);
   font-family: var(--font-sans);
-  scroll-behavior: smooth;
 }
 
 h1, h2, h3, h4, h5, h6 {
