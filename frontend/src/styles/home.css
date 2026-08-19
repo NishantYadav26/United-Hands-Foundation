@@ -1681,285 +1681,244 @@ a.contact-card:hover .contact-card-icon {
   }
 }
 
-/* ==================================================== hero: photograph wall
+/* ================================================== hero: the living figure
 
-   A wall of real gallery photographs held in teal monochrome, with a soft
-   circle of warm light following the pointer that restores the photographs
-   underneath it to full colour.
+   The number of lives touched, set enormous and bleeding off the right edge,
+   with the photographs of those lives showing through the digits.
 
-   Two identical grids are stacked. `.hero-wall-base` is the muted wall.
-   `.hero-wall-bloom` sits directly on top in full colour and is masked to a
-   circle whose position is driven by --spot-x / --spot-y. Both grids use the
-   same image URLs, so the bloom layer costs no extra network request.
+   Three numerals are stacked in the same grid cell. The bottom one is solid
+   clay and is the guaranteed floor: if background-clip is unsupported or a
+   photograph fails, that is what remains on screen. The two above it are
+   clipped to the glyphs and cross-fade between gallery photographs.
 
-   Only mask-position and opacity change as the pointer moves. Both are
-   compositor-friendly, so the effect holds 60fps without touching layout.  */
+   Only opacity and background-position change while the visitor moves, so the
+   whole effect stays on the compositor.                                     */
 
-.home-hero-mosaic {
+.home-hero-figure {
   position: relative;
   isolation: isolate;
-  background: var(--hero-dark, #06333D);
   overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 82% 18%, rgba(14, 92, 107, 0.55) 0%, rgba(4, 25, 32, 0) 62%),
+    linear-gradient(168deg, #04212A 0%, #06333D 52%, #04212A 100%);
 }
 
-.hero-mosaic {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  /* Rest position: centred and hidden. --spot-o fades the light in on the
-     first pointer move so the wall does not flash lit before the cursor
-     arrives. */
-  --spot-x: 50%;
-  --spot-y: 50%;
-  --spot-o: 0;
-  --spot-size: 34rem;
-}
-
-.hero-wall {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-  gap: 3px;
-}
-
-.hero-tile {
-  position: relative;
-  overflow: hidden;
-}
-
-.hero-tile img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  user-select: none;
-  -webkit-user-drag: none;
-}
-
-/* The quiet state: desaturated, darkened and pushed towards the brand teal so
-   the wall reads as one surface rather than twelve competing photographs. */
-.hero-wall-base .hero-tile img {
-  filter: grayscale(1) contrast(1.08) brightness(0.62) sepia(0.35)
-          hue-rotate(140deg) saturate(1.6);
-}
-
-.hero-wall-bloom {
-  opacity: var(--spot-o);
-  transition: opacity 420ms var(--ease-out-soft, ease);
-  -webkit-mask-image: radial-gradient(circle closest-side,
-              rgba(0, 0, 0, 1) 0%,
-              rgba(0, 0, 0, 0.92) 42%,
-              rgba(0, 0, 0, 0.45) 68%,
-              rgba(0, 0, 0, 0) 100%);
-          mask-image: radial-gradient(circle closest-side,
-              rgba(0, 0, 0, 1) 0%,
-              rgba(0, 0, 0, 0.92) 42%,
-              rgba(0, 0, 0, 0.45) 68%,
-              rgba(0, 0, 0, 0) 100%);
-  -webkit-mask-repeat: no-repeat;
-          mask-repeat: no-repeat;
-  -webkit-mask-size: var(--spot-size) var(--spot-size);
-          mask-size: var(--spot-size) var(--spot-size);
-  /* Centred on the pointer rather than anchored at its top-left. */
-  -webkit-mask-position: calc(var(--spot-x) - var(--spot-size) / 2) calc(var(--spot-y) - var(--spot-size) / 2);
-          mask-position: calc(var(--spot-x) - var(--spot-size) / 2) calc(var(--spot-y) - var(--spot-size) / 2);
-}
-
-.hero-wall-bloom .hero-tile img {
-  filter: saturate(1.06) contrast(1.02);
-}
-
-/* Warms the lit circle very slightly towards the clay accent, so the light
-   reads as light rather than as a hole cut in the wall. */
-.hero-wall-bloom::after {
+/* A hairline grid, barely there, to give the ground the feel of a printed
+   sheet rather than a flat fill. */
+.home-hero-figure::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle closest-side,
-              rgba(188, 83, 24, 0.16), rgba(188, 83, 24, 0) 70%);
-  background-repeat: no-repeat;
-  background-size: var(--spot-size) var(--spot-size);
-  background-position: calc(var(--spot-x) - var(--spot-size) / 2) calc(var(--spot-y) - var(--spot-size) / 2);
+  background-image:
+    linear-gradient(to right, rgba(233, 243, 245, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(233, 243, 245, 0.05) 1px, transparent 1px);
+  background-size: 88px 88px;
+  mask-image: radial-gradient(120% 80% at 50% 40%, #000 25%, transparent 78%);
+  -webkit-mask-image: radial-gradient(120% 80% at 50% 40%, #000 25%, transparent 78%);
   pointer-events: none;
 }
 
-/* Keeps the headline at AA over whatever photograph happens to sit behind it:
-   heaviest on the left where the copy lives, opening up on the right so the
-   wall stays visible. */
-.hero-mosaic-scrim {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(100deg,
-      rgba(4, 30, 37, 0.95) 0%,
-      rgba(4, 30, 37, 0.88) 34%,
-      rgba(4, 30, 37, 0.62) 62%,
-      rgba(4, 30, 37, 0.52) 100%),
-    linear-gradient(180deg, rgba(4, 30, 37, 0.55) 0%, rgba(4, 30, 37, 0) 28%);
-  pointer-events: none;
-}
-
-/* ---------------------------------------------------------- hero copy layer */
-
-.home-hero-mosaic .home-hero-inner {
+.home-hero-figure .home-hero-inner {
   position: relative;
-  z-index: 1;
-  max-width: 1400px;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  align-items: center;
+  gap: 2rem;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: clamp(4.5rem, 11vh, 8rem) 1.5rem clamp(3.5rem, 9vh, 6rem);
-  min-height: min(86vh, 780px);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  padding: clamp(4rem, 9vh, 7rem) 1.5rem clamp(3.5rem, 8vh, 6rem);
+  min-height: min(88vh, 820px);
 }
 
-.home-hero-mosaic .home-hero-copy {
-  max-width: 44rem;
+/* ------------------------------------------------------------------- copy */
+
+.home-hero-figure .home-hero-copy {
+  max-width: 33rem;
 }
 
-.home-hero-mosaic .home-eyebrow {
+.home-hero-figure .home-eyebrow {
   color: var(--clay-on-dark, #EFA96F);
 }
 
-.home-hero-mosaic .home-hero-title {
+.home-hero-figure .home-hero-title {
   color: #FFFFFF;
-  font-size: clamp(2.6rem, 6.2vw, 4.6rem);
-  line-height: 1.04;
+  font-size: clamp(2.3rem, 4.4vw, 3.5rem);
+  line-height: 1.06;
   letter-spacing: -0.025em;
   text-wrap: balance;
 }
 
-/* Lora's italic is the most characterful thing already loaded on this site,
-   so the second line leans on it rather than pulling in another face. */
-.home-hero-mosaic .home-hero-title-accent {
+/* Lora's italic is the most characterful face already loaded on this site, so
+   the second line leans on it rather than pulling in another. */
+.home-hero-figure .home-hero-title-accent {
   color: var(--clay-on-dark, #EFA96F);
   font-style: italic;
 }
 
-.home-hero-mosaic .home-hero-lede {
-  color: rgba(233, 243, 245, 0.9);
-  font-size: clamp(1rem, 1.35vw, 1.16rem);
-  max-width: 33rem;
+.home-hero-figure .home-hero-lede {
+  color: rgba(233, 243, 245, 0.88);
+  font-size: clamp(1rem, 1.3vw, 1.12rem);
+  max-width: 30rem;
 }
 
-.home-hero-mosaic .home-hero-proof-item {
-  color: rgba(233, 243, 245, 0.86);
+.home-hero-figure .home-hero-proof {
+  gap: 1.5rem 2.25rem;
+  padding-top: 1.6rem;
+  border-top: 1px solid rgba(233, 243, 245, 0.16);
 }
 
-.home-hero-mosaic .home-hero-proof-item strong {
+.home-hero-figure .home-hero-proof-item {
+  color: rgba(233, 243, 245, 0.82);
+}
+
+.home-hero-figure .home-hero-proof-item strong {
   color: #FFFFFF;
 }
 
-.home-hero-mosaic .home-hero-proof {
-  padding-top: 1.75rem;
-  border-top: 1px solid rgba(233, 243, 245, 0.18);
+/* ----------------------------------------------------------------- figure */
+
+.hero-figure {
+  position: relative;
+  justify-self: end;
+  width: 100%;
+  /* The numerals run past the right edge on purpose: a figure this size reads
+     as a printed page only if it is allowed to be cropped. */
+  margin-right: clamp(-7rem, -4vw, -1rem);
+  --drift-x: 0%;
+  --drift-y: 0%;
 }
 
-/* A quiet cue that the wall responds to the pointer. Hidden from touch, where
-   the light drifts by itself and no such invitation is needed. */
-.hero-mosaic-hint {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 1.5rem;
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
+.hero-figure-stack {
+  position: relative;
+  display: grid;
+}
+
+.hero-figure-digits {
+  grid-area: 1 / 1;
+  display: block;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: clamp(5.5rem, 15.5vw, 15rem);
+  line-height: 0.82;
+  letter-spacing: -0.055em;
+  /* Lining figures of even width, so the number does not jitter sideways as it
+     counts up through different digits. */
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: 'tnum' 1, 'lnum' 1;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.hero-figure-solid {
+  color: var(--clay-on-dark, #EFA96F);
+  opacity: 0.28;
+}
+
+.hero-figure-fill {
+  color: transparent;
+  background-repeat: no-repeat;
+  background-size: 118% auto;
+  background-position: calc(50% + var(--drift-x)) calc(42% + var(--drift-y));
+  -webkit-background-clip: text;
+          background-clip: text;
+  opacity: 0;
+  transition: opacity 1200ms var(--ease-out-soft, ease),
+              background-position 700ms var(--ease-out-soft, ease);
+  /* Keeps the clipped text on its own layer so the parallax never repaints the
+     numerals themselves. */
+  will-change: background-position;
+}
+
+.hero-figure-fill.is-top {
+  opacity: 1;
+}
+
+/* A thin clay keyline traced around the glyphs. Without it the photograph
+   dissolves into the ground wherever the image happens to be dark. */
+.hero-figure-solid {
+  -webkit-text-stroke: 1px rgba(239, 169, 111, 0.42);
+}
+
+.hero-figure-label {
+  margin: 1.1rem 0 0;
+  padding-left: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: rgba(233, 243, 245, 0.62);
+  color: var(--clay-on-dark, #EFA96F);
 }
 
-.hero-mosaic-hint::before {
+.hero-figure-label::before {
   content: '';
-  width: 1.75rem;
+  display: inline-block;
+  width: 2.25rem;
   height: 1px;
-  background: var(--clay-on-dark, #EFA96F);
+  margin-right: 0.75rem;
+  vertical-align: middle;
+  background: currentColor;
 }
 
-/* ------------------------------------------------------------- touch drift */
-
-/* Without a pointer there is nothing to follow, so the light travels a slow
-   loop of its own and the wall still breathes. */
-@media (hover: none) {
-  .hero-mosaic-hint {
-    display: none;
-  }
-
-  .hero-wall-bloom,
-  .hero-wall-bloom::after {
-    animation: hero-spot-drift 26s ease-in-out infinite;
-  }
-
-  .hero-wall-bloom {
-    opacity: 1;
-  }
-}
-
-@keyframes hero-spot-drift {
-  0%   { -webkit-mask-position: 8% 12%;  mask-position: 8% 12%;  background-position: 8% 12%; }
-  25%  { -webkit-mask-position: 74% 4%;  mask-position: 74% 4%;  background-position: 74% 4%; }
-  50%  { -webkit-mask-position: 86% 68%; mask-position: 86% 68%; background-position: 86% 68%; }
-  75%  { -webkit-mask-position: 22% 76%; mask-position: 22% 76%; background-position: 22% 76%; }
-  100% { -webkit-mask-position: 8% 12%;  mask-position: 8% 12%;  background-position: 8% 12%; }
-}
-
-/* --------------------------------------------------------------- responsive */
+/* ------------------------------------------------------------- responsive */
 
 @media (max-width: 1024px) {
-  .hero-wall {
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(3, 1fr);
+  .home-hero-figure .home-hero-inner {
+    grid-template-columns: 1fr;
+    gap: 2.75rem;
+    min-height: auto;
+    padding-top: 3.5rem;
   }
 
-  .hero-mosaic {
-    --spot-size: 26rem;
+  /* Below the split, the figure leads and the copy follows it. */
+  .hero-figure {
+    order: -1;
+    justify-self: start;
+    margin-right: 0;
+  }
+
+  .hero-figure-digits {
+    font-size: clamp(4.75rem, 22vw, 11rem);
+  }
+
+  .home-hero-figure .home-hero-copy,
+  .home-hero-figure .home-hero-lede {
+    max-width: 40rem;
   }
 }
 
 @media (max-width: 640px) {
-  .hero-wall {
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(4, 1fr);
+  .home-hero-figure .home-hero-inner {
+    padding: 3rem 1.25rem 3.25rem;
   }
 
-  .hero-mosaic {
-    --spot-size: 19rem;
+  .hero-figure-digits {
+    font-size: clamp(4.25rem, 25vw, 8rem);
+    letter-spacing: -0.045em;
   }
 
-  .home-hero-mosaic .home-hero-inner {
-    min-height: auto;
-    padding: 4.5rem 1.25rem 3.5rem;
+  .hero-figure-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
   }
 
-  /* The wall is busier at three columns, so the scrim carries more weight to
-     keep the headline at AA. */
-  .hero-mosaic-scrim {
-    background:
-      linear-gradient(180deg,
-        rgba(4, 30, 37, 0.78) 0%,
-        rgba(4, 30, 37, 0.9) 45%,
-        rgba(4, 30, 37, 0.95) 100%);
+  .hero-figure-label::before {
+    width: 1.5rem;
+    margin-right: 0.55rem;
   }
 }
 
-/* ------------------------------------------------------------ reduced motion */
+/* ---------------------------------------------------------- reduced motion */
 
-/* No light, no drift, no transitions - just a still, legible photograph wall.
-   `.is-still` is set from JS, which also skips rendering the bloom layer
-   entirely so its images are never even decoded. */
+/* No count-up and no parallax are scheduled from JS in this mode; this covers
+   the cross-fade so a layer swap cannot animate either. */
 @media (prefers-reduced-motion: reduce) {
-  .hero-wall-bloom,
-  .hero-wall-bloom::after {
-    animation: none;
-  }
-
-  .hero-wall-bloom {
+  .hero-figure-fill {
     transition: none;
+    will-change: auto;
   }
 }
 
-.hero-mosaic.is-still .hero-wall-base .hero-tile img {
-  filter: grayscale(1) contrast(1.05) brightness(0.72) sepia(0.3)
-          hue-rotate(140deg) saturate(1.4);
+.hero-figure.is-still .hero-figure-fill {
+  transition: none;
 }

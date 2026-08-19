@@ -8,7 +8,7 @@ import {
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import MaharashtraMap from '@/components/MaharashtraMap';
-import HeroMosaic from '@/components/HeroMosaic';
+import HeroFigure from '@/components/HeroFigure';
 import { getCached } from '@/lib/apiClient';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import '@/styles/home.css';
@@ -409,11 +409,7 @@ const Home = () => {
       <Navbar />
 
       {/* ---------------------------------------------------------------- Hero */}
-      <section className="home-hero home-hero-mosaic" data-testid="hero-section">
-        {/* Decorative: the wall carries no information that is not also stated
-            in the copy beside it, so it is hidden from assistive technology. */}
-        <HeroMosaic slides={gallery} fallbackImage={heroImage} />
-
+      <section className="home-hero home-hero-figure" data-testid="hero-section">
         <div className="home-hero-inner" ref={heroRef}>
           <div className="home-hero-copy">
             <p className="home-eyebrow">Together, We Create Change</p>
@@ -423,8 +419,8 @@ const Home = () => {
               <span className="home-hero-title-accent">Hearts Connected.</span>
             </h1>
             <p className="home-hero-lede">
-              Empowering communities through healthcare, education, disaster relief,
-              and elderly care across Maharashtra.
+              Palliative care, elderly care, healthcare camps and disaster relief,
+              carried to the districts of Maharashtra that are hardest to reach.
             </p>
 
             <div className="home-hero-actions">
@@ -437,12 +433,6 @@ const Home = () => {
             </div>
 
             <div className="home-hero-proof">
-              {hasStats && displayStats.patients_served > 0 && (
-                <div className="home-hero-proof-item">
-                  <strong>{displayStats.patients_served.toLocaleString('en-IN')}+</strong>
-                  <span>Lives Touched</span>
-                </div>
-              )}
               <div className="home-hero-proof-item">
                 <MapPin size={16} aria-hidden="true" style={{ color: 'var(--clay-on-dark)' }} />
                 <span>
@@ -450,12 +440,23 @@ const Home = () => {
                   <br />Across Maharashtra
                 </span>
               </div>
+              {hasStats && displayStats.total_amount > 0 && (
+                <div className="home-hero-proof-item">
+                  <strong>{formatIndianCompact(displayStats.total_amount)}</strong>
+                  <span>Deployed To The Field</span>
+                </div>
+              )}
             </div>
-
-            <p className="hero-mosaic-hint" data-testid="hero-mosaic-hint">
-              Move across the photographs
-            </p>
           </div>
+
+          {/* The photographs of the people this number counts are clipped
+              inside its digits. Decorative — the figure restates itself as
+              plain text for assistive technology. */}
+          <HeroFigure
+            value={displayStats.patients_served}
+            photos={gallery.map((item) => item.image_url).filter(Boolean)}
+            label="Lives touched"
+          />
         </div>
       </section>
 
