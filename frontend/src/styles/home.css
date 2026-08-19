@@ -1892,20 +1892,23 @@ a.contact-card:hover .contact-card-icon {
     right: 0;
     bottom: 0;
     order: 0;
-    width: 34%;
+    width: 42%;
     height: auto;
   }
 
   /* Fades the column into the ground so it reads as a printed plate on the
      page rather than a rectangle pasted over it. */
+  /* Softens only the inner edge so the plate meets the ground without a hard
+     seam. The earlier ramp stayed 55% opaque a fifth of the way in and did not
+     clear until past the middle, which veiled most of the photograph. */
   .ledger-strip::after {
     content: '';
     position: absolute;
     inset: 0;
     background: linear-gradient(90deg,
       var(--ledger-ground) 0%,
-      rgba(228, 231, 225, 0.55) 22%,
-      rgba(228, 231, 225, 0) 55%);
+      rgba(228, 231, 225, 0.42) 6%,
+      rgba(228, 231, 225, 0) 20%);
     pointer-events: none;
   }
 
@@ -1914,7 +1917,7 @@ a.contact-card:hover .contact-card-icon {
     justify-content: center;
     padding: 8rem 2.5rem 4rem;
     /* Clears the photograph column. */
-    padding-right: 38%;
+    padding-right: 45%;
   }
 
   .home-hero-ledger .home-hero-title {
