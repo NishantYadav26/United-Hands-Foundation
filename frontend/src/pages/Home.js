@@ -8,7 +8,7 @@ import {
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import MaharashtraMap from '@/components/MaharashtraMap';
-import HeroStage from '@/components/HeroStage';
+import HeroField from '@/components/HeroField';
 import { getCached } from '@/lib/apiClient';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import '@/styles/home.css';
@@ -409,16 +409,10 @@ const Home = () => {
       <Navbar />
 
       {/* ---------------------------------------------------------------- Hero */}
-      <section className="home-hero home-hero-stage" data-testid="hero-section">
-        <HeroStage
-          slides={gallery}
-          fallbackImage={heroImage}
-          fallbackAlt="A United Hands Foundation volunteer with families in a Maharashtra village"
-        />
-
+      <section className="home-hero home-hero-field" data-testid="hero-section">
         <div className="home-hero-inner" ref={heroRef}>
           <div className="home-hero-copy">
-            <p className="home-eyebrow">Dharashiv · Latur · Panchgani</p>
+            <p className="home-eyebrow">From the field · Maharashtra</p>
             <h1 className="home-hero-title">
               We go where
               <br />
@@ -426,7 +420,7 @@ const Home = () => {
             </h1>
             <p className="home-hero-lede">
               Home-based palliative care, elderly care and medical camps, carried into
-              the districts of Maharashtra where help arrives last.
+              the districts where help arrives last.
             </p>
 
             <div className="home-hero-actions">
@@ -441,22 +435,26 @@ const Home = () => {
             <div className="home-hero-proof">
               {hasStats && displayStats.patients_served > 0 && (
                 <div className="home-hero-proof-item">
-                  <strong>{displayStats.patients_served.toLocaleString('en-IN')}+</strong>
+                  <strong>{displayStats.patients_served.toLocaleString('en-IN')}</strong>
                   <span>Lives touched</span>
                 </div>
               )}
               <div className="home-hero-proof-item">
                 <strong>{visibleLocations.length}</strong>
-                <span>Districts across<br />Maharashtra</span>
+                <span>Districts</span>
               </div>
               {hasStats && displayStats.total_amount > 0 && (
                 <div className="home-hero-proof-item">
                   <strong>{formatIndianCompact(displayStats.total_amount)}</strong>
-                  <span>Deployed to<br />the field</span>
+                  <span>Deployed</span>
                 </div>
               )}
             </div>
           </div>
+
+          {/* Decorative: the place names are printed on the images themselves
+              and are repeated as real text in Where We Work below. */}
+          <HeroField slides={gallery} fallbackImage={heroImage} />
         </div>
       </section>
 
