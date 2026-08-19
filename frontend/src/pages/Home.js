@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Users, MapPin, HandCoins, FolderCheck, ArrowRight, Heart,
@@ -8,7 +8,7 @@ import {
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import MaharashtraMap from '@/components/MaharashtraMap';
-import HeroSlideshow from '@/components/HeroSlideshow';
+import HeroMosaic from '@/components/HeroMosaic';
 import { getCached } from '@/lib/apiClient';
 import { optimizeCloudinaryUrl } from '@/lib/cloudinary';
 import '@/styles/home.css';
@@ -121,16 +121,6 @@ const Home = () => {
   // Which project card is currently hovered or focused. Its photograph expands
   // to fill the section behind the grid; null means no card is engaged.
   const [activeProject, setActiveProject] = useState(null);
-  // The hero mirrors whichever photograph the slideshow is showing, expanding it
-  // across the whole section while the visitor is engaged with it.
-  const [heroSlide, setHeroSlide] = useState(null);
-  const [heroEngaged, setHeroEngaged] = useState(false);
-
-  // Stable identities: HeroSlideshow reports upward from an effect, and a fresh
-  // function each render would restart that effect on every state change.
-  const handleHeroSlideChange = useCallback((slide) => setHeroSlide(slide || null), []);
-  const handleHeroHoverChange = useCallback((engaged) => setHeroEngaged(engaged), []);
-
   const hasStats = stats !== null;
   const displayStats = stats || {
     patients_served: 0,
@@ -419,26 +409,10 @@ const Home = () => {
       <Navbar />
 
       {/* ---------------------------------------------------------------- Hero */}
-      <section
-        className={`home-hero${heroEngaged && heroSlide?.image_url ? ' is-immersive' : ''}`}
-        data-testid="hero-section"
-      >
-        {/* A single element rather than one per photograph: it points at the
-            same URL the slideshow is already displaying, so the browser serves
-            it from cache and the expansion starts instantly. Mounting all
-            eleven gallery images a second time would double the hero's bytes
-            for no visual gain. */}
-        <div className="hero-backdrop" aria-hidden="true">
-          {heroSlide?.image_url && (
-            <img
-              src={optimizeCloudinaryUrl(heroSlide.image_url, { width: 1200 })}
-              alt=""
-              decoding="async"
-              className="hero-backdrop-image"
-            />
-          )}
-          <div className="hero-backdrop-scrim" />
-        </div>
+      <section className="home-hero home-hero-mosaic" data-testid="hero-section">
+        {/* Decorative: the wall carries no information that is not also stated
+            in the copy beside it, so it is hidden from assistive technology. */}
+        <HeroMosaic slides={gallery} fallbackImage={heroImage} />
 
         <div className="home-hero-inner" ref={heroRef}>
           <div className="home-hero-copy">
@@ -470,23 +444,17 @@ const Home = () => {
                 </div>
               )}
               <div className="home-hero-proof-item">
-                <MapPin size={16} aria-hidden="true" style={{ color: 'var(--accent-teal)' }} />
+                <MapPin size={16} aria-hidden="true" style={{ color: 'var(--clay-on-dark)' }} />
                 <span>
                   Working in {visibleLocations.length}+ Districts
                   <br />Across Maharashtra
                 </span>
               </div>
             </div>
-          </div>
 
-          <div className="home-hero-media">
-            <HeroSlideshow
-              slides={gallery}
-              fallbackImage={heroImage}
-              fallbackAlt="A United Hands Foundation volunteer handing supplies to children in a Maharashtra village"
-              onActiveChange={handleHeroSlideChange}
-              onHoverChange={handleHeroHoverChange}
-            />
+            <p className="hero-mosaic-hint" data-testid="hero-mosaic-hint">
+              Move across the photographs
+            </p>
           </div>
         </div>
       </section>

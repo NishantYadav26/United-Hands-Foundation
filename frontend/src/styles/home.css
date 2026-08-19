@@ -1680,3 +1680,286 @@ a.contact-card:hover .contact-card-icon {
     transform: none;
   }
 }
+
+/* ==================================================== hero: photograph wall
+
+   A wall of real gallery photographs held in teal monochrome, with a soft
+   circle of warm light following the pointer that restores the photographs
+   underneath it to full colour.
+
+   Two identical grids are stacked. `.hero-wall-base` is the muted wall.
+   `.hero-wall-bloom` sits directly on top in full colour and is masked to a
+   circle whose position is driven by --spot-x / --spot-y. Both grids use the
+   same image URLs, so the bloom layer costs no extra network request.
+
+   Only mask-position and opacity change as the pointer moves. Both are
+   compositor-friendly, so the effect holds 60fps without touching layout.  */
+
+.home-hero-mosaic {
+  position: relative;
+  isolation: isolate;
+  background: var(--hero-dark, #06333D);
+  overflow: hidden;
+}
+
+.hero-mosaic {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  /* Rest position: centred and hidden. --spot-o fades the light in on the
+     first pointer move so the wall does not flash lit before the cursor
+     arrives. */
+  --spot-x: 50%;
+  --spot-y: 50%;
+  --spot-o: 0;
+  --spot-size: 34rem;
+}
+
+.hero-wall {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 3px;
+}
+
+.hero-tile {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-tile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* The quiet state: desaturated, darkened and pushed towards the brand teal so
+   the wall reads as one surface rather than twelve competing photographs. */
+.hero-wall-base .hero-tile img {
+  filter: grayscale(1) contrast(1.08) brightness(0.62) sepia(0.35)
+          hue-rotate(140deg) saturate(1.6);
+}
+
+.hero-wall-bloom {
+  opacity: var(--spot-o);
+  transition: opacity 420ms var(--ease-out-soft, ease);
+  -webkit-mask-image: radial-gradient(circle closest-side,
+              rgba(0, 0, 0, 1) 0%,
+              rgba(0, 0, 0, 0.92) 42%,
+              rgba(0, 0, 0, 0.45) 68%,
+              rgba(0, 0, 0, 0) 100%);
+          mask-image: radial-gradient(circle closest-side,
+              rgba(0, 0, 0, 1) 0%,
+              rgba(0, 0, 0, 0.92) 42%,
+              rgba(0, 0, 0, 0.45) 68%,
+              rgba(0, 0, 0, 0) 100%);
+  -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+  -webkit-mask-size: var(--spot-size) var(--spot-size);
+          mask-size: var(--spot-size) var(--spot-size);
+  /* Centred on the pointer rather than anchored at its top-left. */
+  -webkit-mask-position: calc(var(--spot-x) - var(--spot-size) / 2) calc(var(--spot-y) - var(--spot-size) / 2);
+          mask-position: calc(var(--spot-x) - var(--spot-size) / 2) calc(var(--spot-y) - var(--spot-size) / 2);
+}
+
+.hero-wall-bloom .hero-tile img {
+  filter: saturate(1.06) contrast(1.02);
+}
+
+/* Warms the lit circle very slightly towards the clay accent, so the light
+   reads as light rather than as a hole cut in the wall. */
+.hero-wall-bloom::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle closest-side,
+              rgba(188, 83, 24, 0.16), rgba(188, 83, 24, 0) 70%);
+  background-repeat: no-repeat;
+  background-size: var(--spot-size) var(--spot-size);
+  background-position: calc(var(--spot-x) - var(--spot-size) / 2) calc(var(--spot-y) - var(--spot-size) / 2);
+  pointer-events: none;
+}
+
+/* Keeps the headline at AA over whatever photograph happens to sit behind it:
+   heaviest on the left where the copy lives, opening up on the right so the
+   wall stays visible. */
+.hero-mosaic-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(100deg,
+      rgba(4, 30, 37, 0.95) 0%,
+      rgba(4, 30, 37, 0.88) 34%,
+      rgba(4, 30, 37, 0.62) 62%,
+      rgba(4, 30, 37, 0.52) 100%),
+    linear-gradient(180deg, rgba(4, 30, 37, 0.55) 0%, rgba(4, 30, 37, 0) 28%);
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------- hero copy layer */
+
+.home-hero-mosaic .home-hero-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: clamp(4.5rem, 11vh, 8rem) 1.5rem clamp(3.5rem, 9vh, 6rem);
+  min-height: min(86vh, 780px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.home-hero-mosaic .home-hero-copy {
+  max-width: 44rem;
+}
+
+.home-hero-mosaic .home-eyebrow {
+  color: var(--clay-on-dark, #EFA96F);
+}
+
+.home-hero-mosaic .home-hero-title {
+  color: #FFFFFF;
+  font-size: clamp(2.6rem, 6.2vw, 4.6rem);
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+/* Lora's italic is the most characterful thing already loaded on this site,
+   so the second line leans on it rather than pulling in another face. */
+.home-hero-mosaic .home-hero-title-accent {
+  color: var(--clay-on-dark, #EFA96F);
+  font-style: italic;
+}
+
+.home-hero-mosaic .home-hero-lede {
+  color: rgba(233, 243, 245, 0.9);
+  font-size: clamp(1rem, 1.35vw, 1.16rem);
+  max-width: 33rem;
+}
+
+.home-hero-mosaic .home-hero-proof-item {
+  color: rgba(233, 243, 245, 0.86);
+}
+
+.home-hero-mosaic .home-hero-proof-item strong {
+  color: #FFFFFF;
+}
+
+.home-hero-mosaic .home-hero-proof {
+  padding-top: 1.75rem;
+  border-top: 1px solid rgba(233, 243, 245, 0.18);
+}
+
+/* A quiet cue that the wall responds to the pointer. Hidden from touch, where
+   the light drifts by itself and no such invitation is needed. */
+.hero-mosaic-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(233, 243, 245, 0.62);
+}
+
+.hero-mosaic-hint::before {
+  content: '';
+  width: 1.75rem;
+  height: 1px;
+  background: var(--clay-on-dark, #EFA96F);
+}
+
+/* ------------------------------------------------------------- touch drift */
+
+/* Without a pointer there is nothing to follow, so the light travels a slow
+   loop of its own and the wall still breathes. */
+@media (hover: none) {
+  .hero-mosaic-hint {
+    display: none;
+  }
+
+  .hero-wall-bloom,
+  .hero-wall-bloom::after {
+    animation: hero-spot-drift 26s ease-in-out infinite;
+  }
+
+  .hero-wall-bloom {
+    opacity: 1;
+  }
+}
+
+@keyframes hero-spot-drift {
+  0%   { -webkit-mask-position: 8% 12%;  mask-position: 8% 12%;  background-position: 8% 12%; }
+  25%  { -webkit-mask-position: 74% 4%;  mask-position: 74% 4%;  background-position: 74% 4%; }
+  50%  { -webkit-mask-position: 86% 68%; mask-position: 86% 68%; background-position: 86% 68%; }
+  75%  { -webkit-mask-position: 22% 76%; mask-position: 22% 76%; background-position: 22% 76%; }
+  100% { -webkit-mask-position: 8% 12%;  mask-position: 8% 12%;  background-position: 8% 12%; }
+}
+
+/* --------------------------------------------------------------- responsive */
+
+@media (max-width: 1024px) {
+  .hero-wall {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+  }
+
+  .hero-mosaic {
+    --spot-size: 26rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-wall {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+  }
+
+  .hero-mosaic {
+    --spot-size: 19rem;
+  }
+
+  .home-hero-mosaic .home-hero-inner {
+    min-height: auto;
+    padding: 4.5rem 1.25rem 3.5rem;
+  }
+
+  /* The wall is busier at three columns, so the scrim carries more weight to
+     keep the headline at AA. */
+  .hero-mosaic-scrim {
+    background:
+      linear-gradient(180deg,
+        rgba(4, 30, 37, 0.78) 0%,
+        rgba(4, 30, 37, 0.9) 45%,
+        rgba(4, 30, 37, 0.95) 100%);
+  }
+}
+
+/* ------------------------------------------------------------ reduced motion */
+
+/* No light, no drift, no transitions - just a still, legible photograph wall.
+   `.is-still` is set from JS, which also skips rendering the bloom layer
+   entirely so its images are never even decoded. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-wall-bloom,
+  .hero-wall-bloom::after {
+    animation: none;
+  }
+
+  .hero-wall-bloom {
+    transition: none;
+  }
+}
+
+.hero-mosaic.is-still .hero-wall-base .hero-tile img {
+  filter: grayscale(1) contrast(1.05) brightness(0.72) sepia(0.3)
+          hue-rotate(140deg) saturate(1.4);
+}
